@@ -262,7 +262,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <p class="muted" id="kz-list"></p>
     <form class="kadd" id="kzform" novalidate>
       <select id="kz-year" aria-label="Jahr"></select>
-      <input type="text" id="kz-name" maxlength="40" placeholder="Kaiser (Pokal)" aria-label="Kaiser" autocomplete="off" style="grid-column:span 2">
+      <input type="text" id="kz-name" maxlength="40" placeholder="Name des Kaisers" aria-label="Kaiser" autocomplete="off" style="grid-column:span 2">
       <button type="submit" class="btn">Eintragen</button>
     </form>
     <form class="kadd" id="kform" novalidate>
@@ -540,7 +540,7 @@ function renderPlan(){
       const h=document.createElement("button");h.type="button";h.className="handle";h.textContent="⠿";h.style.color="#f3dfa6";h.setAttribute("aria-label","Kaiserkegeln verschieben");h.dataset.i=i;li.append(h);
       const no=document.createElement("span");no.className="no";no.textContent="👑";li.append(no);
       const nm=document.createElement("span");nm.className="sn";nm.textContent="21:00 Kaiserkegeln";
-      const sm=document.createElement("span");sm.className="sm";sm.textContent="Schinkenbrot + Pokal";nm.append(sm);li.append(nm);li.append(document.createElement("span"));
+      const sm=document.createElement("span");sm.className="sm";sm.textContent="🥪";nm.append(sm);li.append(nm);li.append(document.createElement("span"));
       ol.append(li);return}
     const g=id&&games[id];const li=document.createElement("li");li.className="slot"+(g?"":" empty");
     const h=document.createElement("button");h.type="button";h.className="handle";h.textContent="⠿";
@@ -749,7 +749,7 @@ $("evcopy").onclick=async()=>{
   let txt=plan.map((id,i)=>{
     if(id===GAST)return "   🤝 Spiel des Gastclubs";
     if(id===KZ){const c=kaiserCandidates(parseIso(kaiserEvening()||todayIso()).getFullYear());
-      return "\n👑 *21:00 KAISERKEGELN*"+(c.length?"\n   Kandidaten: "+c.join(", "):"")+"\n   2×5 Wurf in die Vollen · Kaiser bekommt Schinkenbrot + Pokal-Gravur\n"}
+      return "\n👑 *21:00 KAISERKEGELN*"+(c.length?"\n   Kandidaten: "+c.join(", "):"")+"\n   2×5 Wurf in die Vollen · 🥪\n"}
     const g=id&&games[id];if(!g)return null;const ex=[artTxt(g,2),BAHN[g.bahn]?.[2]].filter(Boolean);
     let line=`${++nr}. ${g.name}`+(ex.length?" ("+ex.join(", ")+")":"")+(g.id===wishWinner?" ⭐ Wunschspiel":"");
     if((g.plays||0)<=2&&g.wertung)line+="\n   ↳ "+((g.plays||0)===0?"Neu: ":"")+g.wertung;
@@ -813,11 +813,11 @@ function renderKaiser(){
   const on=kaiserThemeOn();document.body.classList.toggle("kaiser",on);$("kbanner").hidden=!on;
   const k=kaiserEvening();
   if(on){const d=parseIso(k);const c=kaiserCandidates(d.getFullYear());
-    $("kb-sub").textContent=fmtD(d)+" · 21:00 Uhr · Preis: Schinkenbrot + Pokal-Gravur"+(canEdit&&c.length?" · Kandidaten: "+c.join(", "):"")}
+    $("kb-sub").textContent=fmtD(d)+" · 21:00 Uhr · 🥪"+(canEdit&&c.length?" · Kandidaten: "+c.join(", "):"")}
   const list=Object.values(kaiser).sort((a,b)=>b.year-a.year);
   const kl=$("kz-list");kl.replaceChildren();
-  if(list.length){kl.append("🏆 Pokal: ");
-    list.forEach((x,i)=>{if(i)kl.append(" · ");const sp=document.createElement("span");sp.style.whiteSpace="nowrap";sp.textContent=x.year+" "+x.name;
+  if(list.length){kl.append("👑 Kaiser: ");
+    list.forEach((x,i)=>{if(i)kl.append(" · ");const sp=document.createElement("span");sp.style.whiteSpace="nowrap";sp.textContent=x.name+" "+x.year;
       if(canKings){const rm=document.createElement("button");rm.type="button";rm.className="krm";rm.textContent="×";rm.setAttribute("aria-label","Kaiser "+x.year+" löschen");
         rm.onclick=()=>{if(rm.dataset.sure!=="1"){rm.dataset.sure="1";rm.textContent="?";setTimeout(()=>{rm.dataset.sure="";rm.textContent="×"},3000);return}
           db.collection("kaiser").doc(String(x.year)).delete().catch(()=>toast("Löschen fehlgeschlagen"))};sp.append(rm)}
