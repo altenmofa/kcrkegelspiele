@@ -299,7 +299,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span id="total"></span>
+    <span><span id="total"></span> <small style="opacity:.5">· v21</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
       <button type="button" class="btn" id="xlsx">⤓ Als Excel-Datei</button>
@@ -547,7 +547,7 @@ function renderPlan(){
       const b=document.createElement("button");b.type="button";b.className="slotname";b.setAttribute("aria-label","Platz "+(i+1)+": "+g.name+(canPlan?" – anderes Spiel wählen":" – Regeln ansehen"));
       const nm=document.createElement("span");nm.className="sn";nm.textContent=g.name;
       const sm=document.createElement("span");sm.className="sm";sm.textContent=[g.id===wishWinner?"⭐ Wunsch":"",artTxt(g,0),BAHN[g.bahn]?.[0]].filter(Boolean).join(" · ");
-      nm.append(sm);b.append(nm);b.onclick=()=>canPlan?openPick(i):openInfo(g.id);li.append(b);
+      nm.append(sm);b.append(nm);b.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();if(canPlan)openPick(i);else openInfo(g.id)});li.append(b);
       const rm=document.createElement("button");rm.type="button";rm.className="rm";rm.textContent="×";rm.setAttribute("aria-label",g.name+" von Platz "+(i+1)+" entfernen");
       rm.onclick=()=>{if(i>=10)plan.splice(i,1);else plan[i]=null;render();savePlan()};li.append(rm);
     }else{
@@ -665,7 +665,8 @@ $("p-cancel").onclick=closePick;
 $("pscrim").onclick=e=>{if(e.target===$("pscrim"))closePick()};
 
 /* Spiel-Info (nur Anzeige) */
-function openInfo(id){const g=games[id];if(!g)return;
+function openInfo(id){try{openInfo2(id)}catch(e){toast("Fehler: "+(e&&e.message||e))}}
+function openInfo2(id){const g=games[id];if(!g){toast("Spiel nicht gefunden");return}
   $("i-title").textContent=g.name;
   const t=$("i-tags");t.replaceChildren();artenOf(g).forEach(k=>t.append(tag(ART[k][0],ART[k][1])));if(BAHN[g.bahn])t.append(tag(BAHN[g.bahn][0],BAHN[g.bahn][1]));
   $("i-rules").textContent=g.wertung||"Noch keine Regeln eingetragen.";
