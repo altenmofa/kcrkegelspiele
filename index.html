@@ -188,7 +188,10 @@ body.locked #robar,body.locked .evening,body.locked .top,body.locked .chips,body
 .lockcard{display:flex;flex-direction:column;gap:10px;align-items:flex-start;padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
 .lockcard b{font-family:var(--display);font-size:1.15rem}
 .lockcard span{color:var(--muted)}
-body.nokings #kform,body.nokings #kzform,body.nokings .krm{display:none!important}
+body.nokings #kbox,body.nokings #kzbox,body.nokings .krm,body.nokings #kprompt{display:none!important}
+.kbox{border-top:1px dashed var(--line);padding-top:10px}
+.klabel{margin:0 0 6px;font-weight:600;font-size:.9rem}
+.kprompt{align-self:flex-start;margin:-6px 0 -8px;padding:4px 2px;border:0;background:none;font-size:.85rem;font-weight:600;color:var(--star);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:3px}
 body.noplan #evsuggest,body.noplan #evtpl,body.noplan #f-del,body.noplan #linkbtn,body.noplan .handle,body.noplan .slot .rm,body.noplan .addslot,body.noplan #evclear{display:none!important}
 body.noplan .slot{grid-template-columns:24px 1fr!important}
 body.noplan .slot.empty{display:none}
@@ -248,6 +251,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <div class="lockcard" id="lockcard" hidden><b>🔒 Nur für Mitglieder</b><span id="lock-txt">Bitte anmelden.</span><button type="button" class="btn primary" id="lockbtn">Anmelden</button></div>
   <button type="button" class="btn primary" id="seedbtn" hidden>Startdaten übernehmen (Spiele + Plan aus Claude)</button>
 
+  <button type="button" class="kprompt" id="kprompt" hidden></button>
   <section class="evening reflect" id="reflect" aria-labelledby="h-rf" hidden>
     <div class="evhead">
       <h2 id="h-rf">Rückblick: letztes Kegeln</h2>
@@ -292,17 +296,23 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <ol class="wrank" id="k-list"></ol>
     <p class="muted" id="k-kaiser"></p>
     <p class="muted" id="kz-list"></p>
-    <form class="kadd" id="kzform" novalidate>
-      <select id="kz-year" aria-label="Jahr"></select>
-      <input type="text" id="kz-name" maxlength="40" placeholder="Name des Kaisers" aria-label="Kaiser" autocomplete="off" style="grid-column:span 2">
-      <button type="submit" class="btn">Eintragen</button>
-    </form>
-    <form class="kadd" id="kform" novalidate>
-      <select id="k-date" aria-label="Kegelabend"></select>
-      <input type="text" id="k-name" maxlength="40" placeholder="Name" aria-label="Abendkönig" autocomplete="off">
-      <input type="number" id="k-holz" min="0" max="99" inputmode="numeric" placeholder="Holz" aria-label="Holz">
-      <button type="submit" class="btn primary">Eintragen</button>
-    </form>
+    <div class="kbox" id="kbox">
+      <p class="klabel">➕ Abendkönig eintragen</p>
+      <form class="kadd" id="kform" novalidate>
+        <select id="k-date" aria-label="Kegelabend"></select>
+        <input type="text" id="k-name" maxlength="40" placeholder="Name" aria-label="Abendkönig" autocomplete="off">
+        <input type="number" id="k-holz" min="0" max="99" inputmode="numeric" placeholder="Holz" aria-label="Holz">
+        <button type="submit" class="btn primary">Eintragen</button>
+      </form>
+    </div>
+    <div class="kbox" id="kzbox" hidden>
+      <p class="klabel">👑 Kaiser eintragen</p>
+      <form class="kadd" id="kzform" novalidate>
+        <select id="kz-year" aria-label="Jahr"></select>
+        <input type="text" id="kz-name" maxlength="40" placeholder="Name des Kaisers" aria-label="Kaiser" autocomplete="off" style="grid-column:span 2">
+        <button type="submit" class="btn">Eintragen</button>
+      </form>
+    </div>
   </section>
 
   <section class="evening yr" id="yr" aria-labelledby="h-yr" hidden>
@@ -330,7 +340,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· r26</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· r27</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
@@ -505,6 +515,12 @@ function badgesOf(g){const out=[];const ri=rateInfo(g);
 let listOpen=false;try{listOpen=localStorage.getItem("kcrlist")==="1"}catch(e){}
 function setListOpen(v,keep){listOpen=v;document.body.classList.toggle("lclosed",!v);$("listhead").setAttribute("aria-expanded",String(v));
   if(keep!==false){try{localStorage.setItem("kcrlist",v?"1":"0")}catch(e){}}}
+function kaiserFeier(){ // neuer Kaiser: jedes Handy feiert einmal mit
+  if(SIM.on)return;const k=Object.values(kaiser).sort((a,b)=>b.year-a.year)[0];if(!k||!k.updatedAt)return;
+  if(Date.now()-new Date(k.updatedAt).getTime()>21*864e5)return;
+  const key=k.year+"|"+k.name+"|"+k.updatedAt;let seen="";try{seen=localStorage.getItem("kcrkaiser")||""}catch(e){}
+  if(seen===key)return;try{localStorage.setItem("kcrkaiser",key)}catch(e){}
+  confetti(true);toast("👑 Neuer Kaiser "+k.year+": "+k.name)}
 function confetti(gold){
   const box=document.createElement("div");box.className="confetti";box.setAttribute("aria-hidden","true");
   const set=gold?["👑","✨","🥇","👑","🥪"]:["👑","🎉","🎳","✨"];
@@ -607,7 +623,12 @@ function kaiserEvening(){const id=planDate||nextEvening().iso;return isKaiserDat
 function seasonOf(iso){const d=parseIso(iso);return d?d.getFullYear()+(isKaiserDate(iso)?1:0):0}
 function kaiserCandidates(y){const names={};Object.values(koenige).filter(k=>seasonOf(k.date)===y).forEach(k=>{names[k.name]=(names[k.name]||0)+1});
   return Object.entries(names).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"de")).map(([n,c])=>c>1?n+" ("+c+"×)":n)}
-function kaiserThemeOn(){const k=kaiserEvening();if(!k)return false;const d=parseIso(k),t=parseIso(todayIso());return t.getMonth()===11&&t<=d}
+function kaiserThemeOn(){const k=kaiserEvening();if(!k)return false;const d=parseIso(k),t=parseIso(todayIso());
+  const start=new Date(d);start.setDate(start.getDate()-28+8); // nach der Bewertungswoche des November-Abends
+  return t>=start&&t<=d}
+function kaiserWindow(){const t=parseIso(todayIso()),y=t.getFullYear();
+  const kz=t.getMonth()===0?kaiserOfYear(y-1):kaiserOfYear(y);const nxt=eveningsOfYear(kz.getFullYear()+1)[0];
+  return t>=kz&&t<=nxt?kz.getFullYear():0}
 function ensureKaiser(){
   if(!canPlan||!planLoaded||!kaiserEvening()||plan.includes(KZ))return;
   let i=plan[4]?plan.indexOf(null):4;if(i<0){if(plan.length>=MAX_SLOTS)return;plan.push(null);i=plan.length-1}
@@ -933,16 +954,17 @@ function renderKaiser(){
   const kl=$("kz-list");kl.replaceChildren();
   if(list.length){kl.append("👑 Kaiser: ");
     list.slice(0,1).forEach((x,i)=>{if(i)kl.append(" · ");const sp=document.createElement("span");sp.style.whiteSpace="nowrap";sp.textContent=x.name+" "+x.year;
-      if(canKings){const rm=document.createElement("button");rm.type="button";rm.className="krm";rm.textContent="×";rm.setAttribute("aria-label","Kaiser "+x.year+" löschen");
+      if(isChef){const rm=document.createElement("button");rm.type="button";rm.className="krm";rm.textContent="×";rm.setAttribute("aria-label","Kaiser "+x.year+" löschen");
         rm.onclick=()=>{if(rm.dataset.sure!=="1"){rm.dataset.sure="1";rm.textContent="?";setTimeout(()=>{rm.dataset.sure="";rm.textContent="×"},3000);return}
           db.collection("kaiser").doc(String(x.year)).delete().catch(()=>toast("Löschen fehlgeschlagen"))};sp.append(rm)}
       kl.append(sp)})}
   const sel=$("kz-year");if(!sel.options.length){const y=new Date().getFullYear();for(let i=0;i<12;i++){const o=document.createElement("option");o.value=y-i;o.textContent="Kaiser "+(y-i);sel.append(o)}}
+  const kw=kaiserWindow();$("kzbox").hidden=!(isChef&&kw);if(kw&&!$("kzbox").dataset.set){sel.value=kw;$("kzbox").dataset.set="1"}
 }
-$("kzform").addEventListener("submit",e=>{e.preventDefault();if(!canKings)return;
+$("kzform").addEventListener("submit",e=>{e.preventDefault();if(!isChef||!kaiserWindow())return;
   const year=parseInt($("kz-year").value,10),name=$("kz-name").value.trim().slice(0,40);if(!year||!name){toast("Jahr und Name eintragen");return}
-  db.collection("kaiser").doc(String(year)).set({year,name,updatedAt:new Date().toISOString()}).catch(()=>toast("Speichern fehlgeschlagen"));confetti(true);
-  $("kz-name").value="";toast("👑 Kaiser "+year+": "+name)});
+  db.collection("kaiser").doc(String(year)).set({year,name,updatedAt:new Date().toISOString()}).catch(()=>toast("Speichern fehlgeschlagen"));
+  $("kz-name").value=""});
 
 /* Abend vorschlagen */
 function suggestFill(){
@@ -1006,7 +1028,15 @@ function renderKings(){
     const evs=[...eveningsOfYear(today.getFullYear()-1),...eveningsOfYear(today.getFullYear())].filter(d=>d<=today).reverse().slice(0,15);
     evs.forEach(d=>{const iso=isoOf(d);const o=document.createElement("option");o.value=iso;o.textContent=fmtD(d)+(isKaiserDate(iso)?" 👑":"")+(koenige[iso]?" ✓":"");sel.append(o)});
     if(keep&&[...sel.options].some(o=>o.value===keep))sel.value=keep}
+  const due=kingDue(),kp=$("kprompt");kp.hidden=!(canKings&&due);
+  if(canKings&&due){kp.textContent="👑 Abendkönig "+deDate(due)+" eintragen →";kp.dataset.date=due}
 }
+function kingDue(){const t=todayIso();
+  if(planDate===t&&!koenige[t])return t;
+  if(lastPlan&&lastPlan.date&&!koenige[lastPlan.date]){const u=parseIso(lastPlan.date);u.setDate(u.getDate()+7);if(parseIso(t)<=u)return lastPlan.date}
+  return ""}
+$("kprompt").onclick=()=>{const d=$("kprompt").dataset.date;const sel=$("k-date");if(d&&[...sel.options].some(o=>o.value===d))sel.value=d;
+  $("kbox").scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>$("k-name").focus({preventScroll:true}),400)};
 $("kform").addEventListener("submit",async e=>{e.preventDefault();if(!canKings)return;
   const date=$("k-date").value,name=$("k-name").value.trim().slice(0,40);
   if(!date||!name){toast("Abend und Name eintragen");return}
@@ -1236,7 +1266,7 @@ render();setEdit(null);renderNet();
       $("seedbtn").hidden=!(canPlan&&!Object.keys(games).length);render();maybeArchive();migrateRatings()},
     ()=>{$("status").textContent="Spiele konnten nicht geladen werden."}));
   dataUns.push(db.collection("vorlagen").onSnapshot(s=>{vorlagen={};s.docs.forEach(d=>{const x=d.data();if(x&&x.name)vorlagen[d.id]={...x,id:d.id}});tplLoaded=true;seedTpl(true);if(!$("tscrim").hidden)renderTpl()},()=>{}));
-  dataUns.push(db.collection("kaiser").onSnapshot(s=>{kaiser={};s.docs.forEach(d=>{const x=d.data();if(x&&x.year&&x.name)kaiser[d.id]=x});render()},()=>{}));
+  dataUns.push(db.collection("kaiser").onSnapshot(s=>{kaiser={};s.docs.forEach(d=>{const x=d.data();if(x&&x.year&&x.name)kaiser[d.id]=x});render();kaiserFeier()},()=>{}));
   dataUns.push(db.collection("koenige").onSnapshot(s=>{koenige={};s.docs.forEach(d=>{const x=d.data();if(x&&x.date&&x.name)koenige[d.id]=x});render()},()=>{}));
   dataUns.push(db.collection("plan").onSnapshot(s=>{lastPlan=null;s.docs.forEach(d=>{const x=d.data();if(!x)return;
       if(d.id==="last"&&x.date)lastPlan=x;
