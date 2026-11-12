@@ -128,6 +128,9 @@ input[type=email],input[type=password]{width:100%;font:inherit;font-size:1rem;pa
 body.ro #add,body.ro #linkbtn,body.ro .handle,body.ro .slot .rm,body.ro .addslot,body.ro #evclear,body.ro #f-del,body.ro #form button[type=submit],body.ro #f-ok{display:none!important}
 body.ro .rstars button,body.ro #f-rate button,body.ro .slotname{pointer-events:none}
 body:not(.ro) #robar{display:none}
+body.ro .slot{grid-template-columns:24px 1fr!important}
+body.ro .slot.empty{display:none}
+body.ro .slotname{min-width:0}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .meta{color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums;white-space:nowrap}
 textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
