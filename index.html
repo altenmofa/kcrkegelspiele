@@ -468,7 +468,7 @@ function render(){
     if(t.children.length)main.append(t);
     const side=document.createElement("div");side.className="side";
     const pi=plan.indexOf(g.id);
-    if(pi>=0){const p=document.createElement("span");p.className="tag";p.style.color="var(--accent)";p.textContent="Platz "+(pi+1);side.append(p)}
+    if(pi>=0){const p=document.createElement("span");p.className="tag";p.style.color="var(--accent)";const nn=plan.slice(0,pi+1).filter(x=>x&&games[x]).length;p.textContent="📅 "+nn;p.title="Spiel "+nn+" am nächsten Abend";p.setAttribute("aria-label","Spiel "+nn+" am nächsten Abend");side.append(p)}
     {const ri=rateInfo(g);if(ri.avg){const s=document.createElement("span");s.className="stars";s.textContent=stars(Math.round(ri.avg));s.setAttribute("aria-label","Durchschnitt "+avgTxt(ri));side.append(s);
       const a=document.createElement("span");a.className="meta";a.textContent=avgTxt(ri);side.append(a)}}
     const mt=[g.lastPlayed?"zuletzt "+deDate(g.lastPlayed):"",g.plays?g.plays+"×":""].filter(Boolean).join(" · ");
@@ -493,7 +493,8 @@ const DEFAULT_SLOTS=["g-3-in-die-vollen",null,null,null,null,"g-abendkoenig",nul
 const KZ="__kaiser__",GAST="__gast__";let planTitle="";
 function isKaiserDate(iso){const d=parseIso(iso);if(!d)return false;const n=new Date(d);n.setDate(n.getDate()+28);return n.getFullYear()>d.getFullYear()}
 function kaiserEvening(){const id=planDate||nextEvening().iso;return isKaiserDate(id)?id:""}
-function kaiserCandidates(y){const names={};Object.values(koenige).filter(k=>(k.date||"").startsWith(y+"-")).forEach(k=>{names[k.name]=(names[k.name]||0)+1});
+function seasonOf(iso){const d=parseIso(iso);return d?d.getFullYear()+(isKaiserDate(iso)?1:0):0}
+function kaiserCandidates(y){const names={};Object.values(koenige).filter(k=>seasonOf(k.date)===y).forEach(k=>{names[k.name]=(names[k.name]||0)+1});
   return Object.entries(names).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"de")).map(([n,c])=>c>1?n+" ("+c+"×)":n)}
 function kaiserThemeOn(){const k=kaiserEvening();if(!k)return false;const d=parseIso(k),t=parseIso(todayIso());return t.getMonth()===11&&t<=d}
 function ensureKaiser(){
@@ -859,34 +860,37 @@ function eveningsOfYear(y){const out=[];const base=new Date(2026,10,13);
   let d=new Date(base);while(d.getFullYear()>=y){if(d.getFullYear()===y)out.push(new Date(d));d.setDate(d.getDate()-28)}
   d=new Date(base);d.setDate(d.getDate()+28);while(d.getFullYear()<=y){if(d.getFullYear()===y)out.push(new Date(d));d.setDate(d.getDate()+28)}
   return out.sort((a,b)=>a-b)}
+function kaiserOfYear(y){const e=eveningsOfYear(y);return e[e.length-1]}
+function currentSeason(){const t=parseIso(todayIso()),y=t.getFullYear();return t>kaiserOfYear(y)?y+1:y}
 function renderKings(){
-  const y=new Date().getFullYear();$("k-year").textContent=y;
-  const evs=eveningsOfYear(y),today=parseIso(todayIso());
-  const list=Object.values(koenige).filter(k=>(k.date||"").startsWith(y+"-")).sort((a,b)=>b.date.localeCompare(a.date));
-  $("k-count").textContent=list.length?list.length+" Abende":"";
+  // Saison: vom Abendkönig nach dem Kaiserkegeln des Vorjahres bis vor das Kaiserkegeln dieses Jahres
+  const y=currentSeason();$("k-year").textContent=y;
+  const today=parseIso(todayIso());
+  const list=Object.values(koenige).filter(k=>seasonOf(k.date)===y).sort((a,b)=>b.date.localeCompare(a.date));
+  $("k-count").textContent=list.length?list.length+(list.length===1?" Abend":" Abende"):"";
   const ol=$("k-list");ol.replaceChildren();
-  if(!list.length){const li=document.createElement("li");li.style.color="var(--muted)";li.textContent="Noch keine eingetragen.";ol.append(li)}
-  list.forEach(k=>{const li=document.createElement("li");const a=document.createElement("span");a.textContent=deDate(k.date).slice(0,6)+" · "+k.name;
+  if(!list.length){const li=document.createElement("li");li.style.color="var(--muted)";li.textContent="Noch keine Abendkönige.";ol.append(li)}
+  list.forEach(k=>{const li=document.createElement("li");const a=document.createElement("span");
+    a.textContent=deDate(k.date)+" · "+k.name+(isKaiserDate(k.date)?" 👑":"");if(isKaiserDate(k.date))a.title="Abendkönig am Kaiserabend";
     const c=document.createElement("small");c.textContent=k.holz?k.holz+" Holz":"";
     const right=document.createElement("span");right.append(c);
     if(canKings){const rm=document.createElement("button");rm.type="button";rm.className="krm";rm.textContent="×";rm.setAttribute("aria-label","Eintrag löschen");
       rm.onclick=async()=>{try{await db.collection("koenige").doc(k.date).delete()}catch(e){toast("Löschen fehlgeschlagen")}};right.append(rm)}
     li.append(a,right);ol.append(li)});
-  // Kaiser: alle verschiedenen Abendkönige des Jahres, beim letzten Abend des Jahres
-  const last=evs[evs.length-1];const names={};list.forEach(k=>{names[k.name]=(names[k.name]||0)+1});
-  const parts=Object.entries(names).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"de")).map(([n,c])=>c>1?n+" ("+c+"×)":n);
-  $("k-kaiser").textContent=parts.length?"Kaiserkegeln "+(last?deDate(isoOf(last)):"")+": "+parts.join(", "):"";
-  // Auswahl der Abende (bis heute), neuester zuerst
-  const sel=$("k-date"),keep=sel.value;sel.replaceChildren();
-  evs.filter(d=>d<=today).reverse().forEach(d=>{const o=document.createElement("option");o.value=isoOf(d);o.textContent=fmtD(d)+(koenige[isoOf(d)]?" ✓":"");sel.append(o)});
-  if(keep&&[...sel.options].some(o=>o.value===keep))sel.value=keep;
+  const parts=kaiserCandidates(y),kd=kaiserOfYear(y);
+  $("k-kaiser").textContent=parts.length?"Kaiserkegeln "+deDate(isoOf(kd))+": "+parts.join(", "):"";
+  // Eintragen: die letzten 15 Kegelabende bis heute
+  if(canKings){const sel=$("k-date"),keep=sel.value;sel.replaceChildren();
+    const evs=[...eveningsOfYear(today.getFullYear()-1),...eveningsOfYear(today.getFullYear())].filter(d=>d<=today).reverse().slice(0,15);
+    evs.forEach(d=>{const iso=isoOf(d);const o=document.createElement("option");o.value=iso;o.textContent=fmtD(d)+(isKaiserDate(iso)?" 👑":"")+(koenige[iso]?" ✓":"");sel.append(o)});
+    if(keep&&[...sel.options].some(o=>o.value===keep))sel.value=keep}
 }
 $("kform").addEventListener("submit",async e=>{e.preventDefault();if(!canKings)return;
   const date=$("k-date").value,name=$("k-name").value.trim().slice(0,40);
   if(!date||!name){toast("Abend und Name eintragen");return}
   const holz=Math.max(0,Math.min(99,parseInt($("k-holz").value,10)||0));
   db.collection("koenige").doc(date).set({date,nr:nrFor(date),name,holz,updatedAt:new Date().toISOString()}).catch(()=>toast("Speichern fehlgeschlagen"));
-  $("k-name").value="";$("k-holz").value="";toast("👑 "+name+" eingetragen")});
+  $("k-name").value="";$("k-holz").value="";toast("👑 "+name+(isKaiserDate(date)?" – zählt für "+seasonOf(date):" eingetragen"))});
 
 /* Wunschspiel des Monats */
 let wishMeta=null,wishMetaLoaded=false,myVote=null,allVotes=null,wishWinner=null,saveVote=()=>{},addWish=()=>{};
