@@ -154,6 +154,8 @@ body.kaiser .evening{box-shadow:0 0 0 1px var(--star) inset}
 .tload{padding:6px 10px;font-size:.85rem}
 .netbar{margin:-8px 0 0;padding:8px 12px;border-radius:10px;background:#fff4d6;color:#5a4300;font-size:.85rem}
 @media (prefers-color-scheme:dark){.netbar{background:#3a3016;color:#f3dc9a}}
+.simbar{position:sticky;top:0;z-index:15;display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px;padding:8px 12px;border-radius:10px;background:#ffd84d;color:#3a2a00;font-size:.85rem;font-weight:600}
+.simbar .btn{padding:4px 10px}
 .robar{margin:-8px 0 0;padding:8px 12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);font-size:.85rem}
 input[type=email],input[type=password]{width:100%;font:inherit;font-size:1rem;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
 #l-code{font-family:ui-monospace,Menlo,monospace;font-size:.85rem}
@@ -221,6 +223,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   </header>
   <p class="netbar" id="netbar" hidden></p>
   <p class="robar" id="robar">Nur Ansicht – zum Bearbeiten anmelden.</p>
+  <div class="simbar" id="simbar" hidden><span id="sim-txt"></span><button type="button" class="btn" id="sim-end">Beenden</button></div>
   <div class="lockcard" id="lockcard" hidden><b>🔒 Nur für Mitglieder</b><span id="lock-txt">Bitte anmelden.</span><button type="button" class="btn primary" id="lockbtn">Anmelden</button></div>
   <button type="button" class="btn primary" id="seedbtn" hidden>Startdaten übernehmen (Spiele + Plan aus Claude)</button>
 
@@ -299,8 +302,9 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· v22</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· v23</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
+      <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
       <button type="button" class="btn" id="xlsx">⤓ Als Excel-Datei</button>
     </span>
@@ -381,6 +385,19 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   </form>
 </div>
 
+<div class="scrim" id="simscrim" hidden>
+  <div class="sheet" role="dialog" aria-labelledby="h-sim">
+    <h2 id="h-sim">🧪 Vorschau</h2>
+    <p class="hint">Nur für dich. In der Vorschau wird nichts gespeichert.</p>
+    <label>Ansehen als<select id="sim-role">
+      <option value="">Ich (Chef-Spielewart)</option><option value="mitglied">Kegelbruder</option>
+      <option value="schriftwart">Schriftwart</option><option value="gast">Gast</option></select></label>
+    <label>Datum<select id="sim-date"></select></label>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <button type="button" class="btn" id="sim-cancel">Abbrechen</button>
+      <button type="button" class="btn primary" id="sim-go">Starten</button></div>
+  </div>
+</div>
 <div class="scrim" id="mscrim" hidden>
   <form class="sheet" id="mform" role="dialog" aria-modal="true" aria-labelledby="m-title" novalidate>
     <h3 id="m-title">Mitglieder & Rollen</h3>
@@ -511,7 +528,7 @@ const MAX_SLOTS=15;
 const WD=["So","Mo","Di","Mi","Do","Fr","Sa"];
 function nextEvening(){
   // Alle 4 Wochen freitags; 113. Abend = 13.11.2026
-  const base=new Date(2026,10,13),today=new Date();today.setHours(0,0,0,0);
+  const base=new Date(2026,10,13),today=parseIso(todayIso());
   let n=Math.ceil((today-base)/(28*864e5));if(n<0)n=0;
   const d=new Date(base);d.setDate(base.getDate()+n*28);
   return {nr:113+n,date:d,iso:isoOf(d),txt:fmtD(d)};
@@ -520,7 +537,10 @@ function isoOf(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"
 function fmtD(d){return WD[d.getDay()]+", "+String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+"."+d.getFullYear()}
 function parseIso(s){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||"");return m?new Date(+m[1],+m[2]-1,+m[3]):null}
 function nrFor(iso){const d=parseIso(iso);return d?113+Math.round((d-new Date(2026,10,13))/(28*864e5)):""}
-function todayIso(){return isoOf(new Date())}
+const SIM={role:"",date:"",on:false};try{Object.assign(SIM,JSON.parse(sessionStorage.getItem("kcrsim")||"{}"));SIM.on=!!(SIM.role||SIM.date)}catch(e){}let realChef=false,simToasted=false;
+function simNow(){if(!SIM.date)return new Date();const d=parseIso(SIM.date);d.setHours(20,0,0,0);return d}
+function simBlock(){if(!simToasted){toast("🧪 Vorschau – es wird nichts gespeichert.");simToasted=true}return Promise.resolve()}
+function todayIso(){return SIM.date||isoOf(new Date())}
 let drag=null;
 function renderPlan(){
   if(drag)return;
@@ -625,6 +645,11 @@ async function maybeArchive(){
   if(!db||!canPlan||!planLoaded||!gamesLoaded||archiving||!planDate)return;
   if(planDate>=todayIso())return;
   archiving=true;
+  if(SIM.on){
+    lastPlan={date:planDate,nr:nrFor(planDate),slots:plan.map(x=>x||"")};
+    plan=DEFAULT_SLOTS.slice();planDate=nextEvening().iso;planTitle="";if(isKaiserDate(planDate))plan[4]=KZ;
+    archiving=false;render();return;
+  }
   try{
     const done=lastPlan&&lastPlan.date===planDate;
     if(!done){
@@ -892,7 +917,7 @@ let wishMeta=null,wishMetaLoaded=false,myVote=null,allVotes=null,wishWinner=null
 function wishId(){return planDate||nextEvening().iso}
 function revealDate(id){const d=parseIso(id);return d?new Date(d.getFullYear(),d.getMonth(),d.getDate()-1,19,0):null}
 function revealAt(){const r=wishMeta&&wishMeta.reveal;return r&&r.toDate?r.toDate():revealDate(wishId())}
-function isRevealed(){const r=revealAt();return !!r&&new Date()>=r}
+function isRevealed(){const r=revealAt();return !!r&&simNow()>=r}
 function fmtReveal(){const r=revealAt();return r?WD[r.getDay()]+" "+String(r.getHours()).padStart(2,"0")+":"+String(r.getMinutes()).padStart(2,"0")+" Uhr":""}
 function ranking(){
   if(!allVotes)return [];const c={};allVotes.forEach(v=>{if(v.gameId&&games[v.gameId])c[v.gameId]=(c[v.gameId]||0)+1});
@@ -930,8 +955,9 @@ let isChef=false, canRead=false, dataHook=null, canKings=false, nutzer={}, canEd
 function mail(u){return ((u&&u.email)||"").toLowerCase()}
 function applyRole(){
   const m=mail(curUser);
-  isChef=!!curUser&&!!rollen&&rollen.spielewart===m;
-  const role=!curUser?"none":(isChef||(rollen&&(rollen.spielewarte||[]).includes(m)))?"spielewart":(rollen&&(rollen.schriftwarte||[]).includes(m))?"schriftwart":(rollen&&(rollen.mitglieder||[]).includes(m))?"mitglied":(rollen&&(rollen.gaeste||[]).includes(m))?"gast":"wartet";
+  isChef=realChef=!!curUser&&!!rollen&&rollen.spielewart===m;
+  let role=!curUser?"none":(isChef||(rollen&&(rollen.spielewarte||[]).includes(m)))?"spielewart":(rollen&&(rollen.schriftwarte||[]).includes(m))?"schriftwart":(rollen&&(rollen.mitglieder||[]).includes(m))?"mitglied":(rollen&&(rollen.gaeste||[]).includes(m))?"gast":"wartet";
+  if(realChef&&SIM.role){role=SIM.role;isChef=false}
   canRead=role!=="none"&&role!=="wartet";
   canEdit=canRead&&role!=="gast";canPlan=role==="spielewart";canKings=canPlan||role==="schriftwart";
   document.body.classList.toggle("nokings",!canKings);
@@ -942,7 +968,7 @@ function applyRole(){
   $("lock-txt").textContent=role==="none"?"Bitte anmelden.":(rollenLoaded?"Konto erstellt – der Spielewart schaltet dich frei.":"Rechte werden geprüft …");
   $("lockbtn").hidden=role!=="none";
   if(dataHook)dataHook(canRead);
-  $("membtn").hidden=!isChef;
+  $("membtn").hidden=!isChef;$("simbtn").hidden=!realChef;renderSimBar();
   $("seedbtn").hidden=!(canPlan&&gamesLoaded&&!Object.keys(games).length);
   render();maybeArchive();renderMembers();migrateRatings();ensureKaiser();seedTpl(tplLoaded);
 }
@@ -987,6 +1013,26 @@ function renderMembers(){const ul=$("m-list");ul.replaceChildren();
       [["kein","Kein Zugriff"],["gast","Gast (nur lesen)"],["mitglied","Kegelbruder"],["schriftwart","Schriftwart"],["spielewart","Spielewart"]].forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;sel.append(o)});
       sel.value=r;sel.onchange=()=>setRole(x.email,sel.value);li.append(sel)}
     ul.append(li)})}
+function simDates(){
+  const nx=planDate||nextEvening().iso,d=parseIso(nx),y=d.getFullYear(),k=kaiserOfYear(y);
+  const add=(iso,n)=>{const x=parseIso(iso);x.setDate(x.getDate()+n);return isoOf(x)};
+  const out=[["","Heute"],[add(nx,-1),"Donnerstag vor dem Kegeln (Wunschspiel aufgedeckt)"],[add(nx,1),"Woche nach dem Kegeln ("+fmtD(d)+")"]];
+  if(k){out.push([isoOf(new Date(k.getFullYear(),11,1)),"Kaiser-Monat (1.12.)"]);out.push([isoOf(k),"Kaiserabend ("+fmtD(k)+")"])}
+  return out;
+}
+function renderSimBar(){
+  const b=$("simbar");b.hidden=!SIM.on;if(!SIM.on)return;
+  const rn={"":"Chef",mitglied:"Kegelbruder",schriftwart:"Schriftwart",gast:"Gast"}[SIM.role];
+  $("sim-txt").textContent="🧪 Vorschau: "+rn+(SIM.date?" · "+fmtD(parseIso(SIM.date)):"")+" – nichts wird gespeichert";
+}
+$("simbtn").onclick=()=>{const sel=$("sim-date");sel.replaceChildren();
+  simDates().forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;sel.append(o)});
+  $("sim-role").value=SIM.role;sel.value=SIM.date;$("simscrim").hidden=false};
+$("sim-cancel").onclick=()=>$("simscrim").hidden=true;
+$("sim-go").onclick=()=>{SIM.role=$("sim-role").value;SIM.date=$("sim-date").value;SIM.on=!!(SIM.role||SIM.date);
+  try{if(SIM.on)sessionStorage.setItem("kcrsim",JSON.stringify({role:SIM.role,date:SIM.date}));else sessionStorage.removeItem("kcrsim")}catch(e){}
+  location.reload()};
+$("sim-end").onclick=()=>{try{sessionStorage.removeItem("kcrsim")}catch(e){}location.reload()};
 $("membtn").onclick=()=>{renderMembers();$("m-mail").value="";$("mscrim").hidden=false};
 $("m-close").onclick=()=>{$("mscrim").hidden=true};
 $("mscrim").onclick=e=>{if(e.target===$("mscrim"))$("mscrim").hidden=true};
@@ -1017,7 +1063,7 @@ render();setEdit(null);renderNet();
   let fdb;try{fdb=F.initializeFirestore(app,{localCache:F.persistentLocalCache()})}catch(e){fdb=F.getFirestore(app)}
   const auth=F.getAuth(app);
   db={collection(name){return{
-    doc(id){const r=F.doc(fdb,name,id);return{set:d=>F.setDoc(r,d),update:d=>F.updateDoc(r,d),delete:()=>F.deleteDoc(r)}},
+    doc(id){const r=F.doc(fdb,name,id);return{set:d=>SIM.on?simBlock():F.setDoc(r,d),update:d=>SIM.on?simBlock():F.updateDoc(r,d),delete:()=>SIM.on?simBlock():F.deleteDoc(r)}},
     onSnapshot(ok,err){return F.onSnapshot(F.collection(fdb,name),{includeMetadataChanges:true},s=>{
       if(s.metadata.hasPendingWrites)pendingCols.add(name);else pendingCols.delete(name);renderNet();
       ok({docs:s.docs.map(d=>({id:d.id,data:()=>d.data()}))})},err)}}}};
@@ -1030,21 +1076,21 @@ render();setEdit(null);renderNet();
     const mRef=F.doc(fdb,"wunsch",id);
     wUnsub.push(F.onSnapshot(mRef,async snap=>{
       wishMeta=snap.exists()?snap.data():null;wishMetaLoaded=true;
-      if(!snap.exists()&&canPlan){try{await F.setDoc(mRef,{abend:id,reveal:F.Timestamp.fromDate(revealDate(id))})}catch(e){}}
+      if(!snap.exists()&&canPlan&&!SIM.on){try{await F.setDoc(mRef,{abend:id,reveal:F.Timestamp.fromDate(revealDate(id))})}catch(e){}}
       render();
     },()=>{wishMetaLoaded=true;render()}));
     if(curUser)wUnsub.push(F.onSnapshot(F.doc(fdb,"wunsch",id,"stimmen",curUser.uid),s=>{myVote=s.exists()?s.data():null;render()},()=>{}));
     if(isRevealed())wUnsub.push(F.onSnapshot(F.collection(fdb,"wunsch",id,"stimmen"),s=>{allVotes=s.docs.map(d=>d.data());render()},()=>{allVotes=[];render()}));
   }
   saveVote=async gid=>{if(!curUser||!canEdit)return;const id=wishId();
-    myVote={gameId:gid};render();
+    myVote={gameId:gid};render();if(SIM.on){simBlock();return}
     F.setDoc(F.doc(fdb,"wunsch",id,"stimmen",curUser.uid),{gameId:gid,at:new Date().toISOString()}).catch(()=>toast("Stimme nicht gespeichert – Abstimmung schon vorbei?"));
     toast("Gewählt – bleibt geheim")};
   addWish=gid=>{if(!canPlan)return;let i=plan.indexOf(null);if(i<0){if(plan.length>=MAX_SLOTS){toast("Plan ist voll");return}plan.push(null);i=plan.length-1}
     plan[i]=gid;render();savePlan();toast("Auf Platz "+(i+1)+" eingeplant")};
-  setInterval(()=>{subWish();renderWish()},60000);
+  setInterval(()=>{subWish();renderWish()},60000);window.kcrSubWish=subWish;
   const rRef=F.doc(fdb,"config","rollen");
-  saveRollen=async d=>{try{await F.setDoc(rRef,{spielewart:d.spielewart,mitglieder:d.mitglieder||[],spielewarte:d.spielewarte||[],schriftwarte:d.schriftwarte||[],gaeste:d.gaeste||[],updatedAt:new Date().toISOString()})}catch(e){toast("Konnte die Mitgliederliste nicht speichern.")}};
+  saveRollen=async d=>{if(SIM.on){simBlock();return}try{await F.setDoc(rRef,{spielewart:d.spielewart,mitglieder:d.mitglieder||[],spielewarte:d.spielewarte||[],schriftwarte:d.schriftwarte||[],gaeste:d.gaeste||[],updatedAt:new Date().toISOString()})}catch(e){toast("Konnte die Mitgliederliste nicht speichern.")}};
   let unsubR=null,unsubN=null;
   F.onAuthStateChanged(auth,u=>{
     if(unsubR){unsubR();unsubR=null}
@@ -1052,7 +1098,7 @@ render();setEdit(null);renderNet();
     if(unsubN){unsubN();unsubN=null}nutzer={};
     if(!u)return;
     {const nm=($("a-name").value||"").trim().slice(0,40);const d={email:mail(u),lastSeen:new Date().toISOString()};if(nm)d.name=nm;
-      F.setDoc(F.doc(fdb,"nutzer",u.uid),d,{merge:true}).catch(()=>{});$("a-name").value=""}
+      (SIM.on?simBlock():F.setDoc(F.doc(fdb,"nutzer",u.uid),d,{merge:true})).catch(()=>{});$("a-name").value=""}
     const subR=()=>{if(unsubR){unsubR();unsubR=null}if(!curUser||curUser.uid!==u.uid)return;
     unsubR=F.onSnapshot(rRef,async snap=>{
       if(!snap.exists()){
