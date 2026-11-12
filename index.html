@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>KC Rebell · Kegelspiele</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="theme-color" content="#9b2c2c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -158,7 +159,12 @@ input[type=email],input[type=password]{width:100%;font:inherit;font-size:1rem;pa
 #l-code{font-family:ui-monospace,Menlo,monospace;font-size:.85rem}
 body.ro #add,body.ro #linkbtn,body.ro .handle,body.ro .slot .rm,body.ro .addslot,body.ro #evclear,body.ro #f-del,body.ro #form button[type=submit],body.ro #f-ok{display:none!important}
 body.ro .rstars button,body.ro #f-rate button,body.ro .slotname{pointer-events:none}
+body.ro .kings,body.ro #f-notes-wrap{display:none!important}
 body:not(.ro) #robar{display:none}
+body.locked #robar,body.locked .evening,body.locked .top,body.locked .chips,body.locked #list,body.locked .foot,body.locked #linkbtn,body.locked #status,body.locked #seedbtn{display:none!important}
+.lockcard{display:flex;flex-direction:column;gap:10px;align-items:flex-start;padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+.lockcard b{font-family:var(--display);font-size:1.15rem}
+.lockcard span{color:var(--muted)}
 body.nokings #kform,body.nokings #kzform,body.nokings .krm{display:none!important}
 body.noplan #evsuggest,body.noplan #evtpl,body.noplan #f-del,body.noplan #linkbtn,body.noplan .handle,body.noplan .slot .rm,body.noplan .addslot,body.noplan #evclear{display:none!important}
 body.noplan .slotname{pointer-events:none}
@@ -208,6 +214,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   </header>
   <p class="netbar" id="netbar" hidden></p>
   <p class="robar" id="robar">Nur Ansicht – zum Bearbeiten anmelden.</p>
+  <div class="lockcard" id="lockcard" hidden><b>🔒 Nur für Mitglieder</b><span id="lock-txt">Bitte anmelden.</span><button type="button" class="btn primary" id="lockbtn">Anmelden</button></div>
   <button type="button" class="btn primary" id="seedbtn" hidden>Startdaten übernehmen (Spiele + Plan aus Claude)</button>
 
   <section class="evening reflect" id="reflect" aria-labelledby="h-rf" hidden>
@@ -340,7 +347,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
         <input type="number" id="f-plays" min="0" max="999" inputmode="numeric" placeholder="0">
       </div>
     </div>
-    <div>
+    <div id="f-notes-wrap">
       <label class="lbl" for="f-notes">Notizen</label>
       <textarea id="f-notes" maxlength="2000" rows="2" placeholder="Material, Varianten, wann zuletzt gespielt …"></textarea>
     </div>
@@ -389,7 +396,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
 <div class="scrim" id="mscrim" hidden>
   <form class="sheet" id="mform" role="dialog" aria-modal="true" aria-labelledby="m-title" novalidate>
     <h3 id="m-title">Mitglieder & Rollen</h3>
-    <p class="note">Gast: nur ansehen · Kegelbruder: Spiele anlegen, bewerten · Schriftwart (max. 2): zusätzlich Abendkönige + Kaiser · Spielewart: alles außer Rollen.</p>
+    <p class="note">Kein Zugriff: sieht nichts · Gast: Spiele + Plan ansehen, keine Namen · Kegelbruder: Spiele anlegen, bewerten · Schriftwart (max. 2): zusätzlich Abendkönige + Kaiser · Spielewart: alles außer Rollen.</p>
     <ul class="mlist" id="m-list"></ul>
     <div class="madd"><input type="email" id="m-mail" inputmode="email" autocomplete="off" placeholder="E-Mail vorab freischalten (optional)"><button type="submit" class="btn">Hinzufügen</button></div>
     <div class="actions"><span style="flex:1"></span><button type="button" class="btn" id="m-close">Fertig</button></div>
@@ -806,7 +813,7 @@ function renderKaiser(){
   const on=kaiserThemeOn();document.body.classList.toggle("kaiser",on);$("kbanner").hidden=!on;
   const k=kaiserEvening();
   if(on){const d=parseIso(k);const c=kaiserCandidates(d.getFullYear());
-    $("kb-sub").textContent=fmtD(d)+" · 21:00 Uhr · Preis: Schinkenbrot + Pokal-Gravur"+(c.length?" · Kandidaten: "+c.join(", "):"")}
+    $("kb-sub").textContent=fmtD(d)+" · 21:00 Uhr · Preis: Schinkenbrot + Pokal-Gravur"+(canEdit&&c.length?" · Kandidaten: "+c.join(", "):"")}
   const list=Object.values(kaiser).sort((a,b)=>b.year-a.year);
   const kl=$("kz-list");kl.replaceChildren();
   if(list.length){kl.append("🏆 Pokal: ");
@@ -931,17 +938,22 @@ function renderWish(){
 }
 
 /* Firebase + Rollen */
-let isChef=false, canKings=false, nutzer={}, canEdit=false, canPlan=false, curUser=null, rollen=null, rollenLoaded=false;
+let isChef=false, canRead=false, dataHook=null, canKings=false, nutzer={}, canEdit=false, canPlan=false, curUser=null, rollen=null, rollenLoaded=false;
 function mail(u){return ((u&&u.email)||"").toLowerCase()}
 function applyRole(){
   const m=mail(curUser);
   isChef=!!curUser&&!!rollen&&rollen.spielewart===m;
-  const role=!curUser?"none":(isChef||(rollen&&(rollen.spielewarte||[]).includes(m)))?"spielewart":(rollen&&(rollen.schriftwarte||[]).includes(m))?"schriftwart":(rollen&&(rollen.mitglieder||[]).includes(m))?"mitglied":"gast";
-  canEdit=role!=="gast"&&role!=="none";canPlan=role==="spielewart";canKings=canPlan||role==="schriftwart";
+  const role=!curUser?"none":(isChef||(rollen&&(rollen.spielewarte||[]).includes(m)))?"spielewart":(rollen&&(rollen.schriftwarte||[]).includes(m))?"schriftwart":(rollen&&(rollen.mitglieder||[]).includes(m))?"mitglied":(rollen&&(rollen.gaeste||[]).includes(m))?"gast":"wartet";
+  canRead=role!=="none"&&role!=="wartet";
+  canEdit=canRead&&role!=="gast";canPlan=role==="spielewart";canKings=canPlan||role==="schriftwart";
   document.body.classList.toggle("nokings",!canKings);
   document.body.classList.toggle("ro",!canEdit);document.body.classList.toggle("noplan",!canPlan);
   $("loginbtn").textContent=curUser?"Abmelden":"Anmelden";$("loginbtn").title=curUser?("Angemeldet: "+m):"";
-  $("robar").textContent=role==="gast"?(rollenLoaded?"Konto erstellt – der Spielewart schaltet dich frei.":"Rechte werden geprüft …"):"Nur Ansicht – zum Bearbeiten anmelden.";
+  $("robar").textContent="Nur Ansicht.";
+  document.body.classList.toggle("locked",!canRead);$("lockcard").hidden=canRead;
+  $("lock-txt").textContent=role==="none"?"Bitte anmelden.":(rollenLoaded?"Konto erstellt – der Spielewart schaltet dich frei.":"Rechte werden geprüft …");
+  $("lockbtn").hidden=role!=="none";
+  if(dataHook)dataHook(canRead);
   $("membtn").hidden=!isChef;
   $("seedbtn").hidden=!(canPlan&&gamesLoaded&&!Object.keys(games).length);
   render();maybeArchive();renderMembers();migrateRatings();ensureKaiser();seedTpl(tplLoaded);
@@ -962,18 +974,20 @@ function openLogin(){$("a-msg").textContent="";$("authscrim").hidden=false;setTi
 $("a-cancel").onclick=()=>{$("authscrim").hidden=true};
 $("authscrim").onclick=e=>{if(e.target===$("authscrim"))$("authscrim").hidden=true};
 $("loginbtn").onclick=()=>openLogin();
+$("lockbtn").onclick=()=>openLogin();
 /* Mitglieder */
 let saveRollen=null;
-function roleOf(m){if(!rollen)return "gast";if(rollen.spielewart===m)return "chef";if((rollen.spielewarte||[]).includes(m))return "spielewart";if((rollen.schriftwarte||[]).includes(m))return "schriftwart";if((rollen.mitglieder||[]).includes(m))return "mitglied";return "gast"}
+function roleOf(m){if(!rollen)return "kein";if(rollen.spielewart===m)return "chef";if((rollen.spielewarte||[]).includes(m))return "spielewart";if((rollen.schriftwarte||[]).includes(m))return "schriftwart";if((rollen.mitglieder||[]).includes(m))return "mitglied";if((rollen.gaeste||[]).includes(m))return "gast";return "kein"}
 function setRole(m,r){if(!saveRollen||!rollen)return;
-  const mit=(rollen.mitglieder||[]).filter(x=>x!==m),sw=(rollen.spielewarte||[]).filter(x=>x!==m),sch=(rollen.schriftwarte||[]).filter(x=>x!==m);
+  const mit=(rollen.mitglieder||[]).filter(x=>x!==m),sw=(rollen.spielewarte||[]).filter(x=>x!==m),sch=(rollen.schriftwarte||[]).filter(x=>x!==m),ga=(rollen.gaeste||[]).filter(x=>x!==m);
+  if(r==="gast")ga.push(m);
   if(r==="schriftwart"&&sch.length>=2){toast("Es gibt schon 2 Schriftwarte");renderMembers();return}
   if(r==="mitglied")mit.push(m);if(r==="spielewart")sw.push(m);if(r==="schriftwart")sch.push(m);
-  saveRollen({...rollen,mitglieder:mit,spielewarte:sw,schriftwarte:sch})}
+  saveRollen({...rollen,mitglieder:mit,spielewarte:sw,schriftwarte:sch,gaeste:ga})}
 function renderMembers(){const ul=$("m-list");ul.replaceChildren();
   // alle registrierten Konten + vorab freigeschaltete E-Mails
   const map={};Object.values(nutzer).forEach(n=>{if(n.email)map[n.email]={email:n.email,name:n.name||""}});
-  [...((rollen&&rollen.mitglieder)||[]),...((rollen&&rollen.spielewarte)||[]),...((rollen&&rollen.schriftwarte)||[])].forEach(m=>{if(!map[m])map[m]={email:m,name:"",vorab:true}});
+  [...((rollen&&rollen.mitglieder)||[]),...((rollen&&rollen.spielewarte)||[]),...((rollen&&rollen.schriftwarte)||[]),...((rollen&&rollen.gaeste)||[])].forEach(m=>{if(!map[m])map[m]={email:m,name:"",vorab:true}});
   const list=Object.values(map).sort((a,b)=>(a.name||a.email).localeCompare(b.name||b.email,"de"));
   if(!list.length){const li=document.createElement("li");li.style.color="var(--muted)";li.textContent="Noch keine Konten.";ul.append(li)}
   list.forEach(x=>{const li=document.createElement("li");const u=document.createElement("span");u.className="u";u.textContent=x.name||x.email;
@@ -982,7 +996,7 @@ function renderMembers(){const ul=$("m-list");ul.replaceChildren();
     const r=roleOf(x.email);
     if(r==="chef"){const t=document.createElement("small");t.textContent="Chef-Spielewart";t.style.color="var(--accent)";li.append(t)}
     else{const sel=document.createElement("select");sel.setAttribute("aria-label","Rolle von "+(x.name||x.email));
-      [["gast","Gast"],["mitglied","Kegelbruder"],["schriftwart","Schriftwart"],["spielewart","Spielewart"]].forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;sel.append(o)});
+      [["kein","Kein Zugriff"],["gast","Gast (nur lesen)"],["mitglied","Kegelbruder"],["schriftwart","Schriftwart"],["spielewart","Spielewart"]].forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;sel.append(o)});
       sel.value=r;sel.onchange=()=>setRole(x.email,sel.value);li.append(sel)}
     ul.append(li)})}
 $("membtn").onclick=()=>{renderMembers();$("m-mail").value="";$("mscrim").hidden=false};
@@ -990,7 +1004,7 @@ $("m-close").onclick=()=>{$("mscrim").hidden=true};
 $("mscrim").onclick=e=>{if(e.target===$("mscrim"))$("mscrim").hidden=true};
 $("mform").addEventListener("submit",e=>{e.preventDefault();const m=$("m-mail").value.trim().toLowerCase();
   if(!/^\S+@\S+\.\S+$/.test(m)){toast("Bitte eine gültige E-Mail eintragen.");return}
-  if(roleOf(m)!=="gast"){toast("Schon freigeschaltet");return}
+  if(roleOf(m)!=="kein"){toast("Schon freigeschaltet");return}
   setRole(m,"mitglied");$("m-mail").value=""});
 /* Offline */
 const pendingCols=new Set();
@@ -1001,7 +1015,7 @@ addEventListener("online",renderNet);addEventListener("offline",renderNet);
 if("serviceWorker" in navigator){addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
 render();setEdit(null);renderNet();
 (async()=>{
-  const timer=setTimeout(()=>{$("status").textContent="Die Spiele laden gerade nicht. Internetverbindung prüfen und neu öffnen."},10000);
+  const timer=setTimeout(()=>{if(!canRead)return;$("status").textContent="Die Spiele laden gerade nicht. Internetverbindung prüfen und neu öffnen."},10000);
   let F;
   try{
     const V="10.12.2";
@@ -1021,9 +1035,10 @@ render();setEdit(null);renderNet();
       ok({docs:s.docs.map(d=>({id:d.id,data:()=>d.data()}))})},err)}}}};
   let wUnsub=[],wKey="";
   function subWish(force){
-    const id=wishId(),key=id+"|"+(curUser?curUser.uid:"")+"|"+isRevealed();
+    const id=wishId(),key=id+"|"+(curUser?curUser.uid:"")+"|"+isRevealed()+"|"+canRead;
     if(key===wKey&&!force)return;wKey=key;
     wUnsub.forEach(f=>f());wUnsub=[];wishMeta=null;wishMetaLoaded=false;myVote=null;allVotes=null;
+    if(!canRead){render();return}
     const mRef=F.doc(fdb,"wunsch",id);
     wUnsub.push(F.onSnapshot(mRef,async snap=>{
       wishMeta=snap.exists()?snap.data():null;wishMetaLoaded=true;
@@ -1041,7 +1056,7 @@ render();setEdit(null);renderNet();
     plan[i]=gid;render();savePlan();toast("Auf Platz "+(i+1)+" eingeplant")};
   setInterval(()=>{subWish();renderWish()},60000);
   const rRef=F.doc(fdb,"config","rollen");
-  saveRollen=async d=>{try{await F.setDoc(rRef,{spielewart:d.spielewart,mitglieder:d.mitglieder||[],spielewarte:d.spielewarte||[],schriftwarte:d.schriftwarte||[],updatedAt:new Date().toISOString()})}catch(e){toast("Konnte die Mitgliederliste nicht speichern.")}};
+  saveRollen=async d=>{try{await F.setDoc(rRef,{spielewart:d.spielewart,mitglieder:d.mitglieder||[],spielewarte:d.spielewarte||[],schriftwarte:d.schriftwarte||[],gaeste:d.gaeste||[],updatedAt:new Date().toISOString()})}catch(e){toast("Konnte die Mitgliederliste nicht speichern.")}};
   let unsubR=null,unsubN=null;
   F.onAuthStateChanged(auth,u=>{
     if(unsubR){unsubR();unsubR=null}
@@ -1050,14 +1065,16 @@ render();setEdit(null);renderNet();
     if(!u)return;
     {const nm=($("a-name").value||"").trim().slice(0,40);const d={email:mail(u),lastSeen:new Date().toISOString()};if(nm)d.name=nm;
       F.setDoc(F.doc(fdb,"nutzer",u.uid),d,{merge:true}).catch(()=>{});$("a-name").value=""}
+    const subR=()=>{if(unsubR){unsubR();unsubR=null}if(!curUser||curUser.uid!==u.uid)return;
     unsubR=F.onSnapshot(rRef,async snap=>{
       if(!snap.exists()){
         // Erste Anmeldung des Spielewarts legt die Rollenliste an (klappt laut Regeln nur für ihn)
-        try{await F.setDoc(rRef,{spielewart:mail(u),mitglieder:[],spielewarte:[],schriftwarte:[],updatedAt:new Date().toISOString()});return}catch(e){}
+        try{await F.setDoc(rRef,{spielewart:mail(u),mitglieder:[],spielewarte:[],schriftwarte:[],gaeste:[],updatedAt:new Date().toISOString()});return}catch(e){}
       }
       rollen=snap.exists()?snap.data():null;rollenLoaded=true;applyRole();subWish(true);
       if(isChef&&!unsubN)unsubN=F.onSnapshot(F.collection(fdb,"nutzer"),s=>{nutzer={};s.docs.forEach(d=>{nutzer[d.id]=d.data()});renderMembers()},()=>{});
-    },()=>{rollenLoaded=true;applyRole()});
+    },()=>{rollenLoaded=true;rollen=null;applyRole();setTimeout(subR,20000)})};
+    subR();
   });
   $("loginbtn").onclick=async()=>{if(curUser){await F.signOut(auth);toast("Abgemeldet")}else openLogin()};
   $("a-new").onclick=async()=>{$("a-msg").textContent="";const m=$("a-mail").value.trim(),pw=$("a-pw").value;
@@ -1069,16 +1086,24 @@ render();setEdit(null);renderNet();
     catch(err){$("a-msg").textContent="Anmeldung fehlgeschlagen. E-Mail und Passwort prüfen."}});
   $("a-reset").onclick=async()=>{const m=$("a-mail").value.trim();if(!m){$("a-msg").textContent="Bitte zuerst die E-Mail eintragen.";return}
     try{await F.sendPasswordResetEmail(auth,m);$("a-msg").textContent="Falls ein Konto existiert, kommt gleich eine E-Mail zum Zurücksetzen."}catch(err){$("a-msg").textContent="Das hat nicht geklappt."}};
-  db.collection("games").onSnapshot(s=>{clearTimeout(timer);games={};s.docs.forEach(d=>{const x=d.data();if(x&&x.name)games[d.id]=x});$("status").hidden=true;gamesLoaded=true;
+  let dataUns=[];
+  dataHook=on=>{
+    if(on&&dataUns.length)return;
+    if(!on){if(!dataUns.length)return;dataUns.forEach(f=>f());dataUns=[];games={};koenige={};kaiser={};vorlagen={};lastPlan=null;gamesLoaded=false;planLoaded=false;render();return}
+    clearTimeout(timer);$("status").hidden=false;$("status").textContent="Lade eure Spiele …";
+  dataUns.push(db.collection("games").onSnapshot(s=>{games={};s.docs.forEach(d=>{const x=d.data();if(x&&x.name)games[d.id]=x});$("status").hidden=true;gamesLoaded=true;
       $("seedbtn").hidden=!(canPlan&&!Object.keys(games).length);render();maybeArchive();migrateRatings()},
-    ()=>{clearTimeout(timer);$("status").textContent="Spiele konnten nicht geladen werden. Sind die Sicherheitsregeln gesetzt?"});
-  db.collection("vorlagen").onSnapshot(s=>{vorlagen={};s.docs.forEach(d=>{const x=d.data();if(x&&x.name)vorlagen[d.id]={...x,id:d.id}});tplLoaded=true;seedTpl(true);if(!$("tscrim").hidden)renderTpl()},()=>{});
-  db.collection("kaiser").onSnapshot(s=>{kaiser={};s.docs.forEach(d=>{const x=d.data();if(x&&x.year&&x.name)kaiser[d.id]=x});render()},()=>{});
-  db.collection("koenige").onSnapshot(s=>{koenige={};s.docs.forEach(d=>{const x=d.data();if(x&&x.date&&x.name)koenige[d.id]=x});render()},()=>{});
-  db.collection("plan").onSnapshot(s=>{lastPlan=null;s.docs.forEach(d=>{const x=d.data();if(!x)return;
+    ()=>{$("status").textContent="Spiele konnten nicht geladen werden."}));
+  dataUns.push(db.collection("vorlagen").onSnapshot(s=>{vorlagen={};s.docs.forEach(d=>{const x=d.data();if(x&&x.name)vorlagen[d.id]={...x,id:d.id}});tplLoaded=true;seedTpl(true);if(!$("tscrim").hidden)renderTpl()},()=>{}));
+  dataUns.push(db.collection("kaiser").onSnapshot(s=>{kaiser={};s.docs.forEach(d=>{const x=d.data();if(x&&x.year&&x.name)kaiser[d.id]=x});render()},()=>{}));
+  dataUns.push(db.collection("koenige").onSnapshot(s=>{koenige={};s.docs.forEach(d=>{const x=d.data();if(x&&x.date&&x.name)koenige[d.id]=x});render()},()=>{}));
+  dataUns.push(db.collection("plan").onSnapshot(s=>{lastPlan=null;s.docs.forEach(d=>{const x=d.data();if(!x)return;
       if(d.id==="last"&&x.date)lastPlan=x;
       if(d.id==="next"&&Array.isArray(x.slots)){plan=Array.from({length:Math.min(MAX_SLOTS,Math.max(10,x.slots.length))},(_,i)=>x.slots[i]||null);planDate=x.date||"";planTitle=x.title||""}});
-    planLoaded=true;render();maybeArchive();subWish();ensureKaiser()},()=>{});
+    planLoaded=true;render();maybeArchive();subWish();ensureKaiser()},()=>{}));
+    subWish(true);
+  };
+  dataHook(canRead);
   $("seedbtn").onclick=async()=>{
     const b=$("seedbtn");b.disabled=true;b.textContent="Übernehme …";
     try{const r=await fetch("seed.json",{cache:"no-store"});const seed=await r.json();
