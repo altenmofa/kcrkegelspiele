@@ -330,7 +330,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· r25</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· r26</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
@@ -528,7 +528,7 @@ function playedOf(y){const ev=Object.assign({},HIST,planHist);if(lastPlan&&lastP
     out[d]=[...new Set((Array.isArray(slots)?slots:(slots.slots||[])).filter(id=>id&&games[id]&&!FIXED.has(id)))]});return out}
 function renderYear(){
   const sec=$("yr"),t=parseIso(todayIso());
-  if(!canRead||t.getMonth()!==11){sec.hidden=true;return}
+  if(!canRead||t.getMonth()!==11||t.getFullYear()<2027){sec.hidden=true;return}
   const y=t.getFullYear(),played=playedOf(y),cnt={};
   Object.values(played).forEach(ids=>ids.forEach(id=>cnt[id]=(cnt[id]||0)+1));
   const ids=Object.keys(cnt);if(!ids.length){sec.hidden=true;return}
