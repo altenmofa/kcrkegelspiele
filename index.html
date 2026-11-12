@@ -807,7 +807,13 @@ function renderKaiser(){
   if(on){const d=parseIso(k);const c=kaiserCandidates(d.getFullYear());
     $("kb-sub").textContent=fmtD(d)+" · 21:00 Uhr · Preis: Schinkenbrot + Pokal-Gravur"+(c.length?" · Kandidaten: "+c.join(", "):"")}
   const list=Object.values(kaiser).sort((a,b)=>b.year-a.year);
-  $("kz-list").textContent=list.length?"🏆 Pokal: "+list.map(x=>x.year+" "+x.name).join(" · "):"";
+  const kl=$("kz-list");kl.replaceChildren();
+  if(list.length){kl.append("🏆 Pokal: ");
+    list.forEach((x,i)=>{if(i)kl.append(" · ");const sp=document.createElement("span");sp.style.whiteSpace="nowrap";sp.textContent=x.year+" "+x.name;
+      if(canKings){const rm=document.createElement("button");rm.type="button";rm.className="krm";rm.textContent="×";rm.setAttribute("aria-label","Kaiser "+x.year+" löschen");
+        rm.onclick=()=>{if(rm.dataset.sure!=="1"){rm.dataset.sure="1";rm.textContent="?";setTimeout(()=>{rm.dataset.sure="";rm.textContent="×"},3000);return}
+          db.collection("kaiser").doc(String(x.year)).delete().catch(()=>toast("Löschen fehlgeschlagen"))};sp.append(rm)}
+      kl.append(sp)})}
   const sel=$("kz-year");if(!sel.options.length){const y=new Date().getFullYear();for(let i=0;i<12;i++){const o=document.createElement("option");o.value=y-i;o.textContent="Kaiser "+(y-i);sel.append(o)}}
 }
 $("kzform").addEventListener("submit",e=>{e.preventDefault();if(!canKings)return;
