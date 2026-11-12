@@ -179,6 +179,10 @@ body.noplan .slot.empty{display:none}
 body.ro .slot{grid-template-columns:24px 1fr!important}
 body.ro .slot.empty{display:none}
 body.ro .slotname{min-width:0}
+.mini{display:flex;align-items:center;gap:6px;flex-wrap:wrap;color:var(--muted);font-size:.75rem}
+.mini input[type=date],.mini input[type=number]{width:auto;font-size:.75rem;padding:3px 6px;min-height:0;border-radius:8px;color:var(--muted)}
+.mini input[type=number]{width:3.6em}
+.mini label+input{margin-right:6px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .meta{color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums;white-space:nowrap}
 .plays{color:var(--muted);font-size:.68rem;opacity:.75;white-space:nowrap}
@@ -339,15 +343,9 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
       <div class="rate" id="f-rate" role="group" aria-labelledby="l-rate"></div>
       <div class="rhint" id="f-rhint"></div>
     </div>
-    <div class="two">
-      <div>
-        <label class="lbl" for="f-last">Zuletzt gespielt</label>
-        <input type="date" id="f-last">
-      </div>
-      <div>
-        <label class="lbl" for="f-plays">Wie oft gespielt</label>
-        <input type="number" id="f-plays" min="0" max="999" inputmode="numeric" placeholder="0">
-      </div>
+    <div class="mini">
+      <label for="f-last">zuletzt</label><input type="date" id="f-last">
+      <label for="f-plays">gespielt</label><input type="number" id="f-plays" min="0" max="999" inputmode="numeric" placeholder="0"><span>×</span>
     </div>
     <div id="f-notes-wrap">
       <label class="lbl" for="f-notes">Notizen</label>
@@ -806,7 +804,7 @@ function renderKaiser(){
   const list=Object.values(kaiser).sort((a,b)=>b.year-a.year);
   const kl=$("kz-list");kl.replaceChildren();
   if(list.length){kl.append("👑 Kaiser: ");
-    list.forEach((x,i)=>{if(i)kl.append(" · ");const sp=document.createElement("span");sp.style.whiteSpace="nowrap";sp.textContent=x.name+" "+x.year;
+    list.slice(0,1).forEach((x,i)=>{if(i)kl.append(" · ");const sp=document.createElement("span");sp.style.whiteSpace="nowrap";sp.textContent=x.name+" "+x.year;
       if(canKings){const rm=document.createElement("button");rm.type="button";rm.className="krm";rm.textContent="×";rm.setAttribute("aria-label","Kaiser "+x.year+" löschen");
         rm.onclick=()=>{if(rm.dataset.sure!=="1"){rm.dataset.sure="1";rm.textContent="?";setTimeout(()=>{rm.dataset.sure="";rm.textContent="×"},3000);return}
           db.collection("kaiser").doc(String(x.year)).delete().catch(()=>toast("Löschen fehlgeschlagen"))};sp.append(rm)}
