@@ -299,7 +299,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· v21</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· v22</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
       <button type="button" class="btn" id="xlsx">⤓ Als Excel-Datei</button>
@@ -546,8 +546,8 @@ function renderPlan(){
     if(g){n++;used.push(g);
       const b=document.createElement("button");b.type="button";b.className="slotname";b.setAttribute("aria-label","Platz "+(i+1)+": "+g.name+(canPlan?" – anderes Spiel wählen":" – Regeln ansehen"));
       const nm=document.createElement("span");nm.className="sn";nm.textContent=g.name;
-      const sm=document.createElement("span");sm.className="sm";sm.textContent=[g.id===wishWinner?"⭐ Wunsch":"",artTxt(g,0),BAHN[g.bahn]?.[0]].filter(Boolean).join(" · ");
-      nm.append(sm);b.append(nm);b.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();if(canPlan)openPick(i);else openInfo(g.id)});li.append(b);
+      const sm=document.createElement("span");sm.className="sm";sm.textContent=[id===wishWinner?"⭐ Wunsch":"",artTxt(g,0),BAHN[g.bahn]?.[0]].filter(Boolean).join(" · ");
+      nm.append(sm);b.append(nm);b.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();if(canPlan)openPick(i);else openInfo(id)});li.append(b);
       const rm=document.createElement("button");rm.type="button";rm.className="rm";rm.textContent="×";rm.setAttribute("aria-label",g.name+" von Platz "+(i+1)+" entfernen");
       rm.onclick=()=>{if(i>=10)plan.splice(i,1);else plan[i]=null;render();savePlan()};li.append(rm);
     }else{
@@ -739,7 +739,7 @@ $("evcopy").onclick=async()=>{
     if(id===KZ){const c=kaiserCandidates(parseIso(kaiserEvening()||todayIso()).getFullYear());
       return "\n👑 *21:00 KAISERKEGELN*"+(c.length?"\n   Kandidaten: "+c.join(", "):"")+"\n   2×5 Wurf in die Vollen · 🥪\n"}
     const g=id&&games[id];if(!g)return null;const ex=[artTxt(g,2),BAHN[g.bahn]?.[2]].filter(Boolean);
-    let line=`${++nr}. ${g.name}`+(ex.length?" ("+ex.join(", ")+")":"")+(g.id===wishWinner?" ⭐ Wunschspiel":"");
+    let line=`${++nr}. ${g.name}`+(ex.length?" ("+ex.join(", ")+")":"")+(id===wishWinner?" ⭐ Wunschspiel":"");
     if((g.plays||0)<=2&&g.wertung)line+="\n   ↳ "+((g.plays||0)===0?"Neu: ":"")+g.wertung;
     return line}).filter(Boolean).join("\n");
   if(!txt){toast("Noch keine Spiele eingeplant");return}
