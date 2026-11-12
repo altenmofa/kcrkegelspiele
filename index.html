@@ -158,7 +158,7 @@ body.kaiser .evening{box-shadow:0 0 0 1px var(--star) inset}
 input[type=email],input[type=password]{width:100%;font:inherit;font-size:1rem;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
 #l-code{font-family:ui-monospace,Menlo,monospace;font-size:.85rem}
 body.ro #add,body.ro #linkbtn,body.ro .handle,body.ro .slot .rm,body.ro .addslot,body.ro #evclear,body.ro #f-del,body.ro #form button[type=submit],body.ro #f-ok{display:none!important}
-body.ro .rstars button,body.ro #f-rate button,body.ro .slotname{pointer-events:none}
+body.ro .rstars button,body.ro #f-rate button{pointer-events:none}
 body.ro .kings,body.ro #f-notes-wrap{display:none!important}
 body:not(.ro) #robar{display:none}
 body.locked #robar,body.locked .evening,body.locked .top,body.locked .chips,body.locked #list,body.locked .foot,body.locked #linkbtn,body.locked #status,body.locked #seedbtn{display:none!important}
@@ -167,7 +167,6 @@ body.locked #robar,body.locked .evening,body.locked .top,body.locked .chips,body
 .lockcard span{color:var(--muted)}
 body.nokings #kform,body.nokings #kzform,body.nokings .krm{display:none!important}
 body.noplan #evsuggest,body.noplan #evtpl,body.noplan #f-del,body.noplan #linkbtn,body.noplan .handle,body.noplan .slot .rm,body.noplan .addslot,body.noplan #evclear{display:none!important}
-body.noplan .slotname{pointer-events:none}
 body.noplan .slot{grid-template-columns:24px 1fr!important}
 body.noplan .slot.empty{display:none}
 .mlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
@@ -182,6 +181,10 @@ body.ro .slot.empty{display:none}
 body.ro .slotname{min-width:0}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .meta{color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.plays{color:var(--muted);font-size:.68rem;opacity:.75;white-space:nowrap}
+.info .tags{margin:0}
+.info .irules{white-space:pre-wrap;margin:0;line-height:1.5}
+.info .istars{color:var(--star);font-size:1.3rem;letter-spacing:2px}
 textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .seg.three{grid-template-columns:repeat(3,1fr)}
@@ -399,6 +402,16 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   </form>
 </div>
 
+<div class="scrim" id="iscrim" hidden>
+  <div class="sheet info" role="dialog" aria-modal="true" aria-labelledby="i-title">
+    <h3 id="i-title"></h3>
+    <div class="tags" id="i-tags"></div>
+    <p class="irules" id="i-rules"></p>
+    <div><span class="istars" id="i-stars"></span> <span class="meta" id="i-avg"></span></div>
+    <div class="actions"><span style="flex:1"></span><button type="button" class="btn" id="i-close">Schließen</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -465,8 +478,7 @@ function render(){
     if(pi>=0){const p=document.createElement("span");p.className="tag";p.style.color="var(--accent)";const nn=plan.slice(0,pi+1).filter(x=>x&&games[x]).length;p.textContent="📅 "+nn;p.title="Spiel "+nn+" am nächsten Abend";p.setAttribute("aria-label","Spiel "+nn+" am nächsten Abend");side.append(p)}
     {const ri=rateInfo(g);if(ri.avg){const s=document.createElement("span");s.className="stars";s.textContent=stars(Math.round(ri.avg));s.setAttribute("aria-label","Durchschnitt "+avgTxt(ri));side.append(s);
       const a=document.createElement("span");a.className="meta";a.textContent=avgTxt(ri);side.append(a)}}
-    const mt=[g.lastPlayed?"zuletzt "+deDate(g.lastPlayed):"",g.plays?g.plays+"×":""].filter(Boolean).join(" · ");
-    if(mt){const m=document.createElement("span");m.className="meta";m.textContent=mt;side.append(m)}
+    if(g.plays){const m=document.createElement("span");m.className="plays";m.textContent=g.plays+"× gespielt";side.append(m)}
     row.append(main,side);
     row.onclick=()=>openSheet(g.id);
     row.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target===row){e.preventDefault();openSheet(g.id)}});
@@ -534,10 +546,10 @@ function renderPlan(){
     h.setAttribute("aria-label","Platz "+(i+1)+" verschieben (Pfeiltasten oder ziehen)");h.dataset.i=i;li.append(h);
     const no=document.createElement("span");no.className="no";no.textContent=i+1;li.append(no);
     if(g){n++;used.push(g);
-      const b=document.createElement("button");b.type="button";b.className="slotname";b.setAttribute("aria-label","Platz "+(i+1)+": "+g.name+" – anderes Spiel wählen");
+      const b=document.createElement("button");b.type="button";b.className="slotname";b.setAttribute("aria-label","Platz "+(i+1)+": "+g.name+(canPlan?" – anderes Spiel wählen":" – Regeln ansehen"));
       const nm=document.createElement("span");nm.className="sn";nm.textContent=g.name;
       const sm=document.createElement("span");sm.className="sm";sm.textContent=[g.id===wishWinner?"⭐ Wunsch":"",artTxt(g,0),BAHN[g.bahn]?.[0]].filter(Boolean).join(" · ");
-      nm.append(sm);b.append(nm);b.onclick=()=>openPick(i);li.append(b);
+      nm.append(sm);b.append(nm);b.onclick=()=>canPlan?openPick(i):openInfo(g.id);li.append(b);
       const rm=document.createElement("button");rm.type="button";rm.className="rm";rm.textContent="×";rm.setAttribute("aria-label",g.name+" von Platz "+(i+1)+" entfernen");
       rm.onclick=()=>{if(i>=10)plan.splice(i,1);else plan[i]=null;render();savePlan()};li.append(rm);
     }else{
@@ -654,6 +666,16 @@ $("addslot").onclick=()=>{if(plan.length>=MAX_SLOTS)return;plan.push(null);rende
 $("p-cancel").onclick=closePick;
 $("pscrim").onclick=e=>{if(e.target===$("pscrim"))closePick()};
 
+/* Spiel-Info (nur Anzeige) */
+function openInfo(id){const g=games[id];if(!g)return;
+  $("i-title").textContent=g.name;
+  const t=$("i-tags");t.replaceChildren();artenOf(g).forEach(k=>t.append(tag(ART[k][0],ART[k][1])));if(BAHN[g.bahn])t.append(tag(BAHN[g.bahn][0],BAHN[g.bahn][1]));
+  $("i-rules").textContent=g.wertung||"Noch keine Regeln eingetragen.";
+  const ri=rateInfo(g);$("i-stars").textContent=ri.avg?stars(Math.round(ri.avg)):"";$("i-avg").textContent=ri.avg?avgTxt(ri):"Noch nicht bewertet";
+  $("iscrim").hidden=false}
+$("i-close").onclick=()=>{$("iscrim").hidden=true};
+$("iscrim").onclick=e=>{if(e.target===$("iscrim"))$("iscrim").hidden=true};
+
 /* Hilfsfunktion für IDs */
 function slugId(n){return "g-"+n.toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,60)}
 
@@ -686,7 +708,7 @@ $("f-art").onclick=e=>{const b=e.target.closest("button");if(!b)return;const v=b
 $("f-bahn").onclick=e=>{const b=e.target.closest("button");if(b){cur.bahn=cur.bahn===b.dataset.v?"":b.dataset.v;setSeg("f-bahn",cur.bahn)}};
 $("f-cancel").onclick=close;
 $("scrim").onclick=e=>{if(e.target===$("scrim"))close()};
-document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("scrim").hidden)close();else if(!$("pscrim").hidden)closePick();else if(!$("authscrim").hidden)$("authscrim").hidden=true;else if(!$("mscrim").hidden)$("mscrim").hidden=true;else if(!$("tscrim").hidden)$("tscrim").hidden=true});
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("scrim").hidden)close();else if(!$("pscrim").hidden)closePick();else if(!$("authscrim").hidden)$("authscrim").hidden=true;else if(!$("mscrim").hidden)$("mscrim").hidden=true;else if(!$("tscrim").hidden)$("tscrim").hidden=true;else if(!$("iscrim").hidden)$("iscrim").hidden=true});
 $("form").addEventListener("submit",async e=>{
   e.preventDefault();const name=$("f-name").value.trim();if(!name){$("f-name").focus();return}
   const id=editing||("g"+Date.now().toString(36)+Math.random().toString(36).slice(2,6));
