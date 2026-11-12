@@ -1,6 +1,6 @@
 // KC Rebell Kegelspiele – Offline-Speicher für die App-Dateien
 // Bei jeder neuen App-Version die Nummer erhöhen, dann holen sich alle Handys die neuen Dateien.
-const CACHE = "kcr-v16";
+const CACHE = "kcr-v17";
 const SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./kaiser-logo.jpg"];
 const EXTERN = [
   "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
