@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>KC Rebell · Kegelspiele</title>
+<meta name="theme-color" content="#9b2c2c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Kegelspiele">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f6f2ee; --surface:#fff; --ink:#24191a; --muted:#6e6264; --line:#e6dcd6;
+  --accent:#9b2c2c; --accent-soft:#f6e3e1;
+  --c-einzel:#2f6b8f; --c-seite:#a8642a; --c-team:#2f7f7a; --c-volle:#4f7a3a; --c-abr:#7a4a8f; --star:#c9962b;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#171213; --surface:#211a1b; --ink:#efe7e6; --muted:#a8999a; --line:#352b2c;
+  --accent:#e2817a; --accent-soft:#3a2425;
+  --c-einzel:#7fb6d6; --c-seite:#e0a568; --c-team:#7cc9c2; --c-volle:#9cc685; --c-abr:#c09ad3; --star:#e3bb5b; color-scheme:dark}}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
+.wrap{max-width:680px;margin:0 auto;padding-top:calc(20px + env(safe-area-inset-top,0px));padding-bottom:calc(48px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+h1{font-family:var(--display);font-weight:800;font-size:2rem;letter-spacing:-.02em;margin:0}
+h2{font-family:var(--display);font-weight:600;font-size:1.1rem;margin:0}
+.sub{color:var(--muted);margin:4px 0 0}
+button{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible,textarea:focus-visible,.game:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.top{display:flex;gap:8px}
+.search{flex:1;min-width:0;font:inherit;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink)}
+.btn{font-weight:600;padding:11px 16px;border-radius:12px;border:1px solid var(--line);background:var(--surface);cursor:pointer;white-space:nowrap}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.danger{color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{font-size:.85rem;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:600}
+.evening{background:var(--surface);border:1.5px solid var(--accent);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.evhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.evcount{font-variant-numeric:tabular-nums;font-weight:600;color:var(--accent)}
+.evcount.ok{color:var(--c-volle)}
+.evmix{color:var(--muted);font-size:.85rem}
+.evlist{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:2px}
+.evlist:empty{display:none}
+.evempty{color:var(--muted);font-size:.85rem;margin:0}
+.evactions{display:flex;gap:8px;flex-wrap:wrap}
+.evactions .btn{padding:7px 12px;font-size:.85rem}
+.list{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.game{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 14px;border-top:1px solid var(--line);cursor:pointer}
+.game:first-child{border-top:0}
+.game:hover{background:var(--accent-soft)}
+.gname{font-weight:600;overflow-wrap:anywhere}
+.gw{color:var(--muted);font-size:.85rem;margin-top:2px;overflow-wrap:anywhere}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+.tag{font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.stars{color:var(--star);font-size:.85rem;letter-spacing:1px;white-space:nowrap}
+.pick{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:none;cursor:pointer;font-size:1.05rem;color:var(--muted)}
+.pick[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.side{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.status{color:var(--muted);font-size:.85rem;text-align:center;margin:0}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:.85rem}
+/* Formular */
+.scrim{position:fixed;inset:0;background:rgba(20,10,10,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet{background:var(--surface);width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:20px max(18px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:16px;max-height:92%;overflow:auto}
+@media (min-width:600px){.scrim{align-items:center}.sheet{border-radius:20px}}
+.sheet h3{font-family:var(--display);font-weight:600;font-size:1.2rem;margin:0}
+.lbl{font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px}
+input[type=text],textarea{width:100%;font:inherit;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+input[type=text]{font-size:1.05rem}
+input[type=date],input[type=number]{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);min-height:44px}
+.verify{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--accent-soft);font-size:.85rem}
+.verify a{color:var(--accent);font-weight:600;text-decoration:none}
+.verify button{margin-left:auto;padding:7px 12px;border-radius:10px;border:1px solid var(--accent);background:var(--surface);color:var(--accent);font-weight:600;cursor:pointer}
+.verify button[aria-pressed="true"]{background:var(--c-volle);border-color:var(--c-volle);color:#fff}
+.verify.ok{background:none;border:1px solid var(--line)}
+.evdate{margin:-6px 0 0;color:var(--muted);font-size:.85rem;font-variant-numeric:tabular-nums}
+.addslot.more{border:1.5px dashed var(--accent);border-radius:12px;padding:10px 12px;text-align:center}
+.slot{grid-template-columns:30px 22px 1fr auto!important}
+.handle{width:30px;height:38px;display:flex;align-items:center;justify-content:center;border:0;background:none;color:var(--muted);font-size:1.15rem;cursor:grab;touch-action:none;border-radius:8px;padding:0}
+.handle:active{cursor:grabbing}
+.slot.dragging{box-shadow:0 6px 18px rgba(0,0,0,.18);border-color:var(--accent);background:var(--surface);position:relative;z-index:2}
+.reflect{border-color:var(--star)}
+.rslot{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:center;padding:7px 8px 7px 10px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.rstars{display:flex;gap:2px}
+.rstars button{width:32px;height:36px;border:0;background:none;font-size:1.25rem;color:var(--line);cursor:pointer;padding:0}
+.rstars button.on{color:var(--star)}
+.slots{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.slot{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:center;padding:7px 8px 7px 10px;border:1px solid var(--line);border-radius:12px;background:var(--bg);min-height:48px}
+.slot.empty{border-style:dashed;background:none}
+.slot .no{font-family:var(--display);font-weight:600;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+.slot .sn{font-weight:600;overflow-wrap:anywhere;line-height:1.25}
+.slot .sm{display:block;font-weight:400;color:var(--muted);font-size:.76rem}
+.addslot{font:inherit;text-align:left;background:none;border:0;padding:6px 0;color:var(--accent);font-weight:600;cursor:pointer;width:100%}
+.slot .rm,.llist .rm{width:34px;height:34px;flex:none;border-radius:9px;border:1px solid var(--line);background:none;cursor:pointer;color:var(--muted);font-size:1rem}
+.slotname{font:inherit;text-align:left;background:none;border:0;padding:0;color:inherit;cursor:pointer;min-width:0}
+.plist{display:flex;flex-direction:column;max-height:52vh;overflow:auto;border:1px solid var(--line);border-radius:12px}
+.pitem{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:11px 12px;border:0;border-top:1px solid var(--line);background:none;text-align:left;cursor:pointer;font:inherit;color:inherit}
+.pitem:first-child{border-top:0}
+.pitem:hover{background:var(--accent-soft)}
+.pitem[disabled]{opacity:.45;cursor:default}
+.pitem small{color:var(--muted);font-size:.76rem;white-space:nowrap}
+.linkbtn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:var(--ink);padding:11px 14px;border:1.5px dashed var(--accent);border-radius:14px;background:none;cursor:pointer;margin-top:-6px}
+.linkbtn:hover{background:var(--accent-soft)}
+.linkbtn .ic{font-size:1.2rem}
+.linkbtn b{display:block;font-weight:600}
+.linkbtn small{display:block;color:var(--muted);font-size:.82rem}
+.note{color:var(--muted);font-size:.88rem;margin:0}
+input[type=url]{width:100%;font:inherit;font-size:1rem;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+.llist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.llist li{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:.85rem}
+.llist .u{flex:1;min-width:0;overflow-wrap:anywhere}
+.llist .st{font-size:.72rem;font-weight:600;white-space:nowrap}
+.apphead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.btn.login{padding:8px 12px;font-size:.85rem;flex:none}
+.robar{margin:-8px 0 0;padding:8px 12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);font-size:.85rem}
+input[type=email],input[type=password]{width:100%;font:inherit;font-size:1rem;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+#l-code{font-family:ui-monospace,Menlo,monospace;font-size:.85rem}
+body.ro #add,body.ro #linkbtn,body.ro .handle,body.ro .slot .rm,body.ro .addslot,body.ro #evclear,body.ro #f-del,body.ro #form button[type=submit],body.ro #f-ok{display:none!important}
+body.ro .rstars button,body.ro #f-rate button,body.ro .slotname{pointer-events:none}
+body:not(.ro) #robar{display:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.meta{color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.seg.three{grid-template-columns:repeat(3,1fr)}
+.seg button{padding:10px 6px;border-radius:10px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-size:.92rem}
+.seg button small{display:block;font-size:.75rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.seg button[aria-pressed="true"] small{color:#fff;opacity:.85}
+.rate{display:flex;gap:4px}
+.rate button{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-size:1.3rem;color:var(--line)}
+.rate button.on{color:var(--star);border-color:var(--star)}
+.rhint{color:var(--muted);font-size:.85rem;margin-top:6px;min-height:1.2em}
+.actions{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:.9rem;z-index:30;max-width:90%}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .18s ease-out}@keyframes up{from{transform:translateY(16px);opacity:.6}}}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="apphead">
+    <div>
+      <h1>Unsere Kegelspiele</h1>
+      <p class="sub">Kegelclub Rebell · alle Spiele, wie sie gehen und wie sie ankommen.</p>
+    </div>
+    <button type="button" class="btn login" id="loginbtn">Anmelden</button>
+  </header>
+  <p class="robar" id="robar">Nur Ansicht – zum Bearbeiten oben anmelden.</p>
+  <button type="button" class="btn primary" id="seedbtn" hidden>Startdaten übernehmen (Spiele + Plan aus Claude)</button>
+
+  <section class="evening reflect" id="reflect" aria-labelledby="h-rf" hidden>
+    <div class="evhead">
+      <h2 id="h-rf">Rückblick: letztes Kegeln</h2>
+      <span class="evcount" id="rf-count"></span>
+    </div>
+    <p class="evdate" id="rf-date"></p>
+    <p class="note">Wie kamen die Spiele an? Sterne antippen – das ändert direkt die Bewertung des Spiels.</p>
+    <ol class="slots" id="rf-list"></ol>
+  </section>
+
+  <section class="evening" aria-labelledby="h-ev">
+    <div class="evhead">
+      <h2 id="h-ev">Nächster Kegelabend</h2>
+      <span class="evcount" id="evcount">0 von 10</span>
+    </div>
+    <p class="evdate" id="evdate"></p>
+    <ol class="slots" id="slots"></ol>
+    <button type="button" class="addslot more" id="addslot" hidden>＋ Weiteren Platz hinzufügen</button>
+    <div class="evmix" id="evmix"></div>
+    <div class="evactions">
+      <button type="button" class="btn" id="evcopy">Liste kopieren</button>
+      <button type="button" class="btn" id="evclear">Zurücksetzen</button>
+    </div>
+  </section>
+
+  <div class="top">
+    <input class="search" id="q" type="search" placeholder="Spiel suchen …" aria-label="Spiel suchen" autocomplete="off">
+    <button type="button" class="btn primary" id="add">＋ Neues Spiel</button>
+  </div>
+  <button type="button" class="linkbtn" id="linkbtn"><span class="ic" aria-hidden="true">📋</span><span><b id="linkbtn-t">Spiel von Claude einfügen</b><small id="linkbtn-s">Link im Chat an Claude schicken, Antwort-Code hier einfügen</small></span></button>
+
+  <div class="chips" id="filters" role="group" aria-label="Filter">
+    <button type="button" data-f="alle" aria-pressed="true">Alle</button>
+    <button type="button" data-f="einzel" aria-pressed="false">Einzel</button>
+    <button type="button" data-f="seite" aria-pressed="false">Seitenspiel</button>
+    <button type="button" data-f="team" aria-pressed="false">Mannschaft</button>
+    <button type="button" data-f="volle" aria-pressed="false">In die Vollen</button>
+    <button type="button" data-f="abraeumen" aria-pressed="false">Abräumen</button>
+    <button type="button" data-f="ungeprueft" aria-pressed="false">🔍 Ungeprüft</button>
+  </div>
+
+  <section class="list" id="list" aria-label="Spiele"></section>
+  <p class="status" id="status">Lade eure Spiele …</p>
+
+  <div class="foot">
+    <span id="total"></span>
+    <button type="button" class="btn" id="xlsx">⤓ Als Excel-Datei</button>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" hidden>
+  <form class="sheet" id="form" role="dialog" aria-modal="true" aria-labelledby="f-title" novalidate>
+    <h3 id="f-title">Neues Spiel</h3>
+    <div>
+      <label class="lbl" for="f-name">Spielname</label>
+      <input type="text" id="f-name" autocomplete="off" maxlength="120" placeholder="z. B. Hausnummer">
+    </div>
+    <div>
+      <span class="lbl" id="l-art">Spielart <span style="text-transform:none;letter-spacing:0;font-weight:400">· mehrere möglich</span></span>
+      <div class="seg three" id="f-art" role="group" aria-labelledby="l-art">
+        <button type="button" data-v="einzel" aria-pressed="false">Einzel<small>jeder für sich</small></button>
+        <button type="button" data-v="seite" aria-pressed="false">Seite<small>Seite gegen Seite</small></button>
+        <button type="button" data-v="team" aria-pressed="false">Mannschaft<small>z. B. 2er-Teams</small></button>
+      </div>
+    </div>
+    <div>
+      <span class="lbl" id="l-bahn">Bahn eingestellt auf</span>
+      <div class="seg" id="f-bahn" role="group" aria-labelledby="l-bahn">
+        <button type="button" data-v="volle" aria-pressed="false">In die Vollen<small>alle neun stehen</small></button>
+        <button type="button" data-v="abraeumen" aria-pressed="false">Abräumen<small>Gefallene bleiben liegen</small></button>
+      </div>
+    </div>
+    <div>
+      <label class="lbl" for="f-wert">Regeln (kurz)</label>
+      <textarea id="f-wert" maxlength="600" rows="3" placeholder="z. B. 3 Würfe, höchste Holzzahl gewinnt, Pudel = minus 1"></textarea>
+      <div class="verify" id="f-verify" hidden>
+        <span class="vtxt" id="f-vtxt">🔍 Aus dem Internet – noch nicht von dir geprüft</span>
+        <a id="f-src" target="_blank" rel="noopener noreferrer" hidden>Quelle ↗</a>
+        <button type="button" id="f-ok" aria-pressed="false">✓ Regel stimmt so</button>
+      </div>
+    </div>
+    <div>
+      <span class="lbl" id="l-rate">Bewertung</span>
+      <div class="rate" id="f-rate" role="group" aria-labelledby="l-rate"></div>
+      <div class="rhint" id="f-rhint"></div>
+    </div>
+    <div class="two">
+      <div>
+        <label class="lbl" for="f-last">Zuletzt gespielt</label>
+        <input type="date" id="f-last">
+      </div>
+      <div>
+        <label class="lbl" for="f-plays">Wie oft gespielt</label>
+        <input type="number" id="f-plays" min="0" max="999" inputmode="numeric" placeholder="0">
+      </div>
+    </div>
+    <div>
+      <label class="lbl" for="f-notes">Notizen</label>
+      <textarea id="f-notes" maxlength="2000" rows="2" placeholder="Material, Varianten, wann zuletzt gespielt …"></textarea>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn danger" id="f-del" hidden>Löschen</button>
+      <span style="flex:1"></span>
+      <button type="button" class="btn" id="f-cancel">Abbrechen</button>
+      <button type="submit" class="btn primary">Speichern</button>
+    </div>
+  </form>
+</div>
+
+<div class="scrim" id="pscrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="p-title">
+    <h3 id="p-title">Platz belegen</h3>
+    <input class="search" id="p-q" type="search" placeholder="Spiel suchen …" aria-label="Spiel suchen" autocomplete="off">
+    <div class="plist" id="p-list"></div>
+    <div class="actions"><span style="flex:1"></span><button type="button" class="btn" id="p-cancel">Abbrechen</button></div>
+  </div>
+</div>
+
+<div class="scrim" id="lscrim" hidden>
+  <form class="sheet" id="lform" role="dialog" aria-modal="true" aria-labelledby="l-title" novalidate>
+    <h3 id="l-title">Spiel von Claude einfügen</h3>
+    <p class="note">So geht’s: Schick Claude im Chat den Link zu einer Spielanleitung. Claude antwortet mit einem Code-Block (beginnt mit <b>{</b> oder <b>[</b>). Kopiere ihn komplett hier hinein – das Spiel wird als „ungeprüft“ angelegt.</p>
+    <div>
+      <label class="lbl" for="l-code">Code von Claude</label>
+      <textarea id="l-code" rows="7" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder='{"name": "…", "wertung": "…"}'></textarea>
+    </div>
+    <div class="actions"><span style="flex:1"></span><button type="button" class="btn" id="l-cancel">Schließen</button><button type="submit" class="btn primary">Spiel anlegen</button></div>
+  </form>
+</div>
+
+<div class="scrim" id="authscrim" hidden>
+  <form class="sheet" id="authform" role="dialog" aria-modal="true" aria-labelledby="a-title" novalidate>
+    <h3 id="a-title">Anmelden zum Bearbeiten</h3>
+    <div><label class="lbl" for="a-mail">E-Mail</label><input type="email" id="a-mail" autocomplete="username" inputmode="email"></div>
+    <div><label class="lbl" for="a-pw">Passwort</label><input type="password" id="a-pw" autocomplete="current-password"></div>
+    <p class="note" id="a-msg"></p>
+    <div class="actions"><button type="button" class="btn" id="a-reset">Passwort vergessen</button><span style="flex:1"></span><button type="button" class="btn" id="a-cancel">Abbrechen</button><button type="submit" class="btn primary">Anmelden</button></div>
+  </form>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const FIREBASE_CONFIG={
+  apiKey:"AIzaSyDpSbkqmlUdCK8FQZPt-Y5i2gze0HK-2hg",
+  authDomain:"kcrkegelspiele.firebaseapp.com",
+  projectId:"kcrkegelspiele",
+  storageBucket:"kcrkegelspiele.firebasestorage.app",
+  messagingSenderId:"205450537865",
+  appId:"1:205450537865:web:e8c713c36cb52bf94b0f58"
+};
+const $=id=>document.getElementById(id);
+const ART={einzel:["Einzel","var(--c-einzel)","Einzelspiel"],seite:["Seitenspiel","var(--c-seite)","Seitenspiel"],team:["Mannschaft","var(--c-team)","Mannschaftsspiel"]};
+const ART_ORDER=["einzel","seite","team"];
+function artenOf(g){const a=Array.isArray(g.arten)?g.arten:(g.art?[g.art]:[]);return ART_ORDER.filter(k=>a.includes(k))}
+function artTxt(g,i){return artenOf(g).map(k=>ART[k][i]).join(" / ")}
+const BAHN={volle:["In die Vollen","var(--c-volle)","In die Vollen"],abraeumen:["Abräumen","var(--c-abr)","Abräumen"]};
+const RATE_TXT=["","Eher nicht nochmal","Geht so","Ganz gut","Kommt gut an","Absoluter Favorit"];
+let games={}, db=null, filter="alle", editing=null, cur={};
+
+function toast(t){const e=$("toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2600)}
+function tag(t,c){const s=document.createElement("span");s.className="tag";s.textContent=t;s.style.color=c;return s}
+function deDate(s){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||"");return m?m[3]+"."+m[2]+"."+m[1].slice(2):""}
+function stars(n){return n?"★".repeat(n)+"☆".repeat(5-n):""}
+function sorted(){return Object.entries(games).map(([id,g])=>({id,...g})).sort((a,b)=>(a.name||"").localeCompare(b.name||"","de"))}
+
+function render(){
+  const q=$("q").value.trim().toLowerCase(), all=sorted();
+  const box=$("list"); box.replaceChildren();
+  const shown=all.filter(g=>{
+    if(ART[filter]&&!artenOf(g).includes(filter))return false;
+    if(filter==="volle"||filter==="abraeumen"){if(g.bahn!==filter)return false}
+    if(filter==="ungeprueft"&&!(g.quelle&&!g.geprueft))return false;
+    if(q&&!((g.name||"")+" "+(g.wertung||"")+" "+(g.notes||"")).toLowerCase().includes(q))return false;
+    return true});
+  if(!shown.length){const p=document.createElement("div");p.className="game";p.style.cursor="default";
+    p.textContent=all.length?"Kein Spiel passt zu Suche oder Filter.":"Noch keine Spiele. Tragt oben euer erstes ein.";p.style.color="var(--muted)";box.append(p)}
+  shown.forEach(g=>{
+    const row=document.createElement("div");row.className="game";row.tabIndex=0;row.setAttribute("role","button");
+    row.setAttribute("aria-label",g.name+" bearbeiten");
+    const main=document.createElement("div");
+    const n=document.createElement("div");n.className="gname";n.textContent=g.name;main.append(n);
+    if(g.wertung){const w=document.createElement("div");w.className="gw";w.textContent=g.wertung.length>200?g.wertung.slice(0,198)+" …":g.wertung;main.append(w)}
+    const t=document.createElement("div");t.className="tags";
+    artenOf(g).forEach(k=>t.append(tag(ART[k][0],ART[k][1])));
+    if(BAHN[g.bahn])t.append(tag(BAHN[g.bahn][0],BAHN[g.bahn][1]));
+    if(g.quelle&&!g.geprueft)t.append(tag("🔍 Regel ungeprüft","var(--accent)"));
+    if(g.notes)t.append(tag("✎ Notiz","var(--muted)"));
+    if(t.children.length)main.append(t);
+    const side=document.createElement("div");side.className="side";
+    const pi=plan.indexOf(g.id);
+    if(pi>=0){const p=document.createElement("span");p.className="tag";p.style.color="var(--accent)";p.textContent="Platz "+(pi+1);side.append(p)}
+    if(g.rating){const s=document.createElement("span");s.className="stars";s.textContent=stars(g.rating);s.setAttribute("aria-label",g.rating+" von 5");side.append(s)}
+    const mt=[g.lastPlayed?"zuletzt "+deDate(g.lastPlayed):"",g.plays?g.plays+"×":""].filter(Boolean).join(" · ");
+    if(mt){const m=document.createElement("span");m.className="meta";m.textContent=mt;side.append(m)}
+    row.append(main,side);
+    row.onclick=()=>openSheet(g.id);
+    row.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target===row){e.preventDefault();openSheet(g.id)}});
+    box.append(row);
+  });
+  $("total").textContent=all.length===1?"1 Spiel":all.length+" Spiele";
+  $("xlsx").disabled=!all.length;
+  renderPlan();renderReflect();
+}
+
+async function save(id,doc){
+  if(!db){toast("Noch nicht verbunden – bitte kurz warten oder neu laden.");return false}
+  try{await db.collection("games").doc(id).set(doc);return true}
+  catch(e){toast("Speichern hat nicht geklappt. Bitte noch einmal versuchen.");return false}
+}
+/* Nächster Abend: 10 Plätze */
+const DEFAULT_SLOTS=["g-3-in-die-vollen",null,null,null,null,"g-abendkoenig",null,null,null,null];
+let plan=DEFAULT_SLOTS.slice(), pickSlot=null;
+const MAX_SLOTS=15;
+const WD=["So","Mo","Di","Mi","Do","Fr","Sa"];
+function nextEvening(){
+  // Alle 4 Wochen freitags; 113. Abend = 13.11.2026
+  const base=new Date(2026,10,13),today=new Date();today.setHours(0,0,0,0);
+  let n=Math.ceil((today-base)/(28*864e5));if(n<0)n=0;
+  const d=new Date(base);d.setDate(base.getDate()+n*28);
+  return {nr:113+n,date:d,iso:isoOf(d),txt:fmtD(d)};
+}
+function isoOf(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function fmtD(d){return WD[d.getDay()]+", "+String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+"."+d.getFullYear()}
+function parseIso(s){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||"");return m?new Date(+m[1],+m[2]-1,+m[3]):null}
+function nrFor(iso){const d=parseIso(iso);return d?113+Math.round((d-new Date(2026,10,13))/(28*864e5)):""}
+function todayIso(){return isoOf(new Date())}
+let drag=null;
+function renderPlan(){
+  if(drag)return;
+  const ol=$("slots");ol.replaceChildren();let n=0;const used=[];
+  plan.forEach((id,i)=>{
+    const g=id&&games[id];const li=document.createElement("li");li.className="slot"+(g?"":" empty");
+    const h=document.createElement("button");h.type="button";h.className="handle";h.textContent="⠿";
+    h.setAttribute("aria-label","Platz "+(i+1)+" verschieben (Pfeiltasten oder ziehen)");h.dataset.i=i;li.append(h);
+    const no=document.createElement("span");no.className="no";no.textContent=i+1;li.append(no);
+    if(g){n++;used.push(g);
+      const b=document.createElement("button");b.type="button";b.className="slotname";b.setAttribute("aria-label","Platz "+(i+1)+": "+g.name+" – anderes Spiel wählen");
+      const nm=document.createElement("span");nm.className="sn";nm.textContent=g.name;
+      const sm=document.createElement("span");sm.className="sm";sm.textContent=[artTxt(g,0),BAHN[g.bahn]?.[0]].filter(Boolean).join(" · ");
+      nm.append(sm);b.append(nm);b.onclick=()=>openPick(i);li.append(b);
+      const rm=document.createElement("button");rm.type="button";rm.className="rm";rm.textContent="×";rm.setAttribute("aria-label",g.name+" von Platz "+(i+1)+" entfernen");
+      rm.onclick=()=>{if(i>=10)plan.splice(i,1);else plan[i]=null;render();savePlan()};li.append(rm);
+    }else{
+      const ad=document.createElement("button");ad.type="button";ad.className="addslot";ad.textContent="＋ Spiel wählen";ad.setAttribute("aria-label","Platz "+(i+1)+": Spiel wählen");
+      ad.onclick=()=>openPick(i);li.append(ad);li.append(document.createElement("span"));
+    }
+    ol.append(li);
+  });
+  const c=$("evcount");c.textContent=n+" von "+plan.length;c.classList.toggle("ok",n>=8);
+  const ne=nextEvening();$("evdate").textContent=ne.nr+". Kegelabend · "+ne.txt;
+  $("addslot").hidden=plan.some(x=>!x)||plan.length>=MAX_SLOTS;
+  if(used.length){const cnt=k=>used.filter(g=>artenOf(g).includes(k)).length,vo=used.filter(g=>g.bahn==="volle").length,ab=used.filter(g=>g.bahn==="abraeumen").length,neu=used.filter(g=>(g.plays||0)<=2).length;
+    $("evmix").textContent=`${cnt("einzel")} Einzel · ${cnt("seite")} Seite · ${cnt("team")} Mannschaft · ${vo} Volle · ${ab} Abräumen`+(neu?` · ${neu} neu/selten (mit Erklärung in der Kopie)`:"")}else $("evmix").textContent="";
+}
+let planDate="";
+async function savePlan(){
+  if(!db){toast("Noch nicht verbunden – bitte kurz warten oder neu laden.");return}
+  if(!planDate)planDate=nextEvening().iso;
+  try{await db.collection("plan").doc("next").set({slots:plan.map(x=>x||""),date:planDate,updatedAt:new Date().toISOString()})}
+  catch(e){toast("Plan wurde nicht gespeichert. Bitte noch einmal versuchen.")}
+}
+/* Verschieben: Griff ziehen (Maus & Touch) oder Pfeiltasten */
+function moveSlot(from,to){if(to<0||to>=plan.length||from===to)return;const [x]=plan.splice(from,1);plan.splice(to,0,x);render();savePlan()}
+(function(){
+  const ol=$("slots");
+  ol.addEventListener("pointerdown",e=>{
+    const h=e.target.closest(".handle");if(!h)return;e.preventDefault();
+    const li=h.closest("li");try{h.setPointerCapture(e.pointerId)}catch(_){}
+    drag={from:+h.dataset.i,cur:+h.dataset.i,li,h,id:e.pointerId};li.classList.add("dragging");
+  });
+  ol.addEventListener("pointermove",e=>{
+    if(!drag||e.pointerId!==drag.id)return;e.preventDefault();
+    const others=[...ol.children].filter(x=>x!==drag.li);
+    let t=0;others.forEach(o=>{const r=o.getBoundingClientRect();if(r.top+r.height/2<e.clientY)t++});
+    if(t!==drag.cur){ol.insertBefore(drag.li,others[t]||null);drag.cur=t}
+  });
+  const end=e=>{if(!drag||e.pointerId!==drag.id)return;const d=drag;drag=null;d.li.classList.remove("dragging");
+    if(e.type==="pointerup"&&d.cur!==d.from)moveSlot(d.from,d.cur);else render()};
+  ol.addEventListener("pointerup",end);ol.addEventListener("pointercancel",end);
+  ol.addEventListener("keydown",e=>{const h=e.target.closest(".handle");if(!h)return;const i=+h.dataset.i;
+    if(e.key==="ArrowUp"||e.key==="ArrowDown"){e.preventDefault();const to=i+(e.key==="ArrowUp"?-1:1);if(to<0||to>=plan.length)return;moveSlot(i,to);
+      setTimeout(()=>{const nh=ol.querySelector('.handle[data-i="'+to+'"]');if(nh)nh.focus()},0)}});
+})();
+
+/* Rückblick: eine Woche nach dem Kegeln */
+let lastPlan=null, planLoaded=false, gamesLoaded=false, archiving=false;
+function renderReflect(){
+  const sec=$("reflect");
+  const d=lastPlan&&parseIso(lastPlan.date);
+  if(!d){sec.hidden=true;return}
+  const until=new Date(d);until.setDate(until.getDate()+7);
+  const today=parseIso(todayIso());
+  if(today>until){sec.hidden=true;return}
+  sec.hidden=false;
+  $("rf-date").textContent=(lastPlan.nr||nrFor(lastPlan.date))+". Kegelabend · "+fmtD(d)+" · sichtbar bis "+fmtD(until);
+  const ol=$("rf-list");ol.replaceChildren();let rated=0,cnt=0;
+  (lastPlan.slots||[]).forEach(id=>{
+    const g=id&&games[id];if(!g)return;cnt++;if(g.rating)rated++;
+    const li=document.createElement("li");li.className="rslot";
+    const no=document.createElement("span");no.className="no";no.textContent=cnt;
+    const nm=document.createElement("span");nm.className="sn";nm.textContent=g.name;
+    const st=document.createElement("div");st.className="rstars";st.setAttribute("role","group");st.setAttribute("aria-label","Bewertung für "+g.name);
+    for(let k=1;k<=5;k++){const b=document.createElement("button");b.type="button";b.textContent="★";b.className=k<=(g.rating||0)?"on":"";
+      b.setAttribute("aria-label",k+" von 5");b.setAttribute("aria-pressed",String(k<=(g.rating||0)));
+      b.onclick=async()=>{const v=g.rating===k?0:k;games[id]={...g,rating:v,updatedAt:new Date().toISOString()};render();
+        if(db){try{await db.collection("games").doc(id).update({rating:v,updatedAt:new Date().toISOString()})}catch(e){toast("Bewertung wurde nicht gespeichert.")}}};
+      st.append(b)}
+    li.append(no,nm,st);ol.append(li);
+  });
+  $("rf-count").textContent=rated+" von "+cnt+" bewertet";
+}
+async function maybeArchive(){
+  if(!db||!canEdit||!planLoaded||!gamesLoaded||archiving||!planDate)return;
+  if(planDate>=todayIso())return;
+  archiving=true;
+  try{
+    const done=lastPlan&&lastPlan.date===planDate;
+    if(!done){
+      const ids=plan.filter(id=>id&&games[id]);
+      await db.collection("plan").doc("last").set({date:planDate,nr:nrFor(planDate),slots:plan.map(x=>x||""),archivedAt:new Date().toISOString()});
+      for(const id of ids){const g=games[id];const up={plays:(g.plays||0)+1,updatedAt:new Date().toISOString()};if(!g.lastPlayed||g.lastPlayed<planDate)up.lastPlayed=planDate;
+        try{await db.collection("games").doc(id).update(up)}catch(e){}}
+    }
+    plan=DEFAULT_SLOTS.slice();planDate=nextEvening().iso;
+    await db.collection("plan").doc("next").set({slots:plan.map(x=>x||""),date:planDate,updatedAt:new Date().toISOString()});
+  }catch(e){toast("Der letzte Abend konnte nicht abgeschlossen werden.")}
+  archiving=false;render();
+}
+function openPick(i){if(!canEdit)return openLogin();pickSlot=i;$("p-title").textContent="Platz "+(i+1)+" belegen";$("p-q").value="";renderPick();$("pscrim").hidden=false;setTimeout(()=>$("p-q").focus(),50)}
+function closePick(){$("pscrim").hidden=true;pickSlot=null;
+  let ch=false;while(plan.length>10&&!plan[plan.length-1]){plan.pop();ch=true}if(ch)render()}
+function renderPick(){
+  const q=$("p-q").value.trim().toLowerCase(),box=$("p-list");box.replaceChildren();
+  const list=sorted().filter(g=>!q||(g.name||"").toLowerCase().includes(q));
+  if(!list.length){const p=document.createElement("div");p.className="pitem";p.style.color="var(--muted)";p.textContent="Kein Spiel gefunden.";box.append(p)}
+  list.forEach(g=>{
+    const at=plan.indexOf(g.id);const b=document.createElement("button");b.type="button";b.className="pitem";
+    const nm=document.createElement("span");nm.textContent=g.name;
+    const sm=document.createElement("small");sm.textContent=at>=0?"schon auf Platz "+(at+1):[g.lastPlayed?"zuletzt "+deDate(g.lastPlayed):"",g.rating?"★".repeat(g.rating):""].filter(Boolean).join(" · ");
+    b.append(nm,sm);if(at>=0&&at!==pickSlot)b.disabled=true;
+    b.onclick=()=>{if(pickSlot==null)return;plan[pickSlot]=g.id;closePick();render();savePlan()};
+    box.append(b);
+  });
+}
+$("p-q").addEventListener("input",renderPick);
+$("addslot").onclick=()=>{if(plan.length>=MAX_SLOTS)return;plan.push(null);render();openPick(plan.length-1)};
+$("p-cancel").onclick=closePick;
+$("pscrim").onclick=e=>{if(e.target===$("pscrim"))closePick()};
+
+/* Import von Claude */
+const ARTEN_OK=["einzel","seite","team"],BAHN_OK=["volle","abraeumen"];
+function slugId(n){return "g-"+n.toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,60)}
+$("linkbtn").onclick=()=>{if(!canEdit)return openLogin();$("l-code").value="";$("lscrim").hidden=false;setTimeout(()=>$("l-code").focus(),50)};
+$("l-cancel").onclick=()=>{$("lscrim").hidden=true};
+$("lscrim").onclick=e=>{if(e.target===$("lscrim"))$("lscrim").hidden=true};
+$("lform").addEventListener("submit",async e=>{
+  e.preventDefault();let raw=$("l-code").value.trim().replace(/^```[a-z]*\s*/i,"").replace(/```\s*$/,"").replace(/[“”„]/g,'"');
+  let data;try{data=JSON.parse(raw)}catch(err){toast("Der Code ist unvollständig. Bitte den ganzen Block von Claude kopieren.");return}
+  const list=Array.isArray(data)?data:[data];let n=0;
+  for(const x of list){
+    if(!x||typeof x.name!=="string"||!x.name.trim())continue;
+    const name=x.name.trim().slice(0,120);let id=slugId(name);if(games[id])id+="-"+Date.now().toString(36).slice(-4);
+    const doc={name,arten:(Array.isArray(x.arten)?x.arten:[]).filter(a=>ARTEN_OK.includes(a)),bahn:BAHN_OK.includes(x.bahn)?x.bahn:"",
+      wertung:String(x.wertung||"").slice(0,600),notes:String(x.notes||"").slice(0,2000),quelle:/^https?:\/\//.test(x.quelle||"")?String(x.quelle).slice(0,500):"",
+      rating:0,plays:0,lastPlayed:"",createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+    doc.geprueft=!doc.quelle;doc.art=doc.arten[0]||"";
+    try{await db.collection("games").doc(id).set(doc);n++}catch(err){toast("Speichern fehlgeschlagen – bist du angemeldet?");return}
+  }
+  if(!n){toast("Im Code war kein Spiel mit Namen.");return}
+  $("lscrim").hidden=true;toast(n===1?"Spiel angelegt":n+" Spiele angelegt");
+});
+
+/* Formular */
+function setSeg(id,v){$(id).querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===v)))}
+function setRate(n){cur.rating=n;[...$("f-rate").children].forEach((b,i)=>{b.classList.toggle("on",i<n);b.setAttribute("aria-pressed",String(i<n))});$("f-rhint").textContent=RATE_TXT[n]||"Noch nicht bewertet"}
+for(let i=1;i<=5;i++){const b=document.createElement("button");b.type="button";b.textContent="★";b.setAttribute("aria-label",i+" von 5");b.onclick=()=>setRate(cur.rating===i?0:i);$("f-rate").append(b)}
+function openSheet(id){
+  editing=id||null;const g=(id&&games[id])||{};
+  cur={arten:artenOf(g),bahn:g.bahn||"",rating:g.rating||0};
+  $("f-title").textContent=!canEdit?"Spiel ansehen":id?"Spiel bearbeiten":"Neues Spiel";
+  $("f-name").value=g.name||"";$("f-wert").value=g.wertung||"";$("f-notes").value=g.notes||"";
+  cur.geprueft=!!g.geprueft;cur.quelle=g.quelle||"";cur.origWert=g.wertung||"";setVerify();
+  $("f-last").value=g.lastPlayed||"";$("f-plays").value=g.plays||"";
+  setArten();setSeg("f-bahn",cur.bahn);setRate(cur.rating);
+  $("f-del").hidden=!id;$("scrim").hidden=false;setTimeout(()=>$("f-name").focus(),50);
+}
+function close(){$("scrim").hidden=true;editing=null}
+function setVerify(){
+  const v=$("f-verify");v.hidden=!cur.quelle;
+  v.classList.toggle("ok",cur.geprueft);
+  $("f-vtxt").textContent=cur.geprueft?"✓ Von dir geprüft (ursprünglich aus dem Internet)":"🔍 Aus dem Internet – noch nicht von dir geprüft";
+  const a=$("f-src");if(/^https:\/\//.test(cur.quelle)){a.href=cur.quelle;a.hidden=false}else a.hidden=true;
+  $("f-ok").setAttribute("aria-pressed",String(cur.geprueft));$("f-ok").textContent=cur.geprueft?"✓ Geprüft":"✓ Regel stimmt so";
+}
+$("f-ok").onclick=()=>{cur.geprueft=!cur.geprueft;setVerify()};
+function setArten(){$("f-art").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(cur.arten.includes(b.dataset.v))))}
+$("f-art").onclick=e=>{const b=e.target.closest("button");if(!b)return;const v=b.dataset.v;cur.arten=cur.arten.includes(v)?cur.arten.filter(x=>x!==v):ART_ORDER.filter(k=>k===v||cur.arten.includes(k));setArten()};
+$("f-bahn").onclick=e=>{const b=e.target.closest("button");if(b){cur.bahn=cur.bahn===b.dataset.v?"":b.dataset.v;setSeg("f-bahn",cur.bahn)}};
+$("f-cancel").onclick=close;
+$("scrim").onclick=e=>{if(e.target===$("scrim"))close()};
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("scrim").hidden)close();else if(!$("pscrim").hidden)closePick();else if(!$("lscrim").hidden)$("lscrim").hidden=true;else if(!$("authscrim").hidden)$("authscrim").hidden=true});
+$("form").addEventListener("submit",async e=>{
+  e.preventDefault();const name=$("f-name").value.trim();if(!name){$("f-name").focus();return}
+  const id=editing||("g"+Date.now().toString(36)+Math.random().toString(36).slice(2,6));
+  const old=games[id]||{};
+  const wert=$("f-wert").value.trim().slice(0,600);
+  const doc={name:name.slice(0,120),arten:cur.arten.slice(),art:cur.arten[0]||"",bahn:cur.bahn,wertung:wert,
+    quelle:cur.quelle||"",geprueft:cur.quelle?(cur.geprueft||wert!==cur.origWert.trim()):true,rating:cur.rating||0,notes:$("f-notes").value.trim().slice(0,2000),
+    lastPlayed:/^\d{4}-\d{2}-\d{2}$/.test($("f-last").value)?$("f-last").value:"",plays:Math.max(0,Math.min(999,parseInt($("f-plays").value,10)||0)),
+    createdAt:old.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
+  games[id]=doc;close();render();await save(id,doc);
+});
+$("f-del").onclick=async()=>{
+  const id=editing;if(!id)return;const b=$("f-del");
+  if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="Wirklich löschen?";setTimeout(()=>{b.dataset.sure="";b.textContent="Löschen"},3000);return}
+  b.dataset.sure="";b.textContent="Löschen";
+  delete games[id];close();render();
+  if(db){try{await db.collection("games").doc(id).delete()}catch(e){toast("Löschen hat nicht geklappt.")}}
+};
+$("add").onclick=()=>{if(!canEdit)return openLogin();openSheet(null)};
+$("q").addEventListener("input",render);
+$("filters").onclick=e=>{const b=e.target.closest("button");if(!b)return;filter=b.dataset.f;$("filters").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render()};
+
+/* Abend */
+$("evcopy").onclick=async()=>{
+  let txt=plan.map((id,i)=>{const g=id&&games[id];if(!g)return null;const ex=[artTxt(g,2),BAHN[g.bahn]?.[2]].filter(Boolean);
+    let line=`${i+1}. ${g.name}`+(ex.length?" ("+ex.join(", ")+")":"");
+    if((g.plays||0)<=2&&g.wertung)line+="\n   ↳ "+((g.plays||0)===0?"Neu: ":"")+g.wertung;
+    return line}).filter(Boolean).join("\n");
+  if(!txt){toast("Noch keine Spiele eingeplant");return}
+  const ne=nextEvening();txt=`*${ne.nr}. Kegelabend – ${ne.txt}*\n\n`+txt;
+  try{await navigator.clipboard.writeText(txt);toast("Liste kopiert")}catch(e){toast("Kopieren ging hier nicht")}
+};
+$("evclear").onclick=async()=>{
+  const b=$("evclear");
+  if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="Wirklich zurücksetzen?";setTimeout(()=>{b.dataset.sure="";b.textContent="Zurücksetzen"},3000);return}
+  b.dataset.sure="";b.textContent="Zurücksetzen";
+  plan=DEFAULT_SLOTS.slice();render();savePlan();
+};
+
+/* Excel-Export */
+$("xlsx").onclick=async()=>{
+  if(typeof XLSX==="undefined"){toast("Excel-Baustein lädt nicht. Seite neu öffnen.");return}
+  const rows=sorted().map(g=>({"Spielname":g.name,"Spielart":artTxt(g,2),"Bahn":BAHN[g.bahn]?.[2]||"","Regeln":g.wertung||"","Regel geprüft":g.quelle?(g.geprueft?"ja":"nein (aus Internet)"):"ja","Quelle":g.quelle||"","Bewertung (1–5)":g.rating||"","Bewertung":RATE_TXT[g.rating]||"","Zuletzt gespielt":deDate(g.lastPlayed),"Wie oft":g.plays||"","Nächster Abend":plan.indexOf(g.id)>=0?"Platz "+(plan.indexOf(g.id)+1):"","Notizen":g.notes||""}));
+  const ws=XLSX.utils.json_to_sheet(rows);
+  ws["!cols"]=[{wch:28},{wch:14},{wch:15},{wch:60},{wch:18},{wch:40},{wch:15},{wch:20},{wch:16},{wch:9},{wch:14},{wch:50}];
+  ws["!autofilter"]={ref:ws["!ref"]};
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Kegelspiele");
+  const d=new Date(),stamp=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  try{XLSX.writeFile(wb,"Kegelspiele KC Rebell "+stamp+".xlsx")}catch(e){toast("Die Excel-Datei konnte nicht erstellt werden.")}
+};
+
+/* Firebase */
+let canEdit=false;
+function setEdit(user){canEdit=!!user;document.body.classList.toggle("ro",!canEdit);
+  $("loginbtn").textContent=user?"Abmelden":"Anmelden";$("loginbtn").title=user?("Angemeldet: "+(user.email||"")):"";
+  $("seedbtn").hidden=!(canEdit&&gamesLoaded&&!Object.keys(games).length);render();maybeArchive()}
+function openLogin(){$("a-msg").textContent="";$("authscrim").hidden=false;setTimeout(()=>$("a-mail").focus(),50)}
+$("a-cancel").onclick=()=>{$("authscrim").hidden=true};
+$("authscrim").onclick=e=>{if(e.target===$("authscrim"))$("authscrim").hidden=true};
+$("loginbtn").onclick=()=>openLogin();
+render();setEdit(null);
+(async()=>{
+  const timer=setTimeout(()=>{$("status").textContent="Die Spiele laden gerade nicht. Internetverbindung prüfen und neu öffnen."},10000);
+  let F;
+  try{
+    const V="10.12.2";
+    const [appM,fsM,authM]=await Promise.all([
+      import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`),
+      import(`https://www.gstatic.com/firebasejs/${V}/firebase-firestore.js`),
+      import(`https://www.gstatic.com/firebasejs/${V}/firebase-auth.js`)]);
+    F={...appM,...fsM,...authM};
+  }catch(e){clearTimeout(timer);$("status").textContent="Die App konnte nicht geladen werden. Internetverbindung prüfen.";return}
+  const app=F.initializeApp(FIREBASE_CONFIG);
+  let fdb;try{fdb=F.initializeFirestore(app,{localCache:F.persistentLocalCache()})}catch(e){fdb=F.getFirestore(app)}
+  const auth=F.getAuth(app);
+  db={collection(name){return{
+    doc(id){const r=F.doc(fdb,name,id);return{set:d=>F.setDoc(r,d),update:d=>F.updateDoc(r,d),delete:()=>F.deleteDoc(r)}},
+    onSnapshot(ok,err){return F.onSnapshot(F.collection(fdb,name),s=>ok({docs:s.docs.map(d=>({id:d.id,data:()=>d.data()}))}),err)}}}};
+  F.onAuthStateChanged(auth,u=>setEdit(u));
+  $("loginbtn").onclick=async()=>{if(canEdit){await F.signOut(auth);toast("Abgemeldet")}else openLogin()};
+  $("authform").addEventListener("submit",async e=>{e.preventDefault();$("a-msg").textContent="";
+    try{await F.signInWithEmailAndPassword(auth,$("a-mail").value.trim(),$("a-pw").value);$("authscrim").hidden=true;$("a-pw").value="";toast("Angemeldet")}
+    catch(err){$("a-msg").textContent="Anmeldung fehlgeschlagen. E-Mail und Passwort prüfen."}});
+  $("a-reset").onclick=async()=>{const m=$("a-mail").value.trim();if(!m){$("a-msg").textContent="Bitte zuerst die E-Mail eintragen.";return}
+    try{await F.sendPasswordResetEmail(auth,m);$("a-msg").textContent="Falls ein Konto existiert, kommt gleich eine E-Mail zum Zurücksetzen."}catch(err){$("a-msg").textContent="Das hat nicht geklappt."}};
+  db.collection("games").onSnapshot(s=>{clearTimeout(timer);games={};s.docs.forEach(d=>{const x=d.data();if(x&&x.name)games[d.id]=x});$("status").hidden=true;gamesLoaded=true;
+      $("seedbtn").hidden=!(canEdit&&!Object.keys(games).length);render();maybeArchive()},
+    ()=>{clearTimeout(timer);$("status").textContent="Spiele konnten nicht geladen werden. Sind die Sicherheitsregeln gesetzt?"});
+  db.collection("plan").onSnapshot(s=>{lastPlan=null;s.docs.forEach(d=>{const x=d.data();if(!x)return;
+      if(d.id==="last"&&x.date)lastPlan=x;
+      if(d.id==="next"&&Array.isArray(x.slots)){plan=Array.from({length:Math.min(MAX_SLOTS,Math.max(10,x.slots.length))},(_,i)=>x.slots[i]||null);planDate=x.date||""}});
+    planLoaded=true;render();maybeArchive()},()=>{});
+  $("seedbtn").onclick=async()=>{
+    const b=$("seedbtn");b.disabled=true;b.textContent="Übernehme …";
+    try{const r=await fetch("seed.json",{cache:"no-store"});const seed=await r.json();
+      for(const g of seed.games)await db.collection("games").doc(g.id).set(g.data);
+      if(seed.plan)await db.collection("plan").doc("next").set(seed.plan);
+      toast(seed.games.length+" Spiele übernommen");b.hidden=true}
+    catch(e){toast("Übernahme fehlgeschlagen – angemeldet und Regeln gesetzt?");b.disabled=false;b.textContent="Startdaten übernehmen (Spiele + Plan aus Claude)"}};
+})();
+</script>
+</body>
+</html>

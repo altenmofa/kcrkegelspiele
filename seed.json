@@ -1,0 +1,680 @@
+{
+ "games": [
+  {
+   "id": "g-218",
+   "data": {
+    "arten": [
+     "einzel"
+    ],
+    "bahn": "volle",
+    "lastPlayed": "2026-07-24",
+    "name": "218",
+    "notes": "",
+    "plays": 4,
+    "rating": 2,
+    "wertung": "Wer auf einen 25er Schritt genau kommt, sorgt dafür, dass alle anderen Kegelbrüder diesen 25er Schritt als Centbetrag zahlen müssen. Kommt man drüber, zahlt man selbst.",
+    "art": "einzel",
+    "quelle": "",
+    "geprueft": true,
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-218-multiplikator",
+   "data": {
+    "arten": [
+     "einzel"
+    ],
+    "bahn": "volle",
+    "lastPlayed": "2026-10-16",
+    "name": "218 Multiplikator",
+    "notes": "",
+    "plays": 10,
+    "rating": 5,
+    "wertung": "Variante von 218, Ende bei 218, kommt man bspw. mit einer 9 auf 200, dann zahlen alle 9x200ct=1800ct",
+    "art": "einzel",
+    "quelle": "",
+    "geprueft": true,
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-21er",
+   "data": {
+    "arten": [
+     "seite"
+    ],
+    "bahn": "volle",
+    "geprueft": true,
+    "lastPlayed": "2026-07-24",
+    "name": "21er",
+    "notes": "",
+    "plays": 3,
+    "quelle": "",
+    "rating": 3,
+    "wertung": "Beide Teams starten mit 21; immer 1 gegen 1 in die Vollen, Differenz wird beim Gewinnerteam abgezogen; wer zuerst bei 0 ist, gewinnt",
+    "art": "seite",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-3-in-die-vollen",
+   "data": {
+    "arten": [
+     "einzel"
+    ],
+    "bahn": "volle",
+    "geprueft": true,
+    "lastPlayed": "2026-10-16",
+    "name": "3 in die Vollen",
+    "notes": "Fester Auftakt, eröffnet praktisch jeden Abend. Variante Vater-Sohn: 3 Verlierer auf jeder Seite. Gegen Gastclub als Warm-up (Mann gegen Mann oder außer Wertung).",
+    "plays": 10,
+    "quelle": "",
+    "rating": 5,
+    "wertung": "3 Würfe in die Vollen, Holz zusammengezählt",
+    "art": "einzel",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-4-gewinnt",
+   "data": {
+    "arten": [
+     "seite"
+    ],
+    "bahn": "volle",
+    "geprueft": true,
+    "lastPlayed": "2025-12-12",
+    "name": "4 gewinnt",
+    "notes": "Gegen Gastclub: Innentischseiten spielen auf der jeweils anderen Bahn, bei Gleichstand gesamte KCs. Gut als „falls noch Zeit“-Spiel.",
+    "plays": 2,
+    "quelle": "https://kegeln.rainer-grundel.de/kegelspiele/mannschaftsspiele/vier-gewinnt",
+    "rating": 4,
+    "wertung": "Tischseite gegen Tischseite (X gegen O) auf einem 9×9-Feld; abwechselnd 1 Wurf in die Vollen, die Holzzahl bestimmt die Spalte; erste Viererreihe (waagerecht, senkrecht, diagonal) gewinnt",
+    "art": "seite",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-abendkoenig",
+   "data": {
+    "arten": [
+     "einzel"
+    ],
+    "bahn": "volle",
+    "geprueft": true,
+    "lastPlayed": "2026-10-16",
+    "name": "Abendkönig",
+    "notes": "Fester Bestandteil jedes Abends, meist gegen Ende. Seitenvariante: Durchschnitt pro Seite zählt (Verliererseite bekommt geschlossen ein verlorenes Spiel). Gegen Gastclub: Gesamt-KC-Schnitt zählt. Alle Abendkönige spielen bei dem letzten Kegeln des Jahres gegeneinander einen Kaiser bei 2x5 Wurf in die Vollen aus.",
+    "plays": 10,
+    "quelle": "",
+    "rating": 5,
+    "wertung": "5 Würfe in die Vollen, höchste Holzzahl wird Abendkönig, bei Gleichstand 3 in die Vollen",
+    "art": "einzel",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-abraeum-ballermann",
+   "data": {
+    "arten": [
+     "seite"
+    ],
+    "bahn": "abraeumen",
+    "geprueft": true,
+    "lastPlayed": "2026-10-16",
+    "name": "Abräum-Ballermann",
+    "notes": "Vater-Sohn: links Söhne gegen rechts Väter und umgekehrt. Bei Gleichstand: gesamte KCs.",
+    "plays": 7,
+    "quelle": "",
+    "rating": 5,
+    "wertung": "6 Minuten auf Abräumen, Tischseite gegen Tischseite; wer nach 6 Minuten mehr Holz hat, gewinnt",
+    "art": "seite",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-abraeum-multiplikator",
+   "data": {
+    "arten": [
+     "einzel"
+    ],
+    "bahn": "abraeumen",
+    "geprueft": true,
+    "lastPlayed": "2026-05-29",
+    "name": "Abräum-Multiplikator",
+    "notes": "",
+    "plays": 3,
+    "quelle": "",
+    "rating": 4,
+    "wertung": "3 Würfe Abräumen: 1. Wurf ×1, 2. Wurf ×2, 3. Wurf ×3; 2–3 Durchgänge",
+    "art": "einzel",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-ballermann-6",
+   "data": {
+    "arten": [
+     "seite"
+    ],
+    "bahn": "volle",
+    "geprueft": true,
+    "lastPlayed": "2026-10-16",
+    "name": "Ballermann 6",
+    "notes": "Gibt es auch auf Abräumen (siehe Abräum-Ballermann). Oft kombiniert: 1. Halbzeit Vollen, 2. Halbzeit Abräumen. Bei Gleichstand gegen Gastclub: gesamte KCs. Vater-Sohn: beide Bahnen gleichzeitig, dort 5 Minuten.",
+    "plays": 9,
+    "quelle": "",
+    "rating": 5,
+    "wertung": "6 Minuten in die Vollen, Tischseite gegen Tischseite; wer nach 6 Minuten mehr Holz hat, gewinnt",
+    "art": "seite",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-baseball",
+   "data": {
+    "arten": [
+     "einzel"
+    ],
+    "bahn": "volle",
+    "geprueft": true,
+    "lastPlayed": "2026-03-06",
+    "name": "Baseball",
+    "notes": "",
+    "plays": 1,
+    "quelle": "",
+    "rating": 2,
+    "wertung": "5 Innings, pro Inning 2 Würfe je Spieler: 0–1 = Out, 2–5 = 1 Base, 6–7 = 2 Bases, 8 = 3 Bases, 9 = Homerun",
+    "art": "einzel",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-berg-und-tal",
+   "data": {
+    "arten": [
+     "einzel"
+    ],
+    "bahn": "volle",
+    "geprueft": true,
+    "lastPlayed": "2026-08-21",
+    "name": "Berg und Tal",
+    "notes": "",
+    "plays": 1,
+    "quelle": "https://hsb.vibss.de/fileadmin/Medienablage/Sportpraxis/PH_Spiele/PH_Spiele_-_Kegelspiele.pdf",
+    "rating": 2,
+    "wertung": "6 Durchgänge: 1.3.5. Durchgang möglichst hohe Zahl werden, 2.4.6 möglichst niedrige Zahl werfen.",
+    "art": "einzel",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-blackjack",
+   "data": {
+    "arten": [
+     "einzel"
+    ],
+    "bahn": "volle",
+    "geprueft": true,
+    "lastPlayed": "2026-07-24",
+    "name": "Blackjack",
+    "notes": "",
+    "plays": 1,
+    "quelle": "https://kegeln.rainer-grundel.de/kegelspiele/jeder-gegen-jeden/17-4",
+    "rating": 4,
+    "wertung": "Jeder zieht verdeckt 1 Skatkarte (7–10 = Wert, Ass 1 oder 11, Bube 2, Dame 3, König 4). Dann beliebig oft in die Vollen, aber nicht zweimal: Holz + Karte möglichst genau 21; drüber = raus; wer am nächsten an 21 ist, gewinnt.",
+    "art": "einzel",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-bowling",
+   "data": {
+    "arten": [
+     "einzel"
+    ],
+    "bahn": "",
+    "lastPlayed": "2026-05-29",
+    "name": "Bowling",
+    "notes": "Auch kürzer mit 3 Durchgängen gespielt.",
+    "plays": 2,
+    "rating": 0,
+    "wertung": "5 Durchgänge (je 2 Würfe, außer alle 9 im ersten); Zählweise wie Bowling: nach Abräumen zählt der 1. Wurf der Folgerunde zur Vorrunde mit. Letzter Durchgang: 1. Wurf alle 9 = 2 Nachwürfe, im 2. Wurf abgeräumt = 1 Nachwurf",
+    "art": "einzel",
+    "quelle": "",
+    "geprueft": true,
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-brett-raeumen",
+   "data": {
+    "arten": [
+     "einzel"
+    ],
+    "bahn": "abraeumen",
+    "geprueft": true,
+    "lastPlayed": "2026-10-16",
+    "name": "Brett räumen",
+    "notes": "",
+    "plays": 3,
+    "quelle": "https://kegeln.rainer-grundel.de/kegelspiele/einzelspiel/brett-abraeumen",
+    "rating": 3,
+    "wertung": "Bei uns 3 Runden. Je 8 Würfe aufs volle Bild; Punkte nur bei Abräumen: mit 1 Wurf 40, 2 Würfen 35 … jeweils 5 weniger bis 8 Würfe = 5 Punkte.",
+    "art": "einzel",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-fussball",
+   "data": {
+    "arten": [
+     "seite"
+    ],
+    "bahn": "abraeumen",
+    "geprueft": true,
+    "lastPlayed": "2026-03-06",
+    "name": "Fußball",
+    "notes": "Vater-Sohn: pro Bahn Seite gegen Seite, ggf. Entscheidungsmatch bis 3 Väter gegen Söhne, Bahn per Schere-Stein-Papier.",
+    "plays": 3,
+    "quelle": "",
+    "rating": 4,
+    "wertung": "Seite gegen Seite bis 3 (oder 5) Tore",
+    "art": "seite",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-gassenhauer",
+   "data": {
+    "arten": [],
+    "bahn": "",
+    "lastPlayed": "2026-10-16",
+    "name": "Gassenhauer",
+    "notes": "",
+    "plays": 3,
+    "rating": 0,
+    "wertung": "Am Kegelautomaten Bilder einstellen: Gasse links, Gasse rechts, Gasse Mitte",
+    "art": "",
+    "quelle": "",
+    "geprueft": true,
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-geometrie-kegeln",
+   "data": {
+    "arten": [
+     "seite"
+    ],
+    "bahn": "",
+    "lastPlayed": "2025-12-12",
+    "name": "Geometrie-Kegeln",
+    "notes": "",
+    "plays": 1,
+    "rating": 0,
+    "wertung": "",
+    "art": "seite",
+    "quelle": "",
+    "geprueft": true,
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-hennefer-treppe",
+   "data": {
+    "arten": [],
+    "bahn": "abraeumen",
+    "lastPlayed": "2026-10-16",
+    "name": "Hennefer Treppe",
+    "notes": "",
+    "plays": 2,
+    "rating": 0,
+    "wertung": "So lange abräumen, wie man trifft; getroffene Kegel × Würfe = Punkte; 5–10 Runden",
+    "art": "",
+    "quelle": "",
+    "geprueft": true,
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-hieb-und-stich",
+   "data": {
+    "arten": [
+     "einzel"
+    ],
+    "bahn": "abraeumen",
+    "geprueft": true,
+    "lastPlayed": "2026-07-24",
+    "name": "Hieb und Stich",
+    "notes": "Am 24.07. sogar zweimal gespielt.",
+    "plays": 1,
+    "quelle": "https://kegeln.rainer-grundel.de/kegelspiele/einzelspiel/hieb-und-stich",
+    "rating": 4,
+    "wertung": "4 Runden auf Abräumen; pro Runde das volle Bild zweimal abräumen, mit beliebig vielen Würfen; Punkte = Holz minus Würfe (max. 16); eine Pumpe beendet die Runde sofort.",
+    "art": "einzel",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-hohe-minus-niedrige-hausnummer",
+   "data": {
+    "arten": [
+     "einzel"
+    ],
+    "bahn": "volle",
+    "geprueft": true,
+    "lastPlayed": "2026-05-29",
+    "name": "Hohe minus niedrige Hausnummer",
+    "notes": "",
+    "plays": 3,
+    "quelle": "https://www.planet-wissen.de/gesellschaft/sport/kegeln/pwiekegelspiele100.html",
+    "rating": 2,
+    "wertung": "Je 3 Würfe in die Vollen, jeden Wurf sofort Hunderter-, Zehner- oder Einerstelle zuordnen: einmal möglichst hohe, einmal möglichst niedrige Hausnummer (dort Pudel = 9); Punkte = hohe minus niedrige.",
+    "art": "einzel",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-huerdenlauf-100",
+   "data": {
+    "arten": [
+     "seite"
+    ],
+    "bahn": "",
+    "lastPlayed": "",
+    "name": "Hürdenlauf bis 100",
+    "notes": "Teamspiel. Noch in keiner der Abendlisten.",
+    "plays": 0,
+    "rating": 0,
+    "wertung": "Hürden 25, 50, 75, 100 müssen exakt getroffen werden; wer zu viel wirft, bleibt vor der Hürde stehen",
+    "art": "seite",
+    "quelle": "",
+    "geprueft": true,
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-huerdenlauf-reihenfolge",
+   "data": {
+    "arten": [],
+    "bahn": "",
+    "lastPlayed": "2026-10-16",
+    "name": "Hürdenlauf (Holzzahl-Reihenfolge)",
+    "notes": "",
+    "plays": 1,
+    "rating": 0,
+    "wertung": "Hürden (Reihenfolge der Holzzahl) festlegen und richtig umkegeln, 2 Versuche pro Runde",
+    "art": "",
+    "quelle": "",
+    "geprueft": true,
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-kamelrennen",
+   "data": {
+    "arten": [
+     "seite"
+    ],
+    "bahn": "",
+    "geprueft": true,
+    "lastPlayed": "2025-12-12",
+    "name": "Kamelrennen",
+    "notes": "Wunsch von Luca.",
+    "plays": 1,
+    "quelle": "https://kegeln.rainer-grundel.de/tag/lustig",
+    "rating": 2,
+    "wertung": "Schnelles Wettrennen zweier Teams: Team B startet mit doppelter Punktzahl und muss Team A überholen, bevor A die Ziellinie erreicht. Bei Team B werden aber auch die Holzzahlen verdoppelt vor dem Subtrahieren.",
+    "art": "seite",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-kegel-roulette",
+   "data": {
+    "arten": [
+     "einzel"
+    ],
+    "bahn": "volle",
+    "lastPlayed": "2026-03-06",
+    "name": "Kegel-Roulette",
+    "notes": "",
+    "plays": 1,
+    "rating": 0,
+    "wertung": "3 Würfe: 1. Wurf = Geldwert; 2. und 3. Wurf = Einsatz vom Geldwert auf Rot (gerade, verdoppeln), Schwarz (ungerade, verdoppeln), Grün (alle 9, ×9) oder Zahl (×5, außer 9), auch mehrgleisig. 3 Verlierer mit dem wenigsten Geld",
+    "art": "einzel",
+    "quelle": "",
+    "geprueft": true,
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-kuehe-melken",
+   "data": {
+    "arten": [
+     "seite"
+    ],
+    "bahn": "volle",
+    "geprueft": false,
+    "lastPlayed": "2026-04-03",
+    "name": "Kühe melken",
+    "notes": "Wunsch von Moritz.",
+    "plays": 1,
+    "quelle": "https://kegeln.rainer-grundel.de/tag/lustig",
+    "rating": 0,
+    "wertung": "3 „Euter“ mit je 41 Milchpunkten (als Zahlen an der Tafel); 2 Teams werfen abwechselnd in die Vollen, je 30 Würfe; gekegelte Zahl aus einem Euter wischen und dem eigenen Trog gutschreiben; meiste Milch gewinnt.",
+    "art": "seite",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-las-vegas",
+   "data": {
+    "arten": [
+     "einzel",
+     "team"
+    ],
+    "bahn": "volle",
+    "geprueft": true,
+    "lastPlayed": "",
+    "name": "Las Vegas",
+    "notes": "Per Link hinzugefügt. Hinweis: als Teamspiel in 2er-Teams. Laut Quelle auch als Einzelspiel möglich; ca. 50 Min. bei 8 Spielern.",
+    "plays": 0,
+    "quelle": "https://kegeln.rainer-grundel.de/kegelspiele/mannschaftsspiele/las-vegas",
+    "rating": 0,
+    "wertung": "2er-Teams, 6 Runden à bis zu 10 Würfe, Volle ohne Kranz. 1. Wurf legt vor, jeder weitere darf höchstens 1 Holz abweichen: gleich = multiplizieren, ±1 = addieren (von links nach rechts rechnen). Mehr als 1 daneben = Runde 0, Vorrundensumme halbiert. Nach 2 Pflichtwürfen: weiter oder sichern. Pudel = 0.",
+    "art": "einzel",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-lbrb",
+   "data": {
+    "arten": [
+     "einzel",
+     "seite",
+     "team"
+    ],
+    "bahn": "volle",
+    "geprueft": true,
+    "lastPlayed": "",
+    "name": "LBRB",
+    "notes": "Beim Vater-Sohn-Kegeln als Vater-Sohn-Teams gespielt.",
+    "plays": 1,
+    "quelle": "",
+    "rating": 3,
+    "wertung": "3 Würfe pro Runde addiert; Zielkegel mitgetroffen = umgefallenes Holz × 10; 5 Runden: LB, RB, VH, HH, Kö; 3 Niedrigste verlieren",
+    "art": "einzel",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-maedn",
+   "data": {
+    "arten": [
+     "einzel"
+    ],
+    "bahn": "volle",
+    "geprueft": true,
+    "lastPlayed": "2026-10-16",
+    "name": "Mädn (Mensch ärgere dich nicht)",
+    "notes": "",
+    "plays": 3,
+    "quelle": "https://www.planet-wissen.de/gesellschaft/sport/kegeln/pwiekegelspiele100.html",
+    "rating": 4,
+    "wertung": "Reihum 1 Wurf in die Vollen, Holz wird aufaddiert; wer eine Summe erreicht, die ein anderer gerade hat, setzt diesen auf 0 zurück; wer zuerst die Zielzahl (z. B. 30, 41 oder 51) erreicht, gewinnt.",
+    "art": "einzel",
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-poker-kegeln",
+   "data": {
+    "arten": [
+     "einzel"
+    ],
+    "bahn": "volle",
+    "lastPlayed": "2026-03-06",
+    "name": "Poker-Kegeln",
+    "notes": "",
+    "plays": 1,
+    "rating": 0,
+    "wertung": "Jeder wirft 5× in die Vollen (reihum je 1 Wurf); jeder Wurf = Kartenwert, alle 5 = Pokerhand. Rangfolge: höchste Karte, Zwilling, Doppelzwilling, Drilling, kleine Straße, Full House, große Straße, Flush (nur gerade oder nur ungerade), Vierling, Fünfling",
+    "art": "einzel",
+    "quelle": "",
+    "geprueft": true,
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-swingerclub",
+   "data": {
+    "arten": [
+     "einzel",
+     "team"
+    ],
+    "bahn": "abraeumen",
+    "lastPlayed": "2026-07-24",
+    "name": "Swingerclub",
+    "notes": "Gespielt in Teams, gewertet einzeln.",
+    "plays": 3,
+    "rating": 0,
+    "wertung": "4 Runden in 2er-Teams, je 4 Wurf auf Abräumen; nach jeder Runde sucht sich das Verliererteam je einen neuen Partner; Teampunkte werden bei jedem Spieler einzeln notiert",
+    "art": "einzel",
+    "quelle": "",
+    "geprueft": true,
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-team-abraeumen",
+   "data": {
+    "arten": [
+     "team"
+    ],
+    "bahn": "abraeumen",
+    "lastPlayed": "",
+    "name": "Team-Abräumen (gelost)",
+    "notes": "Vom Vater-Sohn-Kegeln.",
+    "plays": 1,
+    "rating": 0,
+    "wertung": "Teams frei losen (z. B. 2×4er, 3×3er), 2 Durchgänge à 8 Würfe, Gesamtholz entscheidet",
+    "art": "team",
+    "quelle": "",
+    "geprueft": true,
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-vervielfaeltigung",
+   "data": {
+    "arten": [
+     "einzel",
+     "seite"
+    ],
+    "bahn": "",
+    "lastPlayed": "2026-07-24",
+    "name": "Vervielfältigung",
+    "notes": "Als Teamvariante gespielt.",
+    "plays": 3,
+    "rating": 0,
+    "wertung": "Start bei 9, dann der Reihe nach + − × ÷",
+    "art": "einzel",
+    "quelle": "",
+    "geprueft": true,
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  },
+  {
+   "id": "g-wm",
+   "data": {
+    "arten": [
+     "einzel",
+     "seite"
+    ],
+    "bahn": "",
+    "lastPlayed": "",
+    "name": "WM (1 gegen 1)",
+    "notes": "Variante Sniper: wer 2× weniger Holz hat, gewinnt. Vater-Sohn: Verliererteam Schnaps.",
+    "plays": 2,
+    "rating": 0,
+    "wertung": "K.-o.-Modus 1 gegen 1, best of 3 Würfe, gleichzeitig werfen; Finale best of 5",
+    "art": "einzel",
+    "quelle": "",
+    "geprueft": true,
+    "createdAt": "2026-11-12T07:00:00Z",
+    "updatedAt": "2026-11-12T07:00:00Z"
+   }
+  }
+ ],
+ "plan": {
+  "date": "2026-11-13",
+  "slots": [
+   "g-3-in-die-vollen",
+   "g-hennefer-treppe",
+   "g-las-vegas",
+   "g-blackjack",
+   "g-4-gewinnt",
+   "g-abendkoenig",
+   "g-ballermann-6",
+   "g-abraeum-ballermann",
+   "g-218-multiplikator",
+   "g-hieb-und-stich"
+  ],
+  "updatedAt": "2026-11-12T07:00:00Z"
+ }
+}
