@@ -215,6 +215,8 @@ body.abmode .wrap>*:not(.apphead):not(.abend):not(.simbar){display:none!importan
 .abcard.done .abdone{background:var(--accent);border-color:var(--accent);color:#fff}
 .abrules{margin:0;white-space:pre-wrap;line-height:1.45;font-size:.95rem}
 .rec{margin:0;font-size:.75rem;color:var(--muted)}
+.frec{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:20px}
+.frec .ablink{font-size:.75rem}
 .rec b{font-weight:600;color:var(--muted)}
 .abrec{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .abrec .ablink{font-size:.75rem;color:var(--muted)}
@@ -386,7 +388,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· r34</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· r35</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
@@ -448,6 +450,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
       <label for="f-last">zuletzt</label><input type="date" id="f-last">
       <label for="f-plays">gespielt</label><input type="number" id="f-plays" min="0" max="999" inputmode="numeric" placeholder="0"><span>×</span>
     </div>
+    <div class="frec" id="f-recwrap"><span class="rec" id="f-rec"></span><button type="button" class="ablink" id="f-recbtn">Rekord eintragen</button></div>
     <div id="f-notes-wrap">
       <label class="lbl" for="f-notes">Notizen</label>
       <textarea id="f-notes" maxlength="2000" rows="2" placeholder="Material, Varianten, wann zuletzt gespielt …"></textarea>
@@ -603,11 +606,13 @@ function openRec(id){const g=games[id];if(!g||!canPlan)return;recGame=id;const r
   $("r-wert").value="";$("r-name").value=(curUser&&nutzer[curUser.uid]&&nutzer[curUser.uid].name)||"";$("r-date").value=todayIso();
   $("r-del").hidden=!(isChef&&g.rekord&&g.rekord.wert);$("rscrim").hidden=false;setTimeout(()=>$("r-wert").focus(),50)}
 $("r-cancel").onclick=()=>$("rscrim").hidden=true;
+$("f-recbtn").onclick=()=>{if(editing)openRec(editing)};
 $("rscrim").onclick=e=>{if(e.target===$("rscrim"))$("rscrim").hidden=true};
 $("rform").addEventListener("submit",async e=>{e.preventDefault();const id=recGame,g=games[id];if(!g)return;
   const wert=$("r-wert").value.trim().slice(0,30),name=$("r-name").value.trim().slice(0,80),date=$("r-date").value||todayIso();
   if(!wert){toast("Rekordwert eintragen");return}
   const rekord={wert,name,date,at:new Date().toISOString()};games[id]={...g,rekord};$("rscrim").hidden=true;$("iscrim").hidden=true;render();
+  if(editing===id){$("f-rec").textContent="Rekord: "+recTxt(rekord)[1];$("f-recbtn").textContent="Rekord ändern"}
   toast("Rekord gespeichert: "+g.name);
   if(db){try{await db.collection("games").doc(id).update({rekord})}catch(e){toast("Nicht gespeichert.")}}});
 $("r-del").onclick=async()=>{const id=recGame,g=games[id];if(!g||!isChef)return;const {rekord,...rest}=g;games[id]={...rest,rekord:{}};
@@ -771,6 +776,7 @@ function render(){
     if(BAHN[g.bahn])t.append(tag(BAHN[g.bahn][0],BAHN[g.bahn][1]));
     if(g.quelle&&!g.geprueft)t.append(tag("🔍 Regel ungeprüft","var(--accent)"));
     if(g.notes)t.append(tag("✎ Notiz","var(--muted)"));
+    {const r=recordOf(g);if(r)t.append(tag("Rekord: "+r.wert,"var(--muted)"))}
     if(canPlan&&nieCount(g))t.append(tag("👎 "+nieCount(g)+"× nie wieder","var(--muted)"));
     if(t.children.length)main.append(t);
     const side=document.createElement("div");side.className="side";
@@ -1044,6 +1050,8 @@ function openSheet(id){
   $("f-name").value=g.name||"";$("f-wert").value=g.wertung||"";$("f-notes").value=g.notes||"";
   cur.geprueft=!!g.geprueft;cur.quelle=g.quelle||"";cur.origWert=g.wertung||"";setVerify();
   $("f-last").value=g.lastPlayed||"";$("f-plays").value=g.plays||"";
+  {const r=id?recordOf({...g,id}):null;$("f-rec").textContent=r?"Rekord: "+recTxt(r)[1]:(canPlan&&id?"Noch kein Rekord":"");
+    $("f-recbtn").hidden=!(canPlan&&id);$("f-recbtn").textContent=r?"Rekord ändern":"Rekord eintragen";$("f-recwrap").hidden=!r&&!(canPlan&&id)}
   setArten();setSeg("f-bahn",cur.bahn);setRate(cur.rating);
   $("f-del").hidden=!id;$("scrim").hidden=false;setTimeout(()=>$("f-name").focus(),50);
 }
@@ -1072,6 +1080,7 @@ $("form").addEventListener("submit",async e=>{
     lastPlayed:/^\d{4}-\d{2}-\d{2}$/.test($("f-last").value)?$("f-last").value:"",plays:Math.max(0,Math.min(999,parseInt($("f-plays").value,10)||0)),
     createdAt:old.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
   doc.rating=Object.keys(doc.ratings).length?roundAvg(doc.ratings):(old.rating||0);
+  if(old.rekord)doc.rekord=old.rekord;if(old.nie)doc.nie=old.nie; // beim Bearbeiten nicht verlieren
   games[id]=doc;close();render();await save(id,doc);
 });
 $("f-del").onclick=async()=>{if(!canPlan)return;
