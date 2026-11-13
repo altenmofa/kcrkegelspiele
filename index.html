@@ -370,7 +370,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· r28</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· r29</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
@@ -1133,7 +1133,7 @@ function renderKings(){
   const ol=$("k-list");ol.replaceChildren();
   if(!list.length){const li=document.createElement("li");li.style.color="var(--muted)";li.textContent="Noch keine Abendkönige.";ol.append(li)}
   list.forEach(k=>{const li=document.createElement("li");const a=document.createElement("span");
-    a.textContent=deDate(k.date)+" · "+k.name+(isKaiserDate(k.date)?" 👑":"");if(isKaiserDate(k.date))a.title="Abendkönig am Kaiserabend";
+    a.textContent=deDate(k.date)+" · "+k.name;
     const c=document.createElement("small");c.textContent=k.holz?k.holz+" Holz":"";
     const right=document.createElement("span");right.append(c);
     if(canKings){const rm=document.createElement("button");rm.type="button";rm.className="krm";rm.textContent="×";rm.setAttribute("aria-label","Eintrag löschen");
