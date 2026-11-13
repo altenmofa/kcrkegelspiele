@@ -208,6 +208,15 @@ body[data-tab="admin"] .gear{border-color:var(--accent);background:var(--accent-
 .tabbar button{position:relative}
 .tabbar button.dot::after{content:"";position:absolute;top:2px;left:calc(50% + 9px);width:9px;height:9px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
 .stnote{color:var(--accent)}
+.stwbox{padding:0 4px}
+.stwtog{color:var(--muted);font-weight:600}
+#stw-body{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.stwrows{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.stwrows li{display:grid;grid-template-columns:1fr 86px 38px;gap:8px;align-items:center;padding:5px 0;border-bottom:1px dashed var(--line)}
+.stwrows li span{font-weight:600;overflow-wrap:anywhere}
+.stwrows input{padding:7px 8px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font:inherit;min-width:0;text-align:right}
+.stwrows .bz{width:38px;height:36px;border-radius:9px;border:1px solid var(--line);background:none;cursor:pointer}
+.stwrows .bz[aria-pressed="true"]{background:var(--c-volle,#2e7d32);border-color:transparent;color:#fff}
 .stwpick{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
 .stwpick li{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);cursor:pointer}
 .stwpick li.cur{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
@@ -471,22 +480,17 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <datalist id="kat-dl"></datalist>
   </section>
 
-  <section class="evening strafen" id="stw" data-tab="strafen" aria-labelledby="h-stw" hidden>
-    <h2 id="h-stw">✍️ Strafen eintragen</h2>
+  <section class="stwbox" id="stw" data-tab="strafen" hidden>
+    <button type="button" class="ablink stwtog" id="stw-tog" aria-expanded="false" aria-controls="stw-body">✍️ Strafen eintragen</button>
+    <div id="stw-body" hidden>
     <label class="stlbl">Kegelabend<select id="stw-date"></select></label>
-    <ul class="stwpick" id="stw-list"></ul>
-    <div class="stwed" id="stw-ed">
-      <div class="stwedh"><b id="stwe-name"></b><span class="sda" id="stwe-pos"></span></div>
-      <div class="stwedr">
-        <input type="number" id="stwe-betrag" min="0" step="0.1" inputmode="decimal" placeholder="€" aria-label="Betrag">
-        <button type="button" class="bz" id="stwe-bz" aria-pressed="false" title="bezahlt">✓</button>
-      </div>
-      <div class="stwedb"><button type="button" class="btn" id="stwe-prev">←</button><button type="button" class="btn primary" id="stwe-next">Weiter →</button></div>
-    </div>
+    <ul class="stwrows" id="stw-list"></ul>
+    <p class="sda">Betrag eintippen, mit „Weiter“ auf der Tastatur zum Nächsten. ✓ = bezahlt.</p>
     <div class="zettel">
       <p class="klabel">📷 Strafenzettel <span class="sda" id="z-count"></span></p>
       <div id="z-view"></div>
       <label class="btn zbtn">Foto aufnehmen / auswählen<input type="file" id="z-file" accept="image/*" capture="environment" hidden></label>
+    </div>
     </div>
   </section>
 
@@ -823,33 +827,32 @@ function renderStrafen(){
     sel.value=keep&&[...sel.options].some(o=>o.value===keep)?keep:(lastPlan&&[...sel.options].some(o=>o.value===lastPlan.date)?lastPlan.date:(sel.options[0]||{}).value)}
   renderStw();
 }
-let stwCur=0,stwShown="";
-function stwSave(){const d=$("stw-date").value,ms=clubMembers(),m=ms[stwCur];if(!d||!m)return;
-  const f={betrag:Math.max(0,Math.round((parseFloat(String($("stwe-betrag").value).replace(",","."))||0)*100)/100),posten:"",bezahlt:$("stwe-bz").getAttribute("aria-pressed")==="true"};
-  const x=strafen[d+"__"+m.uid]||{};f.posten=x.posten||"";if((x.betrag||0)===f.betrag&&!!x.bezahlt===f.bezahlt)return;saveStrafe(d,m,f)}
-function stwGo(k){stwSave();const n=clubMembers().length;if(!n)return;stwCur=(k+n)%n;renderStw();setTimeout(()=>$("stwe-betrag").focus({preventScroll:true}),30)}
 function renderStw(){
-  const d=$("stw-date").value,ul=$("stw-list");ul.replaceChildren();const ms=clubMembers();$("stw-ed").hidden=!d||!ms.length;if(!d)return;
-  if(!ms.length){const li=document.createElement("li");li.textContent="Noch keine Kegelbrüder mit Konto.";ul.append(li)}
-  if(stwCur>=ms.length)stwCur=0;
-  ms.forEach((m,k)=>{const x=strafen[d+"__"+m.uid]||{};const li=document.createElement("li");if(k===stwCur)li.classList.add("cur");
-    const n=document.createElement("span");n.textContent=m.name;const v=document.createElement("span");v.className="v"+(x.bezahlt?" paid":"");v.textContent=x.betrag?eur(x.betrag):"–";
-    li.append(n,v);li.onclick=()=>stwGo(k);ul.append(li)});
-  const m=ms[stwCur];if(m){const x=strafen[d+"__"+m.uid]||{};$("stwe-name").textContent=m.name;$("stwe-pos").textContent=(stwCur+1)+" von "+ms.length;
-    const key=d+"__"+m.uid;if(stwShown!==key){stwShown=key; // Felder nur beim Wechsel neu füllen, sonst gehen Eingaben verloren
-      $("stwe-betrag").value=x.betrag?String(x.betrag):"";$("stwe-bz").setAttribute("aria-pressed",String(!!x.bezahlt))}
-    $("stwe-next").textContent=ms.length>1?"Weiter → "+ms[(stwCur+1)%ms.length].name:"Speichern"}
+  const d=$("stw-date").value,ul=$("stw-list");if(!d)return;const ms=clubMembers();
+  const key=d+"|"+ms.map(m=>m.uid).join(",");
+  if(ul.dataset.key===key){ // nur Werte auffrischen, damit Eingabe und Fokus erhalten bleiben
+    ul.querySelectorAll("li").forEach(li=>{const b=li.querySelector("input"),bz=li.querySelector(".bz");if(!b)return;const x=strafen[d+"__"+b.dataset.uid]||{};
+      if(document.activeElement!==b)b.value=x.betrag?String(x.betrag):"";bz.setAttribute("aria-pressed",String(!!x.bezahlt))});
+  }else{ul.dataset.key=key;
+  ul.replaceChildren();if(!ms.length){const li=document.createElement("li");li.textContent="Noch keine Kegelbrüder mit Konto.";ul.append(li)}
+  ms.forEach((m,k)=>{const x=strafen[d+"__"+m.uid]||{};const li=document.createElement("li");
+    const n=document.createElement("span");n.textContent=m.name;
+    const b=document.createElement("input");b.type="number";b.min="0";b.step="0.1";b.inputMode="decimal";b.enterKeyHint=k<ms.length-1?"next":"done";b.placeholder="€";b.dataset.uid=m.uid;
+    b.value=x.betrag?String(x.betrag):"";b.setAttribute("aria-label","Strafe "+m.name);
+    const bz=document.createElement("button");bz.type="button";bz.className="bz";bz.textContent="✓";bz.setAttribute("aria-pressed",String(!!x.bezahlt));bz.setAttribute("aria-label",m.name+" hat bezahlt");
+    const save=()=>{const v=Math.max(0,Math.round((parseFloat(String(b.value).replace(",","."))||0)*100)/100),pd=bz.getAttribute("aria-pressed")==="true",y=strafen[d+"__"+m.uid]||{};
+      if((y.betrag||0)===v&&!!y.bezahlt===pd)return;saveStrafe(d,m,{betrag:v,posten:y.posten||"",bezahlt:pd})};
+    b.onchange=save;b.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();const all=[...ul.querySelectorAll("input")];const nx=all[k+1];save();if(nx)nx.focus();else b.blur()}};
+    bz.onclick=()=>{bz.setAttribute("aria-pressed",String(bz.getAttribute("aria-pressed")!=="true"));save()};
+    li.append(n,b,bz);ul.append(li)});}
   const zs=zettelOf(d),zv=$("z-view");zv.replaceChildren();$("z-count").textContent="("+zs.length+" von 3)";
   zs.forEach((z,k)=>{const w=document.createElement("div");w.className="zt";const im=document.createElement("img");im.src=z.bild;im.alt="Strafenzettel "+(k+1)+" vom "+fmtD(parseIso(d));im.onclick=()=>showImg(z.bild);
     const rm=document.createElement("button");rm.type="button";rm.textContent="×";rm.setAttribute("aria-label","Foto "+(k+1)+" löschen");
     rm.onclick=async()=>{if(!confirmDel())return;delete zettel[z.id];renderStrafen();if(db)db.collection("zettel").doc(z.id).delete().catch(()=>toast("Nicht gelöscht."))};w.append(im,rm);zv.append(w)});
   $("z-file").closest("label").hidden=zs.length>=3;
 }
-$("stw-date").onchange=()=>{stwCur=0;renderStw()};
-$("stwe-next").onclick=()=>stwGo(stwCur+1);$("stwe-prev").onclick=()=>stwGo(stwCur-1);
-$("stwe-bz").onclick=()=>{const b=$("stwe-bz");b.setAttribute("aria-pressed",String(b.getAttribute("aria-pressed")!=="true"));stwSave()};
-$("stwe-betrag").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();stwGo(stwCur+1)}});
-$("stwe-betrag").addEventListener("change",stwSave);
+$("stw-date").onchange=renderStw;
+$("stw-tog").onclick=()=>{const o=$("stw-body").hidden;$("stw-body").hidden=!o;$("stw-tog").setAttribute("aria-expanded",String(o));$("stw-tog").textContent=o?"✍️ Strafen eintragen ▾":"✍️ Strafen eintragen"};
 let katalog={posten:[]};
 function renderKat(){const ps=(katalog.posten||[]).filter(p=>p&&p.text);const ul=$("kat-list");ul.replaceChildren();
   if(!ps.length){const li=document.createElement("li");li.textContent=canKings?"Noch kein Katalog – tippe auf „Bearbeiten“.":"Noch kein Strafenkatalog hinterlegt.";ul.append(li)}
