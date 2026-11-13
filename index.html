@@ -213,10 +213,12 @@ body.abmode .wrap>*:not(.apphead):not(.abend):not(.simbar){display:none!importan
 .abdone{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:none;font-size:1.1rem;cursor:pointer;flex:none}
 .abcard.done .abdone{background:var(--accent);border-color:var(--accent);color:#fff}
 .abrules{margin:0;white-space:pre-wrap;line-height:1.45;font-size:.95rem}
-.rec{margin:0;font-size:.85rem;color:var(--muted)}
-.rec b{color:var(--star)}
+.rec{margin:0;font-size:.75rem;color:var(--muted)}
+.rec b{font-weight:600;color:var(--muted)}
 .abrec{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.abrec .ablink{color:var(--star);font-weight:600}
+.abrec .ablink{font-size:.75rem;color:var(--muted)}
+.abbody{display:flex;flex-direction:column;gap:6px}
+.abmore{border:0;background:none;color:var(--muted);font-size:.78rem;cursor:pointer;padding:4px 2px;white-space:nowrap;font-family:inherit}
 .abhandle{margin-left:-8px;width:26px}
 .abtap{cursor:pointer}
 .abcard.dragging{opacity:.85;box-shadow:0 6px 18px rgba(0,0,0,.18)}
@@ -379,7 +381,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· r32</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· r33</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
@@ -514,7 +516,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <p class="irules" id="i-rules"></p>
     <div><span class="istars" id="i-stars"></span> <span class="meta" id="i-avg"></span></div>
     <p class="rec" id="i-rec"></p>
-    <div class="actions"><button type="button" class="btn" id="i-recbtn">🏅 Neuer Rekord</button><span style="flex:1"></span><button type="button" class="btn" id="i-close">Schließen</button></div>
+    <div class="actions"><button type="button" class="ablink" id="i-recbtn">Rekord eintragen</button><span style="flex:1"></span><button type="button" class="btn" id="i-close">Schließen</button></div>
   </div>
 </div>
 
@@ -523,7 +525,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <h3 id="r-title">🏅 Neuer Rekord</h3>
     <p class="hint" id="r-game"></p>
     <label>Rekordwert<input type="text" id="r-wert" maxlength="30" placeholder="z. B. 142 Holz oder 9 Punkte" autocomplete="off"></label>
-    <label>Kegelbruder<input type="text" id="r-name" maxlength="40" autocomplete="off"></label>
+    <label>Kegelbruder / Kegelbrüder<input type="text" id="r-name" maxlength="80" placeholder="z. B. Peter oder Peter, Klaus &amp; Moritz" autocomplete="off"></label>
     <label>Datum<input type="date" id="r-date"></label>
     <div class="actions"><button type="button" class="btn" id="r-del" hidden>Rekord löschen</button><span style="flex:1"></span>
       <button type="button" class="btn" id="r-cancel">Abbrechen</button><button type="submit" class="btn primary">Speichern</button></div>
@@ -587,27 +589,27 @@ function recordOf(g){if(!g)return null;
   if(g.id==="g-abendkoenig"){const b=Object.values(koenige).filter(k=>k.holz).sort((a,b)=>b.holz-a.holz||a.date.localeCompare(b.date))[0];
     if(b)return{wert:b.holz+" Holz",name:b.name,date:b.date,auto:true}}
   return null}
-function recTxt(r){return r?["🏅 Rekord: ",r.wert+(r.name?" · "+r.name:"")+(r.date?" · "+deDate(r.date):"")]:null}
+function recTxt(r){return r?["Rekord: ",r.wert+(r.name?" · "+r.name:"")+(r.date?" · "+deDate(r.date):"")]:null}
 function fillRec(el,g){el.replaceChildren();const r=recordOf(g);
-  if(!r){el.textContent="🏅 Noch kein Rekord";return}const t=recTxt(r);el.append(t[0]);const b=document.createElement("b");b.textContent=t[1];el.append(b)}
+  if(!r){el.textContent="";return}const t=recTxt(r);el.append(t[0]);const b=document.createElement("b");b.textContent=t[1];el.append(b)}
 let recGame=null;
-function openRec(id){const g=games[id];if(!g||!canEdit)return;recGame=id;const r=g.rekord||{};
+function openRec(id){const g=games[id];if(!g||!canPlan)return;recGame=id;const r=g.rekord||{};
   $("r-game").textContent=g.name+(recordOf(g)?" · bisher: "+recTxt(recordOf(g))[1]:"");
   $("r-wert").value="";$("r-name").value=(curUser&&nutzer[curUser.uid]&&nutzer[curUser.uid].name)||"";$("r-date").value=todayIso();
   $("r-del").hidden=!(isChef&&g.rekord&&g.rekord.wert);$("rscrim").hidden=false;setTimeout(()=>$("r-wert").focus(),50)}
 $("r-cancel").onclick=()=>$("rscrim").hidden=true;
 $("rscrim").onclick=e=>{if(e.target===$("rscrim"))$("rscrim").hidden=true};
 $("rform").addEventListener("submit",async e=>{e.preventDefault();const id=recGame,g=games[id];if(!g)return;
-  const wert=$("r-wert").value.trim().slice(0,30),name=$("r-name").value.trim().slice(0,40),date=$("r-date").value||todayIso();
+  const wert=$("r-wert").value.trim().slice(0,30),name=$("r-name").value.trim().slice(0,80),date=$("r-date").value||todayIso();
   if(!wert){toast("Rekordwert eintragen");return}
   const rekord={wert,name,date,at:new Date().toISOString()};games[id]={...g,rekord};$("rscrim").hidden=true;$("iscrim").hidden=true;render();
-  confetti(false);toast("🏅 Neuer Rekord: "+g.name);
+  toast("Rekord gespeichert: "+g.name);
   if(db){try{await db.collection("games").doc(id).update({rekord})}catch(e){toast("Nicht gespeichert.")}}});
 $("r-del").onclick=async()=>{const id=recGame,g=games[id];if(!g||!isChef)return;const {rekord,...rest}=g;games[id]={...rest,rekord:{}};
   $("rscrim").hidden=true;$("iscrim").hidden=true;render();if(db){try{await db.collection("games").doc(id).update({rekord:{}})}catch(e){toast("Nicht gespeichert.")}}};
 
 /* Kegelabend-Modus: am Kegelabend von 19:50 bis 23:15 */
-let abOff=false;try{abOff=sessionStorage.getItem("kcrab")==="off"}catch(e){}
+let abOpen=new Set();let abOff=false;try{abOff=sessionStorage.getItem("kcrab")==="off"}catch(e){}
 function abendActive(){if(!planDate)return false;const n=simNow(),pd=parseIso(planDate);
   const start=new Date(pd);start.setHours(19,50,0,0);const end=new Date(pd);end.setHours(23,15,0,0);
   return n>=start&&n<end}
@@ -639,14 +641,21 @@ function renderAbend(){
       nm.classList.add("abtap");nm.setAttribute("role","button");nm.tabIndex=0;nm.title="Antippen zum Austauschen";nm.onclick=()=>openPick(i);nm.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();openPick(i)}};
       top.append(h,n,nm,db_)}else{top.append(n,nm);if(isDone){const ok=document.createElement("span");ok.className="abok";ok.textContent="✓";top.append(ok)}}
     li.append(top);
+    // Regeln nur beim aktuellen Spiel offen, alle anderen per Tipp aufklappbar
+    const isNow=li.classList.contains("now"),open=isNow||abOpen.has(i);const body=document.createElement("div");body.className="abbody";body.hidden=!open;
+    const tg=document.createElement("button");tg.type="button";tg.className="abmore";tg.textContent=open?"Regeln ▴":"Regeln ▾";tg.setAttribute("aria-expanded",String(open));
+    tg.onclick=()=>{if(abOpen.has(i))abOpen.delete(i);else abOpen.add(i);renderAbend()};
     if(id===KZ){title.textContent="21:00 Kaiserkegeln 🥪";const p=document.createElement("p");p.className="abrules";
-      const c=kaiserCandidates(parseIso(planDate).getFullYear());p.textContent="2×5 Wurf in die Vollen"+(canEdit&&c.length?"\nKandidaten: "+c.join(", "):"");li.append(p)}
+      const c=kaiserCandidates(parseIso(planDate).getFullYear());p.textContent="2×5 Wurf in die Vollen"+(canEdit&&c.length?"\nKandidaten: "+c.join(", "):"");body.append(p)}
     else if(id===GAST){title.textContent="🤝 Spiel des Gastclubs"}
     else{const g=games[id];if(!g){title.textContent="Unbekanntes Spiel"}else{title.textContent=g.name;
-      if(g.wertung){const p=document.createElement("p");p.className="abrules";p.textContent=g.wertung;li.append(p)}
-      const rr=document.createElement("div");rr.className="abrec";const r=document.createElement("p");r.className="rec";fillRec(r,{...g,id});rr.append(r);
-      if(canEdit){const b=document.createElement("button");b.type="button";b.className="ablink";b.textContent="＋ Rekord";b.onclick=()=>openRec(id);rr.append(b)}
-      li.append(rr)}}
+      if(g.wertung){const p=document.createElement("p");p.className="abrules";p.textContent=g.wertung;body.append(p)}
+      const r=recordOf({...g,id});
+      if(r||canPlan){const rr=document.createElement("div");rr.className="abrec";
+        if(r){const x=document.createElement("p");x.className="rec";x.textContent="Rekord: "+recTxt(r)[1];rr.append(x)}else rr.append(document.createElement("span"));
+        if(canPlan){const b=document.createElement("button");b.type="button";b.className="ablink";b.textContent=r?"neuer Rekord":"Rekord eintragen";b.onclick=()=>openRec(id);rr.append(b)}
+        body.append(rr)}}}
+    if(body.childNodes.length){li.append(body);if(!isNow)top.insertBefore(tg,top.querySelector(".abdone,.abok"))}
     ol.append(li)});
   if(canPlan){const li=document.createElement("li");const b=document.createElement("button");b.type="button";b.className="ablink abadd";b.textContent="＋ Spiel hinzufügen";
     b.onclick=()=>{let k=plan.findIndex(x=>!x);if(k<0){if(plan.length>=MAX_SLOTS){toast("Maximal "+MAX_SLOTS+" Spiele");return}plan.push(null);k=plan.length-1}openPick(k)};li.append(b);ol.append(li)}
@@ -982,7 +991,7 @@ function openInfo2(id){const g=games[id];if(!g){toast("Spiel nicht gefunden");re
   const t=$("i-tags");t.replaceChildren();artenOf(g).forEach(k=>t.append(tag(ART[k][0],ART[k][1])));if(BAHN[g.bahn])t.append(tag(BAHN[g.bahn][0],BAHN[g.bahn][1]));
   $("i-rules").textContent=g.wertung||"Noch keine Regeln eingetragen.";
   const ri=rateInfo(g);$("i-stars").textContent=ri.avg?stars(Math.round(ri.avg)):"";$("i-avg").textContent=ri.avg?avgTxt(ri):"Noch nicht bewertet";
-  fillRec($("i-rec"),{...g,id});$("i-recbtn").hidden=!canEdit;$("i-recbtn").onclick=()=>openRec(id);
+  fillRec($("i-rec"),{...g,id});$("i-recbtn").hidden=!canPlan;$("i-recbtn").onclick=()=>openRec(id);
   $("iscrim").hidden=false}
 $("i-close").onclick=()=>{$("iscrim").hidden=true};
 $("iscrim").onclick=e=>{if(e.target===$("iscrim"))$("iscrim").hidden=true};
