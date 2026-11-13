@@ -306,6 +306,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
       <span class="evcount" id="rf-count"></span>
     </div>
     <p class="evdate" id="rf-date"></p>
+    <button type="button" class="ablink" id="rf-close" hidden>✓ Fertig – Rückblick ausblenden</button>
     <p class="note">Wie war’s? Jeder bewertet selbst.</p>
     <ol class="slots" id="rf-list"></ol>
   </section>
@@ -313,7 +314,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <section class="evening" aria-labelledby="h-ev">
     <div class="evhead">
       <h2 id="h-ev">Nächster Kegelabend</h2>
-      <span class="evcount" id="evcount">0 von 10</span>
+      <span class="evcount" id="evcount">0 von 8</span>
     </div>
     <p class="evdate" id="evdate"></p>
     <p class="sda" id="sda" hidden></p>
@@ -388,7 +389,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· r35</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· r36</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
@@ -666,7 +667,7 @@ function renderAbend(){
         if(canPlan){const b=document.createElement("button");b.type="button";b.className="ablink";b.textContent=r?"neuer Rekord":"Rekord eintragen";b.onclick=()=>openRec(id);rr.append(b)}
         body.append(rr)}}}
     if(body.childNodes.length){li.append(body);if(!isNow)top.insertBefore(tg,top.querySelector(".abdone,.abok"))}
-    swipeDel(li,()=>{const nm_=games[id]?games[id].name:"Spiel";if(isDone){const k=planDone.indexOf(id);if(k>=0)planDone.splice(k,1)}if(i>=10)plan.splice(i,1);else plan[i]=null;render();savePlan();toast(nm_+" entfernt")});
+    swipeDel(li,()=>{const nm_=games[id]?games[id].name:"Spiel";if(isDone){const k=planDone.indexOf(id);if(k>=0)planDone.splice(k,1)}if(i>=DEFAULT_SLOTS.length)plan.splice(i,1);else plan[i]=null;render();savePlan();toast(nm_+" entfernt")});
     ol.append(li)});
   if(canPlan){const li=document.createElement("li");const b=document.createElement("button");b.type="button";b.className="ablink abadd";b.textContent="＋ Spiel hinzufügen";
     b.onclick=()=>{let k=plan.findIndex(x=>!x);if(k<0){if(plan.length>=MAX_SLOTS){toast("Maximal "+MAX_SLOTS+" Spiele");return}plan.push(null);k=plan.length-1}openPick(k)};li.append(b);ol.append(li)}
@@ -682,6 +683,7 @@ function renderAbend(){
     const np=plan.slice();pos.forEach((k,j)=>np[k]=order[j]);plan=np;render();savePlan()};
   ol.addEventListener("pointerup",end);ol.addEventListener("pointercancel",end)})();
 $("rf-again").onclick=()=>{rfShow=true;render()};
+$("rf-close").onclick=()=>{rfShow=false;rfWasOpen=false;render()};
 $("ab-exit").onclick=()=>{abOff=true;try{sessionStorage.setItem("kcrab","off")}catch(e){}renderAbend();window.scrollTo(0,0)};
 $("ab-enter").onclick=()=>{abOff=false;try{sessionStorage.removeItem("kcrab")}catch(e){}renderAbend();window.scrollTo(0,0)};
 function renderKHist(){const sec=$("khist");sec.hidden=!isChef;if(!isChef)return;
@@ -801,7 +803,7 @@ async function save(id,doc){
   catch(e){toast("Speichern hat nicht geklappt. Bitte noch einmal versuchen.");return false}
 }
 /* Nächster Abend: 10 Plätze */
-const DEFAULT_SLOTS=["g-3-in-die-vollen",null,null,null,null,"g-abendkoenig",null,null,null,null];
+const DEFAULT_SLOTS=["g-3-in-die-vollen",null,null,null,null,"g-abendkoenig",null,null]; // 8 Plätze
 const KZ="__kaiser__",GAST="__gast__";let planTitle="";
 function isKaiserDate(iso){const d=parseIso(iso);if(!d)return false;const n=new Date(d);n.setDate(n.getDate()+28);return n.getFullYear()>d.getFullYear()}
 function kaiserEvening(){const id=planDate||nextEvening().iso;return isKaiserDate(id)?id:""}
@@ -847,7 +849,7 @@ function renderPlan(){
       const no=document.createElement("span");no.className="no";no.textContent="🤝";li.append(no);
       const nm=document.createElement("span");nm.className="sn";nm.textContent="Spiel des Gastclubs";li.append(nm);
       const rm=document.createElement("button");rm.type="button";rm.className="rm";rm.textContent="×";rm.setAttribute("aria-label","Gast-Spiel entfernen");
-      rm.onclick=()=>{if(i>=10)plan.splice(i,1);else plan[i]=null;render();savePlan()};li.append(rm);
+      rm.onclick=()=>{if(i>=DEFAULT_SLOTS.length)plan.splice(i,1);else plan[i]=null;render();savePlan()};li.append(rm);
       ol.append(li);return}
     if(id===KZ){const li=document.createElement("li");li.className="slot kz";
       const h=document.createElement("button");h.type="button";h.className="handle";h.textContent="⠿";h.style.color="#f3dfa6";h.setAttribute("aria-label","Kaiserkegeln verschieben");h.dataset.i=i;li.append(h);
@@ -865,8 +867,8 @@ function renderPlan(){
       const sm=document.createElement("span");sm.className="sm";sm.textContent=[id===wishWinner?"⭐ Wunsch":"",artTxt(g,0),BAHN[g.bahn]?.[0]].filter(Boolean).join(" · ");
       nm.append(sm);b.append(nm);b.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();if(canPlan)openPick(i);else openInfo(id)});li.append(b);
       const rm=document.createElement("button");rm.type="button";rm.className="rm";rm.textContent="×";rm.setAttribute("aria-label",g.name+" von Platz "+(i+1)+" entfernen");
-      rm.onclick=()=>{if(i>=10)plan.splice(i,1);else plan[i]=null;render();savePlan()};li.append(rm);
-      swipeDel(li,()=>{if(i>=10)plan.splice(i,1);else plan[i]=null;render();savePlan();toast(g.name+" entfernt")});
+      rm.onclick=()=>{if(i>=DEFAULT_SLOTS.length)plan.splice(i,1);else plan[i]=null;render();savePlan()};li.append(rm);
+      swipeDel(li,()=>{if(i>=DEFAULT_SLOTS.length)plan.splice(i,1);else plan[i]=null;render();savePlan();toast(g.name+" entfernt")});
     }else{
       const ad=document.createElement("button");ad.type="button";ad.className="addslot";ad.textContent="＋ Spiel wählen";ad.setAttribute("aria-label","Platz "+(i+1)+": Spiel wählen");
       ad.onclick=()=>openPick(i);li.append(ad);li.append(document.createElement("span"));
@@ -942,7 +944,7 @@ function renderReflect(){
   const allMine=canEdit&&!!myKey()&&ids.length>0&&ids.every(id=>rateInfo(games[id]).mine);
   if(allMine&&!rfShow){sec.hidden=true;$("rf-again").hidden=false;
     if(rfWasOpen){rfWasOpen=false;toast("Danke! Alle Spiele bewertet ⭐")}return}
-  rfWasOpen=!allMine;$("rf-again").hidden=true;
+  rfWasOpen=!allMine;$("rf-again").hidden=true;$("rf-close").hidden=!allMine;
   sec.hidden=false;
   $("rf-date").textContent=(lastPlan.nr||nrFor(lastPlan.date))+". Kegelabend · "+fmtD(d)+" · sichtbar bis "+fmtD(until);
   const ol=$("rf-list");ol.replaceChildren();let rated=0,cnt=0;
@@ -1498,7 +1500,8 @@ render();setEdit(null);renderNet();
       if(d.id==="last"&&x.date)lastPlan=x;
       if(d.id==="history"&&x.abende)planHist=x.abende;
       if(d.id==="history")playsReset=x.playsReset||"";
-      if(d.id==="next"&&Array.isArray(x.slots)){plan=Array.from({length:Math.min(MAX_SLOTS,Math.max(10,x.slots.length))},(_,i)=>x.slots[i]||null);planDate=x.date||"";planTitle=x.title||"";planDone=Array.isArray(x.done)?x.done.filter(v=>typeof v==="string"):[]}});
+      if(d.id==="next"&&Array.isArray(x.slots)){{let sl=x.slots.slice();while(sl.length>DEFAULT_SLOTS.length&&!sl[sl.length-1])sl.pop(); // leere Plätze hinten auf 8 kürzen
+        plan=Array.from({length:Math.min(MAX_SLOTS,Math.max(DEFAULT_SLOTS.length,sl.length))},(_,i)=>sl[i]||null)}planDate=x.date||"";planTitle=x.title||"";planDone=Array.isArray(x.done)?x.done.filter(v=>typeof v==="string"):[]}});
     if(playsReset===null)playsReset="";planLoaded=true;render();maybeArchive();subWish();ensureKaiser();resetPlays()},()=>{}));
     subWish(true);
   };
