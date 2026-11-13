@@ -190,6 +190,12 @@ body.locked #robar,body.locked .evening,body.locked .top,body.locked .chips,body
 .lockcard span{color:var(--muted)}
 body.nokings #kbox,body.nokings #kzbox,body.nokings .krm,body.nokings #kprompt{display:none!important}
 .kbox{border-top:1px dashed var(--line);padding-top:10px}
+.khist{margin-top:4px;display:flex;flex-direction:column;gap:8px}
+#kh-body{display:flex;flex-direction:column;gap:8px}
+.khlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.khlist li{display:flex;align-items:center;gap:10px;padding:7px 2px;border-bottom:1px dashed var(--line)}
+.khlist li b{min-width:44px;font-variant-numeric:tabular-nums;color:var(--star)}
+.khlist li span{flex:1}
 body.abmode .wrap>*:not(.apphead):not(.abend):not(.simbar){display:none!important}
 .abend{display:flex;flex-direction:column;gap:10px}
 .abhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
@@ -373,7 +379,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· r31</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· r32</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
@@ -381,6 +387,18 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
       <button type="button" class="btn" id="xlsx">⤓ Als Excel-Datei</button>
     </span>
   </div>
+  <section class="khist" id="khist" hidden>
+    <button type="button" class="ablink" id="kh-tog" aria-expanded="false" aria-controls="kh-body">👑 Kaiser-Historie</button>
+    <div id="kh-body" hidden>
+      <p class="sda">Nur für dich. Für die Chronik – in der App sieht man nur den aktuellen Kaiser.</p>
+      <form class="kadd" id="kh-form" novalidate>
+        <select id="kh-year" aria-label="Jahr"></select>
+        <input type="text" id="kh-name" maxlength="40" placeholder="Name des Kaisers" aria-label="Kaiser" autocomplete="off" style="grid-column:span 2">
+        <button type="submit" class="btn">Speichern</button>
+      </form>
+      <ul class="khlist" id="kh-list"></ul>
+    </div>
+  </section>
 </div>
 
 <div class="scrim" id="scrim" hidden>
@@ -462,7 +480,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <h2 id="h-sim">🧪 Vorschau</h2>
     <p class="hint">Nur für dich. In der Vorschau wird nichts gespeichert.</p>
     <label>Ansehen als<select id="sim-role">
-      <option value="">Ich (Chef-Spielewart)</option><option value="mitglied">Kegelbruder</option>
+      <option value="">Ich (Chef-Spielewart)</option><option value="spielewart">Spielewart</option><option value="mitglied">Kegelbruder</option>
       <option value="schriftwart">Schriftwart</option><option value="gast">Gast</option></select></label>
     <label>Datum<select id="sim-date"></select></label>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
@@ -645,8 +663,23 @@ function renderAbend(){
   ol.addEventListener("pointerup",end);ol.addEventListener("pointercancel",end)})();
 $("ab-exit").onclick=()=>{abOff=true;try{sessionStorage.setItem("kcrab","off")}catch(e){}renderAbend();window.scrollTo(0,0)};
 $("ab-enter").onclick=()=>{abOff=false;try{sessionStorage.removeItem("kcrab")}catch(e){}renderAbend();window.scrollTo(0,0)};
+function renderKHist(){const sec=$("khist");sec.hidden=!isChef;if(!isChef)return;
+  const sel=$("kh-year");if(!sel.options.length){const y=new Date().getFullYear();for(let i=0;i<=40;i++){const o=document.createElement("option");o.value=y-i;o.textContent="Kaiser "+(y-i);sel.append(o)}sel.value=String(y-1)}
+  const ul=$("kh-list");ul.replaceChildren();const all=Object.values(kaiser).sort((a,b)=>b.year-a.year);
+  if(!all.length){const li=document.createElement("li");li.textContent="Noch keine Kaiser eingetragen.";ul.append(li)}
+  all.forEach(x=>{const li=document.createElement("li");const y=document.createElement("b");y.textContent=x.year;const n=document.createElement("span");n.textContent=x.name;
+    const rm=document.createElement("button");rm.type="button";rm.className="krm";rm.textContent="×";rm.setAttribute("aria-label","Kaiser "+x.year+" löschen");
+    rm.onclick=()=>{if(!isChef||!db)return;delete kaiser[String(x.year)];render();db.collection("kaiser").doc(String(x.year)).delete().catch(()=>toast("Nicht gelöscht."))};
+    li.append(y,n,rm);ul.append(li)})}
+$("kh-tog").onclick=()=>{const o=$("kh-body").hidden;$("kh-body").hidden=!o;$("kh-tog").setAttribute("aria-expanded",String(o))};
+$("kh-year").onchange=()=>{const k=kaiser[$("kh-year").value];$("kh-name").value=k?k.name:""};
+$("kh-form").addEventListener("submit",e=>{e.preventDefault();if(!isChef||!db)return;const year=+$("kh-year").value,name=$("kh-name").value.trim().slice(0,40);
+  if(!name){toast("Bitte einen Namen eintragen");return}
+  kaiser[String(year)]={year,name,historie:true,updatedAt:new Date().toISOString()};render();
+  db.collection("kaiser").doc(String(year)).set({year,name,historie:true,updatedAt:new Date().toISOString()}).catch(()=>toast("Speichern fehlgeschlagen"));
+  $("kh-name").value="";toast("Kaiser "+year+": "+name+" gespeichert");const sel=$("kh-year");if(sel.selectedIndex<sel.options.length-1){sel.selectedIndex++}});
 function kaiserFeier(){ // neuer Kaiser: jedes Handy feiert einmal mit
-  if(SIM.on)return;const k=Object.values(kaiser).sort((a,b)=>b.year-a.year)[0];if(!k||!k.updatedAt)return;
+  if(SIM.on)return;const k=Object.values(kaiser).sort((a,b)=>b.year-a.year)[0];if(!k||!k.updatedAt||k.historie)return;
   if(Date.now()-new Date(k.updatedAt).getTime()>21*864e5)return;
   const key=k.year+"|"+k.name+"|"+k.updatedAt;let seen="";try{seen=localStorage.getItem("kcrkaiser")||""}catch(e){}
   if(seen===key)return;try{localStorage.setItem("kcrkaiser",key)}catch(e){}
@@ -1077,7 +1110,7 @@ let tplLoaded=false;
 
 /* Kaiserkegeln */
 let kaiser={};
-function renderKaiser(){
+function renderKaiser(){renderKHist();
   const on=kaiserThemeOn();document.body.classList.toggle("kaiser",on);$("kbanner").hidden=!on;
   const k=kaiserEvening();
   if(on){const d=parseIso(k);const c=kaiserCandidates(d.getFullYear());
@@ -1296,7 +1329,7 @@ function simDates(){
 }
 function renderSimBar(){
   const b=$("simbar");b.hidden=!SIM.on;if(!SIM.on)return;
-  const rn={"":"Chef",mitglied:"Kegelbruder",schriftwart:"Schriftwart",gast:"Gast"}[SIM.role];
+  const rn={"":"Chef",spielewart:"Spielewart",mitglied:"Kegelbruder",schriftwart:"Schriftwart",gast:"Gast"}[SIM.role];
   $("sim-txt").textContent="🧪 Vorschau: "+rn+(SIM.date?" · "+fmtD(parseIso(SIM.date)):"")+" – nichts wird gespeichert";
 }
 $("simbtn").onclick=()=>{const sel=$("sim-date");sel.replaceChildren();
