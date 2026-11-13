@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <base href="../">
-<title>DEV · KC Rebell</title>
+<title>DEV · Kegelclub Rebell</title>
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="theme-color" content="#9b2c2c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Kegelspiele">
+<meta name="apple-mobile-web-app-title" content="KC Rebell">
 
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
@@ -90,7 +90,7 @@ body.lclosed #filters,body.lclosed #list{display:none!important}
 .status{color:var(--muted);font-size:.85rem;text-align:center;margin:0}
 .foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:.85rem}
 /* Formular */
-.scrim{position:fixed;inset:0;background:rgba(20,10,10,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.scrim{position:fixed;inset:0;background:rgba(20,10,10,.45);display:flex;align-items:flex-end;justify-content:center;z-index:40}
 .sheet{background:var(--surface);width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:20px max(18px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:16px;max-height:92%;overflow:auto}
 @media (min-width:600px){.scrim{align-items:center}.sheet{border-radius:20px}}
 .sheet h3{font-family:var(--display);font-weight:600;font-size:1.2rem;margin:0}
@@ -231,12 +231,20 @@ body[data-tab="admin"] .gear{border-color:var(--accent);background:var(--accent-
 .stwedr .bz[aria-pressed="true"]{background:var(--c-volle,#2e7d32);border-color:transparent;color:#fff}
 .stwedb{display:grid;grid-template-columns:60px 1fr;gap:8px}
 .kathead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.katpages{display:flex;gap:6px;overflow-x:auto;margin:6px 0 2px;padding-bottom:2px;scrollbar-width:none}
+.katpages button{flex:none;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:5px 12px;font-size:.82rem;cursor:pointer;color:var(--ink);font-family:inherit}
+.katpages button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.katpdf{display:flex;gap:14px;flex-wrap:wrap}
+.katlist li span{min-width:0;overflow-wrap:anywhere}
 .katlist{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column}
 .katlist li{display:flex;justify-content:space-between;gap:12px;padding:7px 2px;border-bottom:1px dashed var(--line)}
 .katlist li:last-child{border-bottom:0}
 .katlist li b{white-space:nowrap;color:var(--accent);font-variant-numeric:tabular-nums}
 .katedit{list-style:none;margin:6px 0 10px;padding:0;display:flex;flex-direction:column;gap:6px}
-.katedit li{display:grid;grid-template-columns:1fr 78px 38px;gap:6px}
+.katedit li{display:grid;grid-template-columns:1fr 88px;gap:6px;padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.katedit .krow2{grid-column:1/-1;display:flex;gap:6px;align-items:center}
+.katedit .krow2 select{flex:1;min-width:0;font:inherit;font-size:.82rem;padding:6px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink)}
+.katedit .krow2 button{width:36px;height:34px;border:1px solid var(--line);background:none;border-radius:9px;cursor:pointer;color:var(--muted)}
 .katedit input{padding:8px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font:inherit;min-width:0}
 .katedit .rm{border:1px solid var(--line);background:none;border-radius:9px;cursor:pointer;color:var(--muted)}
 .tabbar .tmain{flex:1.15}
@@ -307,6 +315,19 @@ body.noplan .slot{grid-template-columns:24px 1fr!important}
 body.noplan .slot.empty{display:none}
 .mlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .mlist li{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:.9rem}
+.mlist li.mrow{flex-direction:column;align-items:stretch}
+.mtop{display:flex;align-items:center;gap:8px}
+.amter{display:flex;flex-wrap:wrap;gap:5px}
+.amt{border:1px solid var(--line);background:none;border-radius:999px;padding:3px 10px;font-size:.78rem;cursor:pointer;color:var(--muted)}
+.verz{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.verz li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}
+.verz li:last-child{border-bottom:0}
+.verz .vn{font-weight:600}
+.verz .va{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}
+.verz .va span{font-size:.72rem;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+.verz .va span.x{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.mextra{width:100%;font-family:inherit;font-size:.8rem!important;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.amt[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 .mlist .u{flex:1;min-width:0;overflow-wrap:anywhere}
 .mlist .rm{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:none;cursor:pointer;color:var(--muted)}
 .mlist select{font:inherit;font-size:.85rem;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
@@ -350,8 +371,8 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   </div>
   <header class="apphead">
     <div>
-      <h1>Unsere Kegelspiele</h1>
-      <p class="sub">Kegelclub Rebell</p>
+      <h1>Kegelclub Rebell</h1>
+      <p class="sub">Unsere Club-App</p>
     </div>
     <span class="hbtns"><button type="button" class="btn gear" id="tab-admin" aria-label="Einstellungen" hidden>⚙️</button><button type="button" class="btn login" id="loginbtn">Anmelden</button></span>
   </header>
@@ -471,12 +492,17 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
 
   <section class="evening strafen" id="stkat" data-tab="strafen" aria-labelledby="h-kat">
     <div class="kathead"><h2 id="h-kat">📜 Strafenkatalog</h2><button type="button" class="ablink" id="kat-edit" hidden>Bearbeiten</button></div>
+    <div class="katpages" id="kat-pages" role="tablist" aria-label="Seiten des Strafenkatalogs"></div>
     <ul class="katlist" id="kat-list"></ul>
     <div id="kat-form" hidden>
+      <div class="katpages" id="kat-epages" aria-label="Seite zum Bearbeiten wählen"></div>
+      <label class="stlbl">Name der Seite<input type="text" id="kat-pname" maxlength="40" placeholder="z. B. Beim Kegeln"></label>
       <ul class="katedit" id="kat-rows"></ul>
-      <div class="actions"><button type="button" class="btn" id="kat-add">＋ Posten</button><span style="flex:1"></span><button type="button" class="btn" id="kat-cancel">Abbrechen</button><button type="button" class="btn primary" id="kat-save">Speichern</button></div>
+      <div class="actions"><button type="button" class="btn" id="kat-add">＋ Posten</button><button type="button" class="btn" id="kat-newpage">＋ Neue Seite</button><button type="button" class="btn" id="kat-left" aria-label="Seite nach vorne">◀</button><button type="button" class="btn" id="kat-right" aria-label="Seite nach hinten">▶</button><button type="button" class="btn" id="kat-delpage">Seite löschen</button><span style="flex:1"></span><button type="button" class="btn" id="kat-cancel">Abbrechen</button><button type="button" class="btn primary" id="kat-save">Speichern</button></div>
     </div>
     <p class="sda" id="kat-stand"></p>
+    <div class="katpdf"><button type="button" class="ablink" id="kat-pdfopen" hidden>📄 Original-Katalog (PDF)</button>
+      <label class="ablink" id="kat-pdfup" hidden>PDF hochladen<input type="file" id="kat-pdffile" accept="application/pdf" hidden></label></div>
     <datalist id="kat-dl"></datalist>
   </section>
 
@@ -496,6 +522,10 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
 
   <section class="evening admin" id="admin" data-tab="admin" aria-labelledby="h-ad">
     <h2 id="h-ad">⚙️ Einstellungen</h2>
+    <div class="kbox" id="ad-verz" hidden>
+      <p class="klabel">👥 Mitglieder &amp; Ämter</p>
+      <ul class="verz" id="verz-list"></ul>
+    </div>
     <div class="kbox" id="ad-name-box" hidden>
       <p class="klabel">Mein Name</p>
       <form class="adrow" id="ad-name-form"><input type="text" id="ad-name" maxlength="40" autocomplete="name" placeholder="So sehen dich die anderen"><button type="submit" class="btn">Speichern</button></form>
@@ -505,8 +535,12 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
       <div class="adbtns" id="ad-tools"></div>
     </div>
     <div class="kbox" id="ad-ana" hidden>
-      <p class="klabel">📊 Strafen-Analyse (nur Warte)</p>
+      <p class="klabel">💶 Strafen-Analyse <span class="sda">(Schriftwarte, Kassenwart)</span></p>
       <div id="ana"></div>
+    </div>
+    <div class="kbox" id="ad-spiel" hidden>
+      <p class="klabel">🎳 Spiel-Analyse <span class="sda">(Spielewarte)</span></p>
+      <div id="spana"></div>
     </div>
   </section>
 
@@ -601,7 +635,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <p class="hint">Nur für dich. In der Vorschau wird nichts gespeichert.</p>
     <label>Ansehen als<select id="sim-role">
       <option value="">Ich (Chef-Spielewart)</option><option value="mitglied">Kegelbruder</option>
-      <option value="schriftwart">Schriftwart</option><option value="gast">Gast</option></select></label>
+      <option value="schriftwart">Schriftwart</option><option value="kassenwart">Kassenwart</option><option value="gast">Gast</option></select></label>
     <label>Datum<select id="sim-date"></select></label>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
       <button type="button" class="btn" id="sim-cancel">Abbrechen</button>
@@ -610,8 +644,8 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
 </div>
 <div class="scrim" id="mscrim" hidden>
   <form class="sheet" id="mform" role="dialog" aria-modal="true" aria-labelledby="m-title" novalidate>
-    <h3 id="m-title">Mitglieder & Rollen</h3>
-    <p class="note">Kein Zugriff: sieht nichts · Gast: Spiele + Plan ansehen, keine Namen · Kegelbruder: Spiele anlegen, bewerten · Schriftwart (max. 2): zusätzlich Abendkönige + Kaiser · Spielewart: alles außer Rollen.</p>
+    <h3 id="m-title">Mitglieder & Ämter</h3>
+    <p class="note">Zugang: Kein Zugriff · Gast (Spiele + Plan, keine Namen) · Kegelbruder. Ämter antippen zum Zuteilen – eine Person kann mehrere haben. Weitere Ämter ohne App-Funktion einfach eintippen.</p>
     <ul class="mlist" id="m-list"></ul>
     <div class="madd"><input type="email" id="m-mail" inputmode="email" autocomplete="off" placeholder="E-Mail vorab freischalten (optional)"><button type="submit" class="btn">Hinzufügen</button></div>
     <div class="actions"><span style="flex:1"></span><button type="button" class="btn" id="m-close">Fertig</button></div>
@@ -821,7 +855,7 @@ function renderStrafen(){
     if(x.posten||x.bezahlt){const p=document.createElement("span");p.className="stp";p.textContent=(x.posten||"")+(x.bezahlt?(x.posten?" · ":"")+"bezahlt":"");li.append(p)}ul.append(li)});
   renderStAll();renderStNote();renderKat();
   // Schriftwarte
-  $("stw").hidden=!canKings;if(!canKings)return;
+  $("stw").hidden=!canFines;if(!canFines)return;
   const sel=$("stw-date"),keep=sel.value;
   if(!sel.options.length||sel.dataset.n!==String(stDates().length)){sel.replaceChildren();stDates().forEach(d=>{const o=document.createElement("option");o.value=d;o.textContent=fmtD(parseIso(d))+" · "+nrFor(d)+". Abend";sel.append(o)});sel.dataset.n=String(sel.options.length);
     sel.value=keep&&[...sel.options].some(o=>o.value===keep)?keep:(lastPlan&&[...sel.options].some(o=>o.value===lastPlan.date)?lastPlan.date:(sel.options[0]||{}).value)}
@@ -853,25 +887,54 @@ function renderStw(){
 }
 $("stw-date").onchange=renderStw;
 $("stw-tog").onclick=()=>{const o=$("stw-body").hidden;$("stw-body").hidden=!o;$("stw-tog").setAttribute("aria-expanded",String(o));$("stw-tog").textContent=o?"✍️ Strafen eintragen ▾":"✍️ Strafen eintragen"};
-let katalog={posten:[]};
-function renderKat(){const ps=(katalog.posten||[]).filter(p=>p&&p.text);const ul=$("kat-list");ul.replaceChildren();
-  if(!ps.length){const li=document.createElement("li");li.textContent=canKings?"Noch kein Katalog – tippe auf „Bearbeiten“.":"Noch kein Strafenkatalog hinterlegt.";ul.append(li)}
+let katalog={seiten:[]},katPage=0,katPdf=null;
+function katSeiten(){const k=katalog||{};if(Array.isArray(k.seiten)&&k.seiten.length)return k.seiten;if(Array.isArray(k.posten)&&k.posten.length)return[{name:"Beim Kegeln",posten:k.posten}];return[]}
+function betragTxt(b){if(b===undefined||b===null||b==="")return "";const n=typeof b==="number"?b:parseFloat(String(b).replace(",","."));return(typeof b==="number"||String(n)===String(b).replace(",",".").trim())&&!isNaN(n)?eur(n):String(b)}
+function renderKat(){const ss=katSeiten();const editing=!$("kat-form").hidden;if(!editing&&katPage>=ss.length)katPage=0;
+  const pg=$("kat-pages");pg.replaceChildren();pg.hidden=ss.length<2||editing;
+  ss.forEach((p,k)=>{const b=document.createElement("button");b.type="button";b.role="tab";b.textContent=p.name||("Seite "+(k+1));b.setAttribute("aria-selected",String(k===katPage));b.onclick=()=>{katPage=k;renderKat()};pg.append(b)});
+  const ps=((ss[katPage]||{}).posten||[]).filter(p=>p&&p.text);const ul=$("kat-list");ul.replaceChildren();
+  if(!ps.length){const li=document.createElement("li");li.textContent=canKat?"Noch kein Katalog – tippe auf „Bearbeiten“.":"Noch kein Strafenkatalog hinterlegt.";ul.append(li)}
   ps.forEach(p=>{const li=document.createElement("li");const a=document.createElement("span");a.textContent=p.text;li.append(a);
-    if(p.betrag){const b=document.createElement("b");b.textContent=eur(p.betrag);li.append(b)}ul.append(li)});
+    const t=betragTxt(p.betrag);if(t){const b=document.createElement("b");b.textContent=t;li.append(b)}ul.append(li)});
   $("kat-stand").textContent=katalog.updatedAt?"Stand: "+deDate(katalog.updatedAt.slice(0,10)):"";
-  $("kat-edit").hidden=!canKings||!$("kat-form").hidden;ul.hidden=!$("kat-form").hidden;
-  const dl=$("kat-dl");dl.replaceChildren();ps.forEach(p=>{const o=document.createElement("option");o.value=p.text;dl.append(o)})}
-function katRow(p){const li=document.createElement("li");const t=document.createElement("input");t.type="text";t.maxLength=60;t.placeholder="Wofür";t.value=p.text||"";
-  const b=document.createElement("input");b.type="number";b.min="0";b.step="0.1";b.inputMode="decimal";b.placeholder="€";b.value=p.betrag?String(p.betrag):"";
-  const r=document.createElement("button");r.type="button";r.className="rm";r.textContent="×";r.setAttribute("aria-label","Posten entfernen");r.onclick=()=>li.remove();
-  li.append(t,b,r);$("kat-rows").append(li)}
-$("kat-edit").onclick=()=>{$("kat-rows").replaceChildren();(katalog.posten||[]).forEach(katRow);if(!(katalog.posten||[]).length)katRow({});$("kat-form").hidden=false;renderKat()};
-$("kat-add").onclick=()=>{katRow({});const ins=$("kat-rows").querySelectorAll("input[type=text]");ins[ins.length-1].focus()};
-$("kat-cancel").onclick=()=>{$("kat-form").hidden=true;renderKat()};
-$("kat-save").onclick=async()=>{if(!canKings)return;
-  const posten=[...$("kat-rows").children].map(li=>{const [t,b]=li.querySelectorAll("input");return{text:t.value.trim().slice(0,60),betrag:Math.max(0,Math.round((parseFloat(String(b.value).replace(",","."))||0)*100)/100)}}).filter(p=>p.text);
-  katalog={posten,updatedAt:new Date().toISOString()};$("kat-form").hidden=true;renderKat();toast("Strafenkatalog gespeichert");
+  $("kat-edit").hidden=!canKat||editing;ul.hidden=editing;
+  $("kat-pdfopen").hidden=!(katPdf&&katPdf.data);$("kat-pdfup").hidden=!canKat||editing;$("kat-pdfup").firstChild.textContent=katPdf&&katPdf.data?"PDF ersetzen":"PDF hochladen";
+  const dl=$("kat-dl");dl.replaceChildren();((ss[0]||{}).posten||[]).forEach(p=>{const o=document.createElement("option");o.value=p.text;dl.append(o)})}
+function katRow(p){const li=document.createElement("li");const t=document.createElement("input");t.type="text";t.maxLength=160;t.placeholder="Wofür";t.value=p.text||"";
+  const b=document.createElement("input");b.type="text";b.maxLength=30;b.placeholder="€";b.value=p.betrag===undefined||p.betrag===null?"":String(p.betrag).replace(".",",");
+  const r2=document.createElement("div");r2.className="krow2";
+  const sel=document.createElement("select");sel.setAttribute("aria-label","Auf Seite verschieben");
+  (katDraft||[]).forEach((pg,k)=>{const o=document.createElement("option");o.value=k;o.textContent=(k===katPage?"Seite: ":"→ ")+(pg.name||("Seite "+(k+1)));sel.append(o)});sel.value=String(katPage);
+  sel.onchange=()=>{const to=+sel.value;if(to===katPage)return;katCollect();const idx=[...$("kat-rows").children].indexOf(li);const [it]=katDraft[katPage].posten.splice(idx,1);if(it){katDraft[to].posten.push(it);toast("Verschoben nach „"+(katDraft[to].name||("Seite "+(to+1)))+"“")}katOpen(katPage)};
+  const mk=(txt,lab,f)=>{const x=document.createElement("button");x.type="button";x.textContent=txt;x.setAttribute("aria-label",lab);x.onclick=f;return x};
+  const up=mk("↑","Nach oben",()=>{const pr=li.previousElementSibling;if(pr)li.parentNode.insertBefore(li,pr)});
+  const dn=mk("↓","Nach unten",()=>{const nx=li.nextElementSibling;if(nx)li.parentNode.insertBefore(nx,li)});
+  const rm=mk("×","Posten entfernen",()=>li.remove());
+  r2.append(sel,up,dn,rm);li.append(t,b,r2);$("kat-rows").append(li)}
+let katDraft=null;
+function katOpen(k){katPage=k;const p=katDraft[k]||{name:"",posten:[]};$("kat-pname").value=p.name||"";$("kat-rows").replaceChildren();(p.posten||[]).forEach(katRow);if(!(p.posten||[]).length)katRow({});$("kat-form").hidden=false;
+  const ep=$("kat-epages");ep.replaceChildren();katDraft.forEach((pg,i)=>{const b=document.createElement("button");b.type="button";b.textContent=pg.name||("Seite "+(i+1));b.setAttribute("aria-selected",String(i===k));b.onclick=()=>{katCollect();katOpen(i)};ep.append(b)});
+  $("kat-left").disabled=k===0;$("kat-right").disabled=k>=katDraft.length-1;renderKat()}
+$("kat-left").onclick=()=>{if(katPage<1)return;katCollect();const [p]=katDraft.splice(katPage,1);katDraft.splice(katPage-1,0,p);katOpen(katPage-1)};
+$("kat-right").onclick=()=>{if(katPage>=katDraft.length-1)return;katCollect();const [p]=katDraft.splice(katPage,1);katDraft.splice(katPage+1,0,p);katOpen(katPage+1)};
+function katCollect(){if(!katDraft)return;const posten=[...$("kat-rows").children].map(li=>{const [t,b]=li.querySelectorAll("input[type=text]");const raw=b.value.trim();const n=parseFloat(raw.replace(",","."));
+    return{text:t.value.trim().slice(0,160),betrag:raw===""?"":(/^\d+([.,]\d+)?$/.test(raw)?Math.round(n*100)/100:raw)}}).filter(p=>p.text);
+  katDraft[katPage]={name:$("kat-pname").value.trim().slice(0,40)||("Seite "+(katPage+1)),posten}}
+$("kat-edit").onclick=()=>{katDraft=JSON.parse(JSON.stringify(katSeiten()));if(!katDraft.length)katDraft=[{name:"Beim Kegeln",posten:[]}];katOpen(Math.min(katPage,katDraft.length-1))};
+$("kat-add").onclick=()=>{katRow({});const ins=$("kat-rows").querySelectorAll("li:last-child input[type=text]");ins[0].focus()};
+$("kat-newpage").onclick=()=>{katCollect();katDraft.push({name:"",posten:[]});katOpen(katDraft.length-1);$("kat-pname").focus()};
+$("kat-delpage").onclick=()=>{if(katDraft.length<2){toast("Mindestens eine Seite");return}katDraft.splice(katPage,1);katOpen(0)};
+$("kat-cancel").onclick=()=>{katDraft=null;$("kat-form").hidden=true;renderKat()};
+$("kat-save").onclick=async()=>{if(!canKat||!katDraft)return;katCollect();
+  katalog={seiten:katDraft.filter(p=>p.posten.length||p.name),updatedAt:new Date().toISOString()};katDraft=null;$("kat-form").hidden=true;renderKat();toast("Strafenkatalog gespeichert");
   if(db){try{await db.collection("katalog").doc("strafen").set(katalog)}catch(e){toast("Nicht gespeichert.")}}};
+$("kat-pdfopen").onclick=()=>{if(!katPdf||!katPdf.data)return;try{const bin=atob(katPdf.data.split(",")[1]);const u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
+  const url=URL.createObjectURL(new Blob([u8],{type:"application/pdf"}));window.open(url,"_blank")||(location.href=url)}catch(e){toast("PDF konnte nicht geöffnet werden.")}};
+$("kat-pdffile").onchange=e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f||!canKat)return;
+  if(f.size>700*1024){toast("PDF ist zu groß (max. 700 KB). Bitte verkleinern oder an Claude schicken.");return}
+  const r=new FileReader();r.onload=async()=>{katPdf={name:f.name,data:r.result,at:new Date().toISOString()};renderKat();toast("PDF gespeichert");
+    if(db){try{await db.collection("katalog").doc("pdf").set(katPdf)}catch(err){toast("Nicht gespeichert.")}}};r.readAsDataURL(f)};
 function stLatest(){let best=null;Object.values(strafen).forEach(x=>{if(x.updatedAt&&(!best||x.updatedAt>best.updatedAt))best=x});return best}
 function stSeen(){try{return localStorage.getItem("kcrstseen")||""}catch(e){return""}}
 function renderStNote(){const b=stLatest(),n=$("stnote"),tb=$("tb-strafen");
@@ -900,7 +963,7 @@ function showImg(src){const o=document.createElement("div");o.className="scrim";
   const im=document.createElement("img");im.src=src;im.alt="Strafenzettel";im.style.cssText="max-width:96vw;max-height:90vh;border-radius:10px";o.append(im);o.onclick=()=>o.remove();document.body.append(o)}
 function zettelOf(d){return Object.entries(zettel).filter(([id,z])=>z.date===d||id===d).map(([id,z])=>({id,...z})).sort((a,b)=>(a.at||"").localeCompare(b.at||""))}
 function confirmDel(){return true}
-$("z-file").onchange=async e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f||!canKings)return;const d=$("stw-date").value;if(!d)return;
+$("z-file").onchange=async e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f||!canFines)return;const d=$("stw-date").value;if(!d)return;
   const used=new Set(zettelOf(d).map(z=>z.id));if(used.size>=3){toast("Maximal 3 Fotos pro Abend");return}
   let id="";for(let i=1;i<=3;i++){if(!used.has(d+"__"+i)){id=d+"__"+i;break}}
   try{const url=await shrink(f);const doc={date:d,bild:url,at:new Date().toISOString(),by:curUser?curUser.uid:""};zettel[id]=doc;renderStrafen();
@@ -910,7 +973,24 @@ function shrink(file){return new Promise((ok,bad)=>{const r=new FileReader();r.o
   let w=im.width,h=im.height,max=1400;if(w>max||h>max){const k=max/Math.max(w,h);w=Math.round(w*k);h=Math.round(h*k)}
   const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);
   let q=.7,u=c.toDataURL("image/jpeg",q);while(u.length>600000&&q>.3){q-=.1;u=c.toDataURL("image/jpeg",q)}ok(u)};im.src=r.result};r.readAsDataURL(file)})}
-function renderAna(){const box=$("ad-ana");if(!box)return;box.hidden=!canKings;if(!canKings)return;
+function renderSpielAna(){const box=$("ad-spiel");if(!box)return;box.hidden=!canPlan;if(!canPlan)return;const el=$("spana");el.replaceChildren();
+  const gs=Object.entries(games).map(([id,g])=>({id,...g,ri:rateInfo(g)})).filter(g=>!FIXED.has(g.id));if(!gs.length){el.textContent="Noch keine Spiele.";return}
+  const t8=parseIso(todayIso());t8.setMonth(t8.getMonth()-8);const lim=isoOf(t8);
+  const never=gs.filter(g=>!g.plays&&!g.lastPlayed),sleep=gs.filter(g=>g.lastPlayed&&g.lastPlayed<lim),rated=gs.filter(g=>g.ri.n>=2);
+  const k=document.createElement("div");k.className="anak";
+  [["Spiele in der Sammlung",String(gs.length)],["Nie gespielt",String(never.length)],["Über 8 Monate nicht gespielt",String(sleep.length)],["Mit Club-Bewertung",String(rated.length)]].forEach(([a,b])=>{const d=document.createElement("div");const v=document.createElement("b");v.textContent=b;const l=document.createElement("span");l.textContent=a;d.append(v,l);k.append(d)});
+  el.append(k);
+  const block=(title,rows,cols)=>{if(!rows.length)return;const h=document.createElement("p");h.className="klabel";h.style.marginTop="10px";h.textContent=title;
+    const tb=document.createElement("table");tb.className="anat";const hr=document.createElement("tr");cols.forEach(c=>{const th=document.createElement("th");th.textContent=c;hr.append(th)});const th_=document.createElement("thead");th_.append(hr);tb.append(th_);
+    const b=document.createElement("tbody");rows.forEach(r=>{const tr=document.createElement("tr");r.forEach(v=>{const td=document.createElement("td");td.textContent=v;tr.append(td)});b.append(tr)});tb.append(b);el.append(h,tb)};
+  const av=r=>r.avg?r.avg.toFixed(1).replace(".",","):"–";
+  block("Meistgespielt",[...gs].sort((a,b)=>(b.plays||0)-(a.plays||0)).slice(0,5).filter(g=>g.plays).map(g=>[g.name,g.plays+"×",g.lastPlayed?deDate(g.lastPlayed):"–"]),["Spiel","Gespielt","Zuletzt"]);
+  block("Bestbewertet",[...rated].sort((a,b)=>b.ri.avg-a.ri.avg).slice(0,5).map(g=>[g.name,"Ø "+av(g.ri),g.ri.n+" Stimmen"]),["Spiel","Schnitt","Stimmen"]);
+  block("Am schwächsten bewertet",[...rated].sort((a,b)=>a.ri.avg-b.ri.avg).slice(0,3).map(g=>[g.name,"Ø "+av(g.ri),g.ri.n+" Stimmen"]),["Spiel","Schnitt","Stimmen"]);
+  block("„Nie wieder“-Stimmen",gs.filter(g=>nieCount(g)).sort((a,b)=>nieCount(b)-nieCount(a)).slice(0,5).map(g=>[g.name,nieCount(g)+"× 👎",g.ri.avg?"Ø "+av(g.ri):"–"]),["Spiel","Stimmen","Schnitt"]);
+  block("Lange nicht gespielt",[...sleep].sort((a,b)=>a.lastPlayed.localeCompare(b.lastPlayed)).slice(0,6).map(g=>[g.name,deDate(g.lastPlayed),g.ri.avg?"Ø "+av(g.ri):"–"]),["Spiel","Zuletzt","Schnitt"]);
+  if(never.length){const p=document.createElement("p");p.className="sda";p.textContent="Nie gespielt: "+never.map(g=>g.name).sort().join(", ");el.append(p)}}
+function renderAna(){renderSpielAna();const box=$("ad-ana");if(!box)return;const ok=canFines;box.hidden=!ok;if(!ok)return;
   const all=Object.values(strafen).filter(x=>x.betrag);const el=$("ana");el.replaceChildren();
   if(!all.length){el.textContent="Noch keine Strafen eingetragen.";return}
   const tot=all.reduce((a,x)=>a+x.betrag,0),open=all.filter(x=>!x.bezahlt).reduce((a,x)=>a+x.betrag,0),evs=new Set(all.map(x=>x.date));
@@ -1502,16 +1582,18 @@ function renderWish(){
 }
 
 /* Firebase + Rollen */
-let isChef=false, canRead=false, dataHook=null, canKings=false, nutzer={}, canEdit=false, canPlan=false, curUser=null, rollen=null, rollenLoaded=false;
+let isChef=false, canRead=false, dataHook=null, canKings=false, canFines=false, canKat=false, aemter=[], nutzer={}, canEdit=false, canPlan=false, curUser=null, rollen=null, rollenLoaded=false;
 function mail(u){return ((u&&u.email)||"").toLowerCase()}
 function applyRole(){
   const m=mail(curUser);
   isChef=realChef=!!curUser&&!!rollen&&rollen.spielewart===m;
-  let role=!curUser?"none":(isChef||(rollen&&(rollen.spielewarte||[]).includes(m)))?"spielewart":(rollen&&(rollen.schriftwarte||[]).includes(m))?"schriftwart":(rollen&&(rollen.mitglieder||[]).includes(m))?"mitglied":(rollen&&(rollen.gaeste||[]).includes(m))?"gast":"wartet";
+  aemter=curUser?aemterOf(m):[];
+  let role=!curUser?"none":(isChef||aemter.includes("spielewart"))?"spielewart":aemter.includes("schriftwart")?"schriftwart":(aemter.length||(rollen&&(rollen.mitglieder||[]).includes(m)))?"mitglied":(rollen&&(rollen.gaeste||[]).includes(m))?"gast":"wartet";
   if(DEV&&!realChef&&curUser&&rollen)role="wartet";
-  if(realChef&&SIM.role){role=SIM.role;isChef=false}
+  if(realChef&&SIM.role){role=SIM.role==="kassenwart"?"mitglied":SIM.role;isChef=false;aemter=SIM.role==="kassenwart"?["kassenwart"]:SIM.role==="schriftwart"?["schriftwart"]:[]}
   canRead=role!=="none"&&role!=="wartet";
   canEdit=canRead&&role!=="gast";canPlan=role==="spielewart";canKings=canPlan||role==="schriftwart";
+  canFines=canEdit&&(isChef||aemter.includes("schriftwart")||aemter.includes("kassenwart"));canKat=canEdit&&(isChef||aemter.includes("schriftwart")||aemter.includes("kegelvater"));
   document.body.classList.toggle("nokings",!canKings);
   document.body.classList.toggle("ro",!canEdit);document.body.classList.toggle("noplan",!canPlan);
   $("loginbtn").textContent=curUser?"Abmelden":"Anmelden";$("loginbtn").title=curUser?("Angemeldet: "+m):"";
@@ -1520,7 +1602,7 @@ function applyRole(){
   $("lock-txt").textContent=role==="none"?"Bitte anmelden.":DEV&&rollenLoaded?"Testversion – nur für den Spielewart.":(rollenLoaded?"Konto erstellt – der Spielewart schaltet dich frei.":"Rechte werden geprüft …");
   $("lockbtn").hidden=role!=="none";
   if(dataHook)dataHook(canRead);
-  $("membtn").hidden=!isChef;$("simbtn").hidden=!realChef;$("backup").hidden=!isChef;renderSimBar();renderTabs();subStrafen();renderStrafen();renderAna();renderName();
+  $("membtn").hidden=!isChef;$("simbtn").hidden=!realChef;$("backup").hidden=!isChef;renderSimBar();renderTabs();subStrafen();renderStrafen();renderAna();renderName();renderVerz();
   $("seedbtn").hidden=!(canPlan&&gamesLoaded&&!Object.keys(games).length);
   render();maybeArchive();renderMembers();migrateRatings();ensureKaiser();seedTpl(tplLoaded);
 }
@@ -1543,27 +1625,57 @@ $("loginbtn").onclick=()=>openLogin();
 $("lockbtn").onclick=()=>openLogin();
 /* Mitglieder */
 let saveRollen=null;
-function roleOf(m){if(!rollen)return "kein";if(rollen.spielewart===m)return "chef";if((rollen.spielewarte||[]).includes(m))return "spielewart";if((rollen.schriftwarte||[]).includes(m))return "schriftwart";if((rollen.mitglieder||[]).includes(m))return "mitglied";if((rollen.gaeste||[]).includes(m))return "gast";return "kein"}
-function setRole(m,r){if(!saveRollen||!rollen)return;
-  const mit=(rollen.mitglieder||[]).filter(x=>x!==m),sw=(rollen.spielewarte||[]).filter(x=>x!==m),sch=(rollen.schriftwarte||[]).filter(x=>x!==m),ga=(rollen.gaeste||[]).filter(x=>x!==m);
-  if(r==="gast")ga.push(m);
-  if(r==="schriftwart"&&sch.length>=2){toast("Es gibt schon 2 Schriftwarte");renderMembers();return}
-  if(r==="mitglied")mit.push(m);if(r==="spielewart")sw.push(m);if(r==="schriftwart")sch.push(m);
-  saveRollen({...rollen,mitglieder:mit,spielewarte:sw,schriftwarte:sch,gaeste:ga})}
+function buildVerz(R){R=R||rollen||{};const names={};Object.values(nutzer).forEach(n=>{if(n.email)names[n.email]=n.name||""});
+  const mails=new Set([R.spielewart,...(R.mitglieder||[]),...(R.spielewarte||[]),...(R.schriftwarte||[]),R.kassenwart,R.kegelvater].filter(Boolean));
+  const out=[];mails.forEach(m=>{const nm=names[m];if(!nm)return;const a=[];if(R.spielewart===m)a.push("Chef-Spielewart");else if((R.spielewarte||[]).includes(m))a.push("Spielewart");
+    if((R.schriftwarte||[]).includes(m))a.push("Schriftwart");if(R.kassenwart===m)a.push("Kassenwart");if(R.kegelvater===m)a.push("Kegelvater");
+    const ex=((R.extra||{})[m.replace(/\./g,",")]||[]);out.push({name:nm,aemter:a,extra:ex})});
+  return out.sort((a,b)=>a.name.localeCompare(b.name,"de"))}
+function renderVerz(){const box=$("ad-verz");if(!box)return;const v=(rollen&&rollen.verzeichnis)||[];box.hidden=!canEdit||!v.length;if(box.hidden)return;
+  const ul=$("verz-list");ul.replaceChildren();v.forEach(x=>{const li=document.createElement("li");const n=document.createElement("span");n.className="vn";n.textContent=x.name;
+    const a=document.createElement("span");a.className="va";(x.aemter||[]).forEach(t=>{const c=document.createElement("span");c.textContent=t;a.append(c)});
+    (x.extra||[]).forEach(t=>{const c=document.createElement("span");c.className="x";c.textContent=t;a.append(c)});
+    if(!(x.aemter||[]).length&&!(x.extra||[]).length){const c=document.createElement("span");c.className="x";c.textContent="Kegelbruder";a.append(c)}
+    li.append(n,a);ul.append(li)})}
+function setExtra(m,txt){if(!saveRollen||!rollen)return;const list=txt.split(",").map(x=>x.trim().slice(0,30)).filter(Boolean).slice(0,6);
+  const ex={...(rollen.extra||{})};const k=m.replace(/\./g,",");if(list.length)ex[k]=list;else delete ex[k];saveRollen({...rollen,extra:ex})}
+const AEMTER=[["spielewart","Spielewart"],["schriftwart","Schriftwart"],["kassenwart","Kassenwart"],["kegelvater","Kegelvater"]];
+function aemterOf(m){const r=rollen||{},a=[];if(r.spielewart===m||(r.spielewarte||[]).includes(m))a.push("spielewart");if((r.schriftwarte||[]).includes(m))a.push("schriftwart");
+  if(r.kassenwart===m)a.push("kassenwart");if(r.kegelvater===m)a.push("kegelvater");return a}
+function baseOf(m){const r=rollen||{};if(r.spielewart===m)return "chef";if((r.gaeste||[]).includes(m)&&!aemterOf(m).length)return "gast";
+  if((r.mitglieder||[]).includes(m)||aemterOf(m).length)return "mitglied";return "kein"}
+function roleOf(m){const b=baseOf(m);if(b!=="mitglied")return b;const a=aemterOf(m);return a.includes("spielewart")?"spielewart":a.includes("schriftwart")?"schriftwart":"mitglied"}
+function setBase(m,b){if(!saveRollen||!rollen)return;const r={...rollen};
+  r.mitglieder=(r.mitglieder||[]).filter(x=>x!==m);r.gaeste=(r.gaeste||[]).filter(x=>x!==m);
+  if(b!=="mitglied"){r.spielewarte=(r.spielewarte||[]).filter(x=>x!==m);r.schriftwarte=(r.schriftwarte||[]).filter(x=>x!==m);if(r.kassenwart===m)r.kassenwart="";if(r.kegelvater===m)r.kegelvater=""}
+  if(b==="mitglied")r.mitglieder.push(m);if(b==="gast")r.gaeste.push(m);saveRollen(r)}
+function toggleAmt(m,a){if(!saveRollen||!rollen)return;const r={...rollen},has=aemterOf(m).includes(a);
+  if(a==="spielewart"){r.spielewarte=(r.spielewarte||[]).filter(x=>x!==m);if(!has)r.spielewarte.push(m)}
+  if(a==="schriftwart"){const l=(r.schriftwarte||[]).filter(x=>x!==m);if(!has&&l.length>=2){toast("Es gibt schon 2 Schriftwarte");renderMembers();return}if(!has)l.push(m);r.schriftwarte=l}
+  if(a==="kassenwart"||a==="kegelvater"){if(has)r[a]="";else{if(r[a]&&r[a]!==m)toast((a==="kassenwart"?"Kassenwart":"Kegelvater")+" wechselt zu "+((Object.values(nutzer).find(n=>n.email===m)||{}).name||m));r[a]=m}}
+  if(!has&&r.spielewart!==m&&!(r.mitglieder||[]).includes(m)){r.mitglieder=[...(r.mitglieder||[]),m];r.gaeste=(r.gaeste||[]).filter(x=>x!==m)}
+  saveRollen(r)}
+function setRole(m,r){if(r==="kein"||r==="gast"||r==="mitglied")setBase(m,r)}
 function renderMembers(){const ul=$("m-list");ul.replaceChildren();
-  // alle registrierten Konten + vorab freigeschaltete E-Mails
-  const map={};Object.values(nutzer).forEach(n=>{if(n.email)map[n.email]={email:n.email,name:n.name||""}});
-  [...((rollen&&rollen.mitglieder)||[]),...((rollen&&rollen.spielewarte)||[]),...((rollen&&rollen.schriftwarte)||[]),...((rollen&&rollen.gaeste)||[])].forEach(m=>{if(!map[m])map[m]={email:m,name:"",vorab:true}});
+  if(isChef&&rollen&&!SIM.on&&Object.keys(nutzer).length&&JSON.stringify(buildVerz())!==JSON.stringify(rollen.verzeichnis||[])&&saveRollen)saveRollen(rollen);
+  const R=rollen||{};const map={};Object.values(nutzer).forEach(n=>{if(n.email)map[n.email]={email:n.email,name:n.name||""}});
+  [...(R.mitglieder||[]),...(R.spielewarte||[]),...(R.schriftwarte||[]),...(R.gaeste||[]),R.kassenwart,R.kegelvater].filter(Boolean).forEach(m=>{if(!map[m])map[m]={email:m,name:"",vorab:true}});
   const list=Object.values(map).sort((a,b)=>(a.name||a.email).localeCompare(b.name||b.email,"de"));
   if(!list.length){const li=document.createElement("li");li.style.color="var(--muted)";li.textContent="Noch keine Konten.";ul.append(li)}
-  list.forEach(x=>{const li=document.createElement("li");const u=document.createElement("span");u.className="u";u.textContent=x.name||x.email;
-    const sm=document.createElement("small");sm.textContent=(x.name?x.email:"")+(x.vorab?(x.name?" · ":"")+"noch kein Konto":"");if(sm.textContent)u.append(sm);
-    li.append(u);
-    const r=roleOf(x.email);
-    if(r==="chef"){const t=document.createElement("small");t.textContent="Chef-Spielewart";t.style.color="var(--accent)";li.append(t)}
-    else{const sel=document.createElement("select");sel.setAttribute("aria-label","Rolle von "+(x.name||x.email));
-      [["kein","Kein Zugriff"],["gast","Gast (nur lesen)"],["mitglied","Kegelbruder"],["schriftwart","Schriftwart"],["spielewart","Spielewart"]].forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;sel.append(o)});
-      sel.value=r;sel.onchange=()=>setRole(x.email,sel.value);li.append(sel)}
+  list.forEach(x=>{const li=document.createElement("li");li.className="mrow";const top=document.createElement("div");top.className="mtop";
+    const u=document.createElement("span");u.className="u";u.textContent=x.name||x.email;
+    const sm=document.createElement("small");sm.textContent=(x.name?x.email:"")+(x.vorab?(x.name?" · ":"")+"noch kein Konto":"");if(sm.textContent)u.append(sm);top.append(u);
+    const b=baseOf(x.email);
+    if(b==="chef"){const t=document.createElement("small");t.textContent="Chef-Spielewart";t.style.color="var(--accent)";top.append(t)}
+    else{const sel=document.createElement("select");sel.setAttribute("aria-label","Zugang von "+(x.name||x.email));
+      [["kein","Kein Zugriff"],["gast","Gast (nur lesen)"],["mitglied","Kegelbruder"]].forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;sel.append(o)});
+      sel.value=b;sel.onchange=()=>setBase(x.email,sel.value);top.append(sel)}
+    li.append(top);
+    if(b==="mitglied"||b==="chef"){const am=document.createElement("div");am.className="amter";const has=aemterOf(x.email);
+      AEMTER.forEach(([k,t])=>{if(b==="chef"&&k==="spielewart")return;const c=document.createElement("button");c.type="button";c.className="amt";c.textContent=t;
+        c.setAttribute("aria-pressed",String(has.includes(k)));c.setAttribute("aria-label",t+" für "+(x.name||x.email));c.onclick=()=>toggleAmt(x.email,k);am.append(c)});li.append(am);
+      const ex=document.createElement("input");ex.type="text";ex.className="mextra";ex.maxLength=120;ex.placeholder="Weitere Ämter, mit Komma getrennt";ex.setAttribute("aria-label","Weitere Ämter von "+(x.name||x.email));
+      ex.value=(((rollen&&rollen.extra)||{})[x.email.replace(/\./g,",")]||[]).join(", ");ex.onchange=()=>setExtra(x.email,ex.value);li.append(ex)}
     ul.append(li)})}
 function simDates(){
   const nx=planDate||nextEvening().iso,d=parseIso(nx),y=d.getFullYear(),k=kaiserOfYear(y);
@@ -1574,7 +1686,7 @@ function simDates(){
 }
 function renderSimBar(){
   const b=$("simbar");b.hidden=!SIM.on;if(!SIM.on)return;
-  const rn={"":"Chef",mitglied:"Kegelbruder",schriftwart:"Schriftwart",gast:"Gast"}[SIM.role];
+  const rn={"":"Chef",mitglied:"Kegelbruder",schriftwart:"Schriftwart",kassenwart:"Kassenwart",gast:"Gast"}[SIM.role];
   $("sim-txt").textContent=(DEV?"🛠 DEV":"🧪 Vorschau")+(SIM.role||SIM.date||!DEV?": "+rn:"")+(SIM.date?" · "+fmtD(parseIso(SIM.date)):"")+" – nichts wird gespeichert";
   $("sim-end").hidden=DEV&&!SIM.role&&!SIM.date;
 }
@@ -1648,7 +1760,7 @@ render();setEdit(null);renderNet();
     plan[i]=gid;render();savePlan();toast("Auf Platz "+(i+1)+" eingeplant")};
   setInterval(()=>{subWish();renderWish();renderKings();renderAbend();maybeArchive()},60000);window.kcrSubWish=subWish;
   const rRef=F.doc(fdb,"config","rollen");
-  saveRollen=async d=>{if(SIM.on){simBlock();return}try{await F.setDoc(rRef,{spielewart:d.spielewart,mitglieder:d.mitglieder||[],spielewarte:d.spielewarte||[],schriftwarte:d.schriftwarte||[],gaeste:d.gaeste||[],updatedAt:new Date().toISOString()})}catch(e){toast("Konnte die Mitgliederliste nicht speichern.")}};
+  saveRollen=async d=>{if(SIM.on){simBlock();return}try{await F.setDoc(rRef,{spielewart:d.spielewart,mitglieder:d.mitglieder||[],spielewarte:d.spielewarte||[],schriftwarte:d.schriftwarte||[],gaeste:d.gaeste||[],kassenwart:d.kassenwart||"",kegelvater:d.kegelvater||"",extra:d.extra||{},verzeichnis:buildVerz(d),updatedAt:new Date().toISOString()})}catch(e){toast("Konnte die Mitgliederliste nicht speichern.")}};
   let unsubR=null,unsubN=null;
   F.onAuthStateChanged(auth,u=>{
     if(unsubR){unsubR();unsubR=null}
@@ -1664,7 +1776,7 @@ render();setEdit(null);renderNet();
         try{await F.setDoc(rRef,{spielewart:mail(u),mitglieder:[],spielewarte:[],schriftwarte:[],gaeste:[],updatedAt:new Date().toISOString()});return}catch(e){}
       }
       rollen=snap.exists()?snap.data():null;rollenLoaded=true;applyRole();subWish(true);
-      if((isChef||canKings)&&!unsubN)unsubN=F.onSnapshot(F.collection(fdb,"nutzer"),s=>{nutzer={};s.docs.forEach(d=>{nutzer[d.id]=d.data()});renderMembers();renderStrafen();renderName()},()=>{});
+      if((isChef||canKings||canFines)&&!unsubN)unsubN=F.onSnapshot(F.collection(fdb,"nutzer"),s=>{nutzer={};s.docs.forEach(d=>{nutzer[d.id]=d.data()});renderMembers();renderStrafen();renderName()},()=>{});
     },()=>{rollenLoaded=true;rollen=null;applyRole();setTimeout(subR,20000)})};
     subR();
   });
@@ -1680,7 +1792,7 @@ render();setEdit(null);renderNet();
     try{await F.sendPasswordResetEmail(auth,m);$("a-msg").textContent="Falls ein Konto existiert, kommt gleich eine E-Mail zum Zurücksetzen."}catch(err){$("a-msg").textContent="Das hat nicht geklappt."}};
   let dataUns=[];
   let unsubS=[],strafKey="";
-  subStrafen=()=>{const key=curUser&&canEdit?curUser.uid+"|"+canKings:"";if(key===strafKey)return;strafKey=key;
+  subStrafen=()=>{const key=curUser&&canEdit?curUser.uid+"|"+canFines:"";if(key===strafKey)return;strafKey=key;
     unsubS.forEach(f=>f());unsubS=[];strafen={};zettel={};if(!key){renderStrafen();return}
     const onS=s=>{strafen={};s.docs.forEach(d=>{const x=d.data();if(x&&x.date&&x.uid)strafen[d.id]=x});renderStrafen();renderAna()};
     unsubS.push(F.onSnapshot(F.collection(fdb,"strafen"),onS,()=>{}));
@@ -1695,7 +1807,7 @@ render();setEdit(null);renderNet();
       $("seedbtn").hidden=!(canPlan&&!Object.keys(games).length);render();maybeArchive();migrateRatings()},
     ()=>{$("status").textContent="Spiele konnten nicht geladen werden."}));
   dataUns.push(db.collection("vorlagen").onSnapshot(s=>{vorlagen={};s.docs.forEach(d=>{const x=d.data();if(x&&x.name)vorlagen[d.id]={...x,id:d.id}});tplLoaded=true;seedTpl(true);if(!$("tscrim").hidden)renderTpl()},()=>{}));
-  dataUns.push(db.collection("katalog").onSnapshot(s=>{s.docs.forEach(d=>{if(d.id==="strafen")katalog=d.data()||{posten:[]}});renderKat()},()=>{}));
+  dataUns.push(db.collection("katalog").onSnapshot(s=>{s.docs.forEach(d=>{if(d.id==="strafen")katalog=d.data()||{seiten:[]};if(d.id==="pdf")katPdf=d.data()||null});renderKat()},()=>{}));
   dataUns.push(db.collection("kaiser").onSnapshot(s=>{kaiser={};s.docs.forEach(d=>{const x=d.data();if(x&&x.year&&x.name)kaiser[d.id]=x});render();kaiserFeier()},()=>{}));
   dataUns.push(db.collection("koenige").onSnapshot(s=>{koenige={};s.docs.forEach(d=>{const x=d.data();if(x&&x.date&&x.name)koenige[d.id]=x});render()},()=>{}));
   dataUns.push(db.collection("plan").onSnapshot(s=>{lastPlan=null;s.docs.forEach(d=>{const x=d.data();if(!x)return;
