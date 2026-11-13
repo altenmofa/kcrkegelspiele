@@ -190,6 +190,7 @@ body.locked #robar,body.locked .evening,body.locked .top,body.locked .chips,body
 .lockcard span{color:var(--muted)}
 body.nokings #kbox,body.nokings #kzbox,body.nokings .krm,body.nokings #kprompt{display:none!important}
 .kbox{border-top:1px dashed var(--line);padding-top:10px}
+.rfagain{align-self:flex-start;margin:-6px 0 -8px;font-size:.8rem}
 .khist{margin-top:4px;display:flex;flex-direction:column;gap:8px}
 #kh-body{display:flex;flex-direction:column;gap:8px}
 .khlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
@@ -222,6 +223,9 @@ body.abmode .wrap>*:not(.apphead):not(.abend):not(.simbar){display:none!importan
 .abhandle{margin-left:-8px;width:26px}
 .abtap{cursor:pointer}
 .abcard.dragging{opacity:.85;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.swipe{touch-action:pan-y;transition:transform .12s ease}
+.swipe.swdel{box-shadow:inset -6px 0 0 #c62828;background:#fdecea}
+.swipe.swgone{transform:translateX(-110%)!important;opacity:0;transition:transform .16s,opacity .16s}
 .abok{color:var(--accent);font-weight:700;font-size:1.2rem}
 .abtools{display:flex;gap:6px;justify-content:flex-end;border-top:1px dashed var(--line);padding-top:6px}
 .abtool{border:1px solid var(--line);background:none;border-radius:9px;padding:4px 10px;font-size:.85rem;cursor:pointer;color:var(--muted)}
@@ -293,6 +297,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <button type="button" class="btn primary" id="seedbtn" hidden>Startdaten übernehmen (Spiele + Plan aus Claude)</button>
 
   <button type="button" class="kprompt" id="kprompt" hidden></button>
+  <button type="button" class="ablink rfagain" id="rf-again" hidden>⭐ Deine Bewertungen vom letzten Abend ansehen</button>
   <section class="evening reflect" id="reflect" aria-labelledby="h-rf" hidden>
     <div class="evhead">
       <h2 id="h-rf">Rückblick: letztes Kegeln</h2>
@@ -381,7 +386,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· r33</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· r34</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
@@ -656,6 +661,7 @@ function renderAbend(){
         if(canPlan){const b=document.createElement("button");b.type="button";b.className="ablink";b.textContent=r?"neuer Rekord":"Rekord eintragen";b.onclick=()=>openRec(id);rr.append(b)}
         body.append(rr)}}}
     if(body.childNodes.length){li.append(body);if(!isNow)top.insertBefore(tg,top.querySelector(".abdone,.abok"))}
+    swipeDel(li,()=>{const nm_=games[id]?games[id].name:"Spiel";if(isDone){const k=planDone.indexOf(id);if(k>=0)planDone.splice(k,1)}if(i>=10)plan.splice(i,1);else plan[i]=null;render();savePlan();toast(nm_+" entfernt")});
     ol.append(li)});
   if(canPlan){const li=document.createElement("li");const b=document.createElement("button");b.type="button";b.className="ablink abadd";b.textContent="＋ Spiel hinzufügen";
     b.onclick=()=>{let k=plan.findIndex(x=>!x);if(k<0){if(plan.length>=MAX_SLOTS){toast("Maximal "+MAX_SLOTS+" Spiele");return}plan.push(null);k=plan.length-1}openPick(k)};li.append(b);ol.append(li)}
@@ -670,6 +676,7 @@ function renderAbend(){
     const order=[...ol.querySelectorAll("li.abcard")].map(x=>plan[+x.dataset.i]);const pos=plan.map((v,k)=>v?k:-1).filter(k=>k>=0);
     const np=plan.slice();pos.forEach((k,j)=>np[k]=order[j]);plan=np;render();savePlan()};
   ol.addEventListener("pointerup",end);ol.addEventListener("pointercancel",end)})();
+$("rf-again").onclick=()=>{rfShow=true;render()};
 $("ab-exit").onclick=()=>{abOff=true;try{sessionStorage.setItem("kcrab","off")}catch(e){}renderAbend();window.scrollTo(0,0)};
 $("ab-enter").onclick=()=>{abOff=false;try{sessionStorage.removeItem("kcrab")}catch(e){}renderAbend();window.scrollTo(0,0)};
 function renderKHist(){const sec=$("khist");sec.hidden=!isChef;if(!isChef)return;
@@ -853,6 +860,7 @@ function renderPlan(){
       nm.append(sm);b.append(nm);b.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();if(canPlan)openPick(i);else openInfo(id)});li.append(b);
       const rm=document.createElement("button");rm.type="button";rm.className="rm";rm.textContent="×";rm.setAttribute("aria-label",g.name+" von Platz "+(i+1)+" entfernen");
       rm.onclick=()=>{if(i>=10)plan.splice(i,1);else plan[i]=null;render();savePlan()};li.append(rm);
+      swipeDel(li,()=>{if(i>=10)plan.splice(i,1);else plan[i]=null;render();savePlan();toast(g.name+" entfernt")});
     }else{
       const ad=document.createElement("button");ad.type="button";ad.className="addslot";ad.textContent="＋ Spiel wählen";ad.setAttribute("aria-label","Platz "+(i+1)+": Spiel wählen");
       ad.onclick=()=>openPick(i);li.append(ad);li.append(document.createElement("span"));
@@ -875,6 +883,15 @@ async function savePlan(){
   try{await db.collection("plan").doc("next").set({slots:plan.map(x=>x||""),date:planDate,title:planTitle||"",done:planDone.slice(),updatedAt:new Date().toISOString()})}
   catch(e){toast("Plan wurde nicht gespeichert. Bitte noch einmal versuchen.")}
 }
+/* Wischen nach links = entfernen (nur Spielewarte) */
+function swipeDel(li,onDel){if(!canPlan)return;li.classList.add("swipe");let st=null;
+  li.addEventListener("pointerdown",e=>{if(e.target.closest("button,input,select,a,.handle"))return;st={x:e.clientX,y:e.clientY,id:e.pointerId,dx:0,on:false}});
+  li.addEventListener("pointermove",e=>{if(!st||e.pointerId!==st.id)return;const dx=e.clientX-st.x,dy=e.clientY-st.y;
+    if(!st.on){if(Math.abs(dy)>12&&Math.abs(dy)>Math.abs(dx)){st=null;return}if(dx<-12&&Math.abs(dx)>Math.abs(dy)){st.on=true;try{li.setPointerCapture(e.pointerId)}catch(_){}}else return}
+    st.dx=Math.min(0,dx);li.style.transform="translateX("+st.dx+"px)";li.classList.toggle("swdel",st.dx<-90)});
+  const end=e=>{if(!st||e.pointerId!==st.id)return;const d=st;st=null;li.style.transform="";li.classList.remove("swdel");
+    if(d.on&&d.dx<-90&&e.type==="pointerup"){li.classList.add("swgone");setTimeout(onDel,160)}};
+  li.addEventListener("pointerup",end);li.addEventListener("pointercancel",end)}
 /* Verschieben: Griff ziehen (Maus & Touch) oder Pfeiltasten */
 function moveSlot(from,to){if(to<0||to>=plan.length||from===to)return;const [x]=plan.splice(from,1);plan.splice(to,0,x);render();savePlan()}
 (function(){
@@ -900,13 +917,26 @@ function moveSlot(from,to){if(to<0||to>=plan.length||from===to)return;const [x]=
 
 /* Rückblick: eine Woche nach dem Kegeln */
 let lastPlan=null, planLoaded=false, gamesLoaded=false, archiving=false;
+let rfShow=false,rfWasOpen=false;
+async function removeFromLast(id){if(!canPlan||!lastPlan)return;const sl=(lastPlan.slots||[]).slice();const k=sl.indexOf(id);if(k<0)return;sl.splice(k,1);
+  const date=lastPlan.date;lastPlan={...lastPlan,slots:sl};const g=games[id];
+  if(g){const pl=Math.max(0,(g.plays||0)-1);const up={plays:pl};if(g.lastPlayed===date&&!pl)up.lastPlayed="";games[id]={...g,...up};
+    if(db){try{await db.collection("games").doc(id).update(up)}catch(e){}}}
+  render();toast((g?g.name:"Spiel")+" aus dem letzten Abend entfernt");
+  if(db){try{await db.collection("plan").doc("last").set({...lastPlan,slots:sl});await db.collection("plan").doc("history").set({abende:{[date]:{nr:nrFor(date),slots:sl.filter(Boolean)}}},{merge:true})}catch(e){toast("Nicht gespeichert.")}}}
 function renderReflect(){
   const sec=$("reflect");
   const d=lastPlan&&parseIso(lastPlan.date);
   if(!d){sec.hidden=true;return}
   const until=new Date(d);until.setDate(until.getDate()+7);
   const today=parseIso(todayIso());
-  if(today>until){sec.hidden=true;return}
+  if(today>until){sec.hidden=true;$("rf-again").hidden=true;return}
+  // Wer alle Spiele bewertet hat, bekommt wieder die normale Ansicht
+  const ids=(lastPlan.slots||[]).filter(id=>id&&games[id]);
+  const allMine=canEdit&&!!myKey()&&ids.length>0&&ids.every(id=>rateInfo(games[id]).mine);
+  if(allMine&&!rfShow){sec.hidden=true;$("rf-again").hidden=false;
+    if(rfWasOpen){rfWasOpen=false;toast("Danke! Alle Spiele bewertet ⭐")}return}
+  rfWasOpen=!allMine;$("rf-again").hidden=true;
   sec.hidden=false;
   $("rf-date").textContent=(lastPlan.nr||nrFor(lastPlan.date))+". Kegelabend · "+fmtD(d)+" · sichtbar bis "+fmtD(until);
   const ol=$("rf-list");ol.replaceChildren();let rated=0,cnt=0;
@@ -930,26 +960,29 @@ function renderReflect(){
         games[id]={...g,nie};render();if(db){try{await db.collection("games").doc(id).update({nie})}catch(e){toast("Nicht gespeichert.")}}}}
     else nb.hidden=true;
     li.append(no,nm,st,nb);ol.append(li);
+    swipeDel(li,()=>removeFromLast(id));
   });
   $("rf-count").textContent=canEdit?(rated+"/"+cnt+" bewertet"):"";
 }
 function nextAfter(iso){let n=nextEvening().iso;if(n<=iso){const d=parseIso(iso);d.setDate(d.getDate()+28);n=isoOf(d)}return n}
+// Wurden am Abend Spiele mit ✓ abgehakt, zählen nur diese als gespielt
+function playedSlots(){const f=doneFlags(),any=f.some(Boolean);return plan.map((x,k)=>x&&(!any||f[k])?x:"")}
 async function maybeArchive(){
   if(!db||!canRead||!planLoaded||!gamesLoaded||archiving||!planDate)return;
   {const e=parseIso(planDate);e.setHours(23,15,0,0);if(simNow()<e)return} // Abschluss am Kegelabend um 23:15
   archiving=true;
   if(SIM.on||!canPlan){
     // Nur auf diesem Handy: Rückblick zeigen und nächsten Abend anzeigen, bis der Spielewart den Abend abschließt
-    if(!lastPlan||lastPlan.date<planDate)lastPlan={date:planDate,nr:nrFor(planDate),slots:plan.map(x=>x||"")};
+    if(!lastPlan||lastPlan.date<planDate)lastPlan={date:planDate,nr:nrFor(planDate),slots:playedSlots()};
     plan=DEFAULT_SLOTS.slice();planDate=nextAfter(planDate);planTitle="";planDone=[];if(isKaiserDate(planDate))plan[4]=KZ;
     archiving=false;render();return;
   }
   try{
     const done=lastPlan&&lastPlan.date===planDate;
     if(!done){
-      const ids=plan.filter(id=>id&&games[id]);
-      await db.collection("plan").doc("last").set({date:planDate,nr:nrFor(planDate),slots:plan.map(x=>x||""),archivedAt:new Date().toISOString()});
-      try{await db.collection("plan").doc("history").set({abende:{[planDate]:{nr:nrFor(planDate),slots:plan.filter(Boolean)}}},{merge:true})}catch(e){}
+      const pslots=playedSlots(),ids=pslots.filter(id=>id&&games[id]);
+      await db.collection("plan").doc("last").set({date:planDate,nr:nrFor(planDate),slots:pslots,archivedAt:new Date().toISOString()});
+      try{await db.collection("plan").doc("history").set({abende:{[planDate]:{nr:nrFor(planDate),slots:pslots.filter(Boolean)}}},{merge:true})}catch(e){}
       for(const id of ids){const g=games[id];const up={plays:(g.plays||0)+1,updatedAt:new Date().toISOString()};if(!g.lastPlayed||g.lastPlayed<planDate)up.lastPlayed=planDate;
         try{await db.collection("games").doc(id).update(up)}catch(e){}}
     }
