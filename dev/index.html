@@ -208,6 +208,28 @@ body[data-tab="admin"] .gear{border-color:var(--accent);background:var(--accent-
 .tabbar button{position:relative}
 .tabbar button.dot::after{content:"";position:absolute;top:2px;left:calc(50% + 9px);width:9px;height:9px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
 .stnote{color:var(--accent)}
+.stwpick{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.stwpick li{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);cursor:pointer}
+.stwpick li.cur{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.stwpick li .v{font-weight:700;font-variant-numeric:tabular-nums}
+.stwpick li .v.paid{color:var(--muted);text-decoration:line-through}
+.stwed{position:sticky;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:5;display:flex;flex-direction:column;gap:8px;padding:12px;border:1.5px solid var(--accent);border-radius:14px;background:var(--surface);box-shadow:0 -4px 14px rgba(0,0,0,.08)}
+.stwedh{display:flex;justify-content:space-between;align-items:baseline}
+.stwedh b{font-family:var(--display);font-size:1.1rem}
+.stwedr{display:grid;grid-template-columns:1fr 46px;gap:6px}
+.stwedr input{padding:9px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font:inherit;min-width:0}
+.stwedr .bz{border-radius:9px;border:1px solid var(--line);background:none;cursor:pointer;font-size:1rem}
+.stwedr .bz[aria-pressed="true"]{background:var(--c-volle,#2e7d32);border-color:transparent;color:#fff}
+.stwedb{display:grid;grid-template-columns:60px 1fr;gap:8px}
+.kathead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.katlist{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column}
+.katlist li{display:flex;justify-content:space-between;gap:12px;padding:7px 2px;border-bottom:1px dashed var(--line)}
+.katlist li:last-child{border-bottom:0}
+.katlist li b{white-space:nowrap;color:var(--accent);font-variant-numeric:tabular-nums}
+.katedit{list-style:none;margin:6px 0 10px;padding:0;display:flex;flex-direction:column;gap:6px}
+.katedit li{display:grid;grid-template-columns:1fr 78px 38px;gap:6px}
+.katedit input{padding:8px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font:inherit;min-width:0}
+.katedit .rm{border:1px solid var(--line);background:none;border-radius:9px;cursor:pointer;color:var(--muted)}
 .tabbar .tmain{flex:1.15}
 .tabbar .tmain span{display:grid;place-items:center;width:46px;height:30px;border-radius:15px;background:var(--accent-soft);font-size:1.25rem}
 .tabbar .tmain[aria-current="page"] span{background:var(--accent);color:#fff}
@@ -228,6 +250,11 @@ body[data-tab="admin"] .gear{border-color:var(--accent);background:var(--accent-
 .stwlist li .bz[aria-pressed="true"]{background:var(--c-volle,#2e7d32);border-color:transparent;color:#fff}
 .stwlist li{padding:8px 0;border-bottom:1px dashed var(--line)}
 .zettel{margin-top:12px}
+#z-view{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+.zt{position:relative}
+.zt img,.zthumbs img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;border:1px solid var(--line);display:block;cursor:zoom-in;margin:0!important}
+.zt button{position:absolute;top:4px;right:4px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;cursor:pointer}
+.zthumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
 .zettel img{max-width:100%;border-radius:12px;border:1px solid var(--line);display:block;margin-bottom:8px;cursor:zoom-in}
 .zbtn{display:inline-block;cursor:pointer}
 .adbtns{display:flex;flex-wrap:wrap;gap:8px}
@@ -429,15 +456,35 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <h2 id="h-sa">👥 Alle Kegelbrüder</h2>
     <label class="stlbl">Kegelabend<select id="sa-date"></select></label>
     <ul class="stlist" id="sa-list"></ul>
-    <p class="stsum" id="sa-open"></p>
+    <p class="stsum" id="sa-sum"></p>
+    <div class="zthumbs" id="sa-z"></div>
+  </section>
+
+  <section class="evening strafen" id="stkat" data-tab="strafen" aria-labelledby="h-kat">
+    <div class="kathead"><h2 id="h-kat">📜 Strafenkatalog</h2><button type="button" class="ablink" id="kat-edit" hidden>Bearbeiten</button></div>
+    <ul class="katlist" id="kat-list"></ul>
+    <div id="kat-form" hidden>
+      <ul class="katedit" id="kat-rows"></ul>
+      <div class="actions"><button type="button" class="btn" id="kat-add">＋ Posten</button><span style="flex:1"></span><button type="button" class="btn" id="kat-cancel">Abbrechen</button><button type="button" class="btn primary" id="kat-save">Speichern</button></div>
+    </div>
+    <p class="sda" id="kat-stand"></p>
+    <datalist id="kat-dl"></datalist>
   </section>
 
   <section class="evening strafen" id="stw" data-tab="strafen" aria-labelledby="h-stw" hidden>
     <h2 id="h-stw">✍️ Strafen eintragen</h2>
     <label class="stlbl">Kegelabend<select id="stw-date"></select></label>
-    <ul class="stwlist" id="stw-list"></ul>
+    <ul class="stwpick" id="stw-list"></ul>
+    <div class="stwed" id="stw-ed">
+      <div class="stwedh"><b id="stwe-name"></b><span class="sda" id="stwe-pos"></span></div>
+      <div class="stwedr">
+        <input type="number" id="stwe-betrag" min="0" step="0.1" inputmode="decimal" placeholder="€" aria-label="Betrag">
+        <button type="button" class="bz" id="stwe-bz" aria-pressed="false" title="bezahlt">✓</button>
+      </div>
+      <div class="stwedb"><button type="button" class="btn" id="stwe-prev">←</button><button type="button" class="btn primary" id="stwe-next">Weiter →</button></div>
+    </div>
     <div class="zettel">
-      <p class="klabel">📷 Strafenzettel</p>
+      <p class="klabel">📷 Strafenzettel <span class="sda" id="z-count"></span></p>
       <div id="z-view"></div>
       <label class="btn zbtn">Foto aufnehmen / auswählen<input type="file" id="z-file" accept="image/*" capture="environment" hidden></label>
     </div>
@@ -768,7 +815,7 @@ function renderStrafen(){
   mine.forEach(x=>{const li=document.createElement("li");const a=document.createElement("span");a.textContent=fmtD(parseIso(x.date))+" · "+nrFor(x.date)+".";
     const v=document.createElement("span");v.className=x.bezahlt?"paid":"open";v.textContent=eur(x.betrag)+(x.bezahlt?" ✓":"");li.append(a,v);
     if(x.posten||x.bezahlt){const p=document.createElement("span");p.className="stp";p.textContent=(x.posten||"")+(x.bezahlt?(x.posten?" · ":"")+"bezahlt":"");li.append(p)}ul.append(li)});
-  renderStAll();renderStNote();
+  renderStAll();renderStNote();renderKat();
   // Schriftwarte
   $("stw").hidden=!canKings;if(!canKings)return;
   const sel=$("stw-date"),keep=sel.value;
@@ -776,21 +823,52 @@ function renderStrafen(){
     sel.value=keep&&[...sel.options].some(o=>o.value===keep)?keep:(lastPlan&&[...sel.options].some(o=>o.value===lastPlan.date)?lastPlan.date:(sel.options[0]||{}).value)}
   renderStw();
 }
+let stwCur=0,stwShown="";
+function stwSave(){const d=$("stw-date").value,ms=clubMembers(),m=ms[stwCur];if(!d||!m)return;
+  const f={betrag:Math.max(0,Math.round((parseFloat(String($("stwe-betrag").value).replace(",","."))||0)*100)/100),posten:"",bezahlt:$("stwe-bz").getAttribute("aria-pressed")==="true"};
+  const x=strafen[d+"__"+m.uid]||{};f.posten=x.posten||"";if((x.betrag||0)===f.betrag&&!!x.bezahlt===f.bezahlt)return;saveStrafe(d,m,f)}
+function stwGo(k){stwSave();const n=clubMembers().length;if(!n)return;stwCur=(k+n)%n;renderStw();setTimeout(()=>$("stwe-betrag").focus({preventScroll:true}),30)}
 function renderStw(){
-  const d=$("stw-date").value,ul=$("stw-list");ul.replaceChildren();if(!d)return;
-  const ms=clubMembers();if(!ms.length){const li=document.createElement("li");li.textContent="Noch keine Kegelbrüder mit Konto.";ul.append(li)}
-  ms.forEach(m=>{const id=d+"__"+m.uid,x=strafen[id]||{};const li=document.createElement("li");
-    const n=document.createElement("span");n.className="stwn";n.textContent=m.name;
-    const b=document.createElement("input");b.type="number";b.min="0";b.step="0.1";b.inputMode="decimal";b.placeholder="€";b.value=x.betrag?String(x.betrag):"";b.setAttribute("aria-label","Strafe "+m.name);
-    const bz=document.createElement("button");bz.type="button";bz.className="bz";bz.textContent="✓";bz.title="bezahlt";bz.setAttribute("aria-pressed",String(!!x.bezahlt));bz.setAttribute("aria-label",m.name+" hat bezahlt");
-    const t=document.createElement("input");t.type="text";t.maxLength=80;t.placeholder="Wofür? (optional)";t.value=x.posten||"";t.setAttribute("aria-label","Wofür "+m.name);
-    const save=()=>saveStrafe(d,m,{betrag:Math.max(0,Math.round((parseFloat(String(b.value).replace(",","."))||0)*100)/100),posten:t.value.trim().slice(0,80),bezahlt:bz.getAttribute("aria-pressed")==="true"});
-    b.onchange=save;t.onchange=save;bz.onclick=()=>{bz.setAttribute("aria-pressed",String(bz.getAttribute("aria-pressed")!=="true"));save()};
-    li.append(n,b,bz,t);ul.append(li)});
-  const z=zettel[d],zv=$("z-view");zv.replaceChildren();
-  if(z&&z.bild){const im=document.createElement("img");im.src=z.bild;im.alt="Strafenzettel vom "+fmtD(parseIso(d));im.onclick=()=>showImg(z.bild);zv.append(im)}
+  const d=$("stw-date").value,ul=$("stw-list");ul.replaceChildren();const ms=clubMembers();$("stw-ed").hidden=!d||!ms.length;if(!d)return;
+  if(!ms.length){const li=document.createElement("li");li.textContent="Noch keine Kegelbrüder mit Konto.";ul.append(li)}
+  if(stwCur>=ms.length)stwCur=0;
+  ms.forEach((m,k)=>{const x=strafen[d+"__"+m.uid]||{};const li=document.createElement("li");if(k===stwCur)li.classList.add("cur");
+    const n=document.createElement("span");n.textContent=m.name;const v=document.createElement("span");v.className="v"+(x.bezahlt?" paid":"");v.textContent=x.betrag?eur(x.betrag):"–";
+    li.append(n,v);li.onclick=()=>stwGo(k);ul.append(li)});
+  const m=ms[stwCur];if(m){const x=strafen[d+"__"+m.uid]||{};$("stwe-name").textContent=m.name;$("stwe-pos").textContent=(stwCur+1)+" von "+ms.length;
+    const key=d+"__"+m.uid;if(stwShown!==key){stwShown=key; // Felder nur beim Wechsel neu füllen, sonst gehen Eingaben verloren
+      $("stwe-betrag").value=x.betrag?String(x.betrag):"";$("stwe-bz").setAttribute("aria-pressed",String(!!x.bezahlt))}
+    $("stwe-next").textContent=ms.length>1?"Weiter → "+ms[(stwCur+1)%ms.length].name:"Speichern"}
+  const zs=zettelOf(d),zv=$("z-view");zv.replaceChildren();$("z-count").textContent="("+zs.length+" von 3)";
+  zs.forEach((z,k)=>{const w=document.createElement("div");w.className="zt";const im=document.createElement("img");im.src=z.bild;im.alt="Strafenzettel "+(k+1)+" vom "+fmtD(parseIso(d));im.onclick=()=>showImg(z.bild);
+    const rm=document.createElement("button");rm.type="button";rm.textContent="×";rm.setAttribute("aria-label","Foto "+(k+1)+" löschen");
+    rm.onclick=async()=>{if(!confirmDel())return;delete zettel[z.id];renderStrafen();if(db)db.collection("zettel").doc(z.id).delete().catch(()=>toast("Nicht gelöscht."))};w.append(im,rm);zv.append(w)});
+  $("z-file").closest("label").hidden=zs.length>=3;
 }
-$("stw-date").onchange=renderStw;
+$("stw-date").onchange=()=>{stwCur=0;renderStw()};
+$("stwe-next").onclick=()=>stwGo(stwCur+1);$("stwe-prev").onclick=()=>stwGo(stwCur-1);
+$("stwe-bz").onclick=()=>{const b=$("stwe-bz");b.setAttribute("aria-pressed",String(b.getAttribute("aria-pressed")!=="true"));stwSave()};
+$("stwe-betrag").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();stwGo(stwCur+1)}});
+$("stwe-betrag").addEventListener("change",stwSave);
+let katalog={posten:[]};
+function renderKat(){const ps=(katalog.posten||[]).filter(p=>p&&p.text);const ul=$("kat-list");ul.replaceChildren();
+  if(!ps.length){const li=document.createElement("li");li.textContent=canKings?"Noch kein Katalog – tippe auf „Bearbeiten“.":"Noch kein Strafenkatalog hinterlegt.";ul.append(li)}
+  ps.forEach(p=>{const li=document.createElement("li");const a=document.createElement("span");a.textContent=p.text;li.append(a);
+    if(p.betrag){const b=document.createElement("b");b.textContent=eur(p.betrag);li.append(b)}ul.append(li)});
+  $("kat-stand").textContent=katalog.updatedAt?"Stand: "+deDate(katalog.updatedAt.slice(0,10)):"";
+  $("kat-edit").hidden=!canKings||!$("kat-form").hidden;ul.hidden=!$("kat-form").hidden;
+  const dl=$("kat-dl");dl.replaceChildren();ps.forEach(p=>{const o=document.createElement("option");o.value=p.text;dl.append(o)})}
+function katRow(p){const li=document.createElement("li");const t=document.createElement("input");t.type="text";t.maxLength=60;t.placeholder="Wofür";t.value=p.text||"";
+  const b=document.createElement("input");b.type="number";b.min="0";b.step="0.1";b.inputMode="decimal";b.placeholder="€";b.value=p.betrag?String(p.betrag):"";
+  const r=document.createElement("button");r.type="button";r.className="rm";r.textContent="×";r.setAttribute("aria-label","Posten entfernen");r.onclick=()=>li.remove();
+  li.append(t,b,r);$("kat-rows").append(li)}
+$("kat-edit").onclick=()=>{$("kat-rows").replaceChildren();(katalog.posten||[]).forEach(katRow);if(!(katalog.posten||[]).length)katRow({});$("kat-form").hidden=false;renderKat()};
+$("kat-add").onclick=()=>{katRow({});const ins=$("kat-rows").querySelectorAll("input[type=text]");ins[ins.length-1].focus()};
+$("kat-cancel").onclick=()=>{$("kat-form").hidden=true;renderKat()};
+$("kat-save").onclick=async()=>{if(!canKings)return;
+  const posten=[...$("kat-rows").children].map(li=>{const [t,b]=li.querySelectorAll("input");return{text:t.value.trim().slice(0,60),betrag:Math.max(0,Math.round((parseFloat(String(b.value).replace(",","."))||0)*100)/100)}}).filter(p=>p.text);
+  katalog={posten,updatedAt:new Date().toISOString()};$("kat-form").hidden=true;renderKat();toast("Strafenkatalog gespeichert");
+  if(db){try{await db.collection("katalog").doc("strafen").set(katalog)}catch(e){toast("Nicht gespeichert.")}}};
 function stLatest(){let best=null;Object.values(strafen).forEach(x=>{if(x.updatedAt&&(!best||x.updatedAt>best.updatedAt))best=x});return best}
 function stSeen(){try{return localStorage.getItem("kcrstseen")||""}catch(e){return""}}
 function renderStNote(){const b=stLatest(),n=$("stnote"),tb=$("tb-strafen");
@@ -806,10 +884,10 @@ function renderStAll(){const all=Object.values(strafen).filter(x=>x.betrag||x.po
   all.filter(x=>x.date===d).sort((a,b)=>a.name.localeCompare(b.name,"de")).forEach(x=>{const li=document.createElement("li");
     const a=document.createElement("span");a.textContent=x.name;const v=document.createElement("span");v.className=x.bezahlt?"paid":"open";v.textContent=eur(x.betrag)+(x.bezahlt?" ✓":"");li.append(a,v);
     if(x.posten||x.bezahlt){const p=document.createElement("span");p.className="stp";p.textContent=(x.posten||"")+(x.bezahlt?(x.posten?" · ":"")+"bezahlt":"");li.append(p)}ul.append(li)});
-  const per={};all.filter(x=>!x.bezahlt&&x.betrag).forEach(x=>{per[x.name]=(per[x.name]||0)+x.betrag});
-  const el=$("sa-open");el.replaceChildren();const ks=Object.keys(per).sort((a,b)=>per[b]-per[a]);
-  if(!ks.length){el.textContent="Alles bezahlt 🎉";return}el.append("Noch offen: ");
-  ks.forEach((k,i)=>{if(i)el.append(", ");el.append(k+" ");const b=document.createElement("b");b.textContent=eur(per[k]);el.append(b)})}
+  const day=all.filter(x=>x.date===d&&x.betrag),tot=day.reduce((a,x)=>a+x.betrag,0),pd=day.filter(x=>x.bezahlt).reduce((a,x)=>a+x.betrag,0);
+  const el=$("sa-sum");el.replaceChildren();el.append("Gesamt an diesem Abend: ");const b=document.createElement("b");b.textContent=eur(tot);el.append(b);
+  if(tot&&pd<tot)el.append(" · davon bezahlt "+eur(pd));else if(tot)el.append(" · alles bezahlt ✓");
+  const zb=$("sa-z");zb.replaceChildren();zettelOf(d).forEach((z,k)=>{const im=document.createElement("img");im.src=z.bild;im.alt="Strafenzettel "+(k+1);im.onclick=()=>showImg(z.bild);zb.append(im)})}
 $("sa-date").onchange=renderStAll;
 async function saveStrafe(d,m,f){const id=d+"__"+m.uid;
   if(!f.betrag&&!f.posten){delete strafen[id];renderStrafen();renderAna();if(db)db.collection("strafen").doc(id).delete().catch(()=>toast("Nicht gespeichert."));return}
@@ -817,14 +895,18 @@ async function saveStrafe(d,m,f){const id=d+"__"+m.uid;
   strafen[id]=doc;renderStrafen();renderAna();if(db)db.collection("strafen").doc(id).set(doc).catch(()=>toast("Nicht gespeichert."))}
 function showImg(src){const o=document.createElement("div");o.className="scrim";o.style.zIndex=60;o.style.alignItems="center";
   const im=document.createElement("img");im.src=src;im.alt="Strafenzettel";im.style.cssText="max-width:96vw;max-height:90vh;border-radius:10px";o.append(im);o.onclick=()=>o.remove();document.body.append(o)}
+function zettelOf(d){return Object.entries(zettel).filter(([id,z])=>z.date===d||id===d).map(([id,z])=>({id,...z})).sort((a,b)=>(a.at||"").localeCompare(b.at||""))}
+function confirmDel(){return true}
 $("z-file").onchange=async e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f||!canKings)return;const d=$("stw-date").value;if(!d)return;
-  try{const url=await shrink(f);zettel[d]={date:d,bild:url,at:new Date().toISOString()};renderStw();
-    if(db)await db.collection("zettel").doc(d).set({date:d,bild:url,at:new Date().toISOString(),by:curUser?curUser.uid:""});toast("Zettel gespeichert")}
+  const used=new Set(zettelOf(d).map(z=>z.id));if(used.size>=3){toast("Maximal 3 Fotos pro Abend");return}
+  let id="";for(let i=1;i<=3;i++){if(!used.has(d+"__"+i)){id=d+"__"+i;break}}
+  try{const url=await shrink(f);const doc={date:d,bild:url,at:new Date().toISOString(),by:curUser?curUser.uid:""};zettel[id]=doc;renderStrafen();
+    if(db)await db.collection("zettel").doc(id).set(doc);toast("Foto gespeichert")}
   catch(err){toast("Foto konnte nicht gespeichert werden.")}};
 function shrink(file){return new Promise((ok,bad)=>{const r=new FileReader();r.onerror=bad;r.onload=()=>{const im=new Image();im.onerror=bad;im.onload=()=>{
   let w=im.width,h=im.height,max=1400;if(w>max||h>max){const k=max/Math.max(w,h);w=Math.round(w*k);h=Math.round(h*k)}
   const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);
-  let q=.7,u=c.toDataURL("image/jpeg",q);while(u.length>800000&&q>.3){q-=.1;u=c.toDataURL("image/jpeg",q)}ok(u)};im.src=r.result};r.readAsDataURL(file)})}
+  let q=.7,u=c.toDataURL("image/jpeg",q);while(u.length>600000&&q>.3){q-=.1;u=c.toDataURL("image/jpeg",q)}ok(u)};im.src=r.result};r.readAsDataURL(file)})}
 function renderAna(){const box=$("ad-ana");if(!box)return;box.hidden=!canKings;if(!canKings)return;
   const all=Object.values(strafen).filter(x=>x.betrag);const el=$("ana");el.replaceChildren();
   if(!all.length){el.textContent="Noch keine Strafen eingetragen.";return}
@@ -835,7 +917,12 @@ function renderAna(){const box=$("ad-ana");if(!box)return;box.hidden=!canKings;i
   el.append(k);
   const tb=document.createElement("table");tb.className="anat";tb.innerHTML="<thead><tr><th>Kegelbruder</th><th>Gesamt</th><th>Offen</th><th>Abende</th></tr></thead>";
   const body=document.createElement("tbody");Object.values(per).sort((a,b)=>b.sum-a.sum).forEach(r=>{const tr=document.createElement("tr");[r.name,eur(r.sum),eur(r.open),String(r.n)].forEach(v=>{const td=document.createElement("td");td.textContent=v;tr.append(td)});body.append(tr)});
-  tb.append(body);el.append(tb)}
+  tb.append(body);el.append(tb);
+  const byD={};all.forEach(x=>{byD[x.date]=byD[x.date]||{sum:0,n:0,open:0};byD[x.date].sum+=x.betrag;byD[x.date].n++;if(!x.bezahlt)byD[x.date].open+=x.betrag});
+  const t2=document.createElement("table");t2.className="anat";t2.innerHTML="<thead><tr><th>Kegelabend</th><th>Gesamt</th><th>Offen</th><th>Pers.</th></tr></thead>";
+  const b2=document.createElement("tbody");Object.keys(byD).sort().reverse().forEach(d=>{const r=byD[d];const tr=document.createElement("tr");
+    [deDate(d)+" ("+nrFor(d)+".)",eur(r.sum),eur(r.open),String(r.n)].forEach(v=>{const td=document.createElement("td");td.textContent=v;tr.append(td)});b2.append(tr)});
+  t2.append(b2);const h=document.createElement("p");h.className="klabel";h.style.marginTop="12px";h.textContent="Pro Kegelabend";el.append(h,t2)}
 $("ad-name-form").addEventListener("submit",async e=>{e.preventDefault();const n=$("ad-name").value.trim().slice(0,40);if(!n)return;meName=n;
   try{await saveName(n);toast("Name gespeichert")}catch(err){toast("Nicht gespeichert.")}});
 function renderName(){const i=$("ad-name");if(document.activeElement!==i)i.value=meName||(curUser&&nutzer[curUser.uid]&&nutzer[curUser.uid].name)||""}
@@ -1593,9 +1680,8 @@ render();setEdit(null);renderNet();
   subStrafen=()=>{const key=curUser&&canEdit?curUser.uid+"|"+canKings:"";if(key===strafKey)return;strafKey=key;
     unsubS.forEach(f=>f());unsubS=[];strafen={};zettel={};if(!key){renderStrafen();return}
     const onS=s=>{strafen={};s.docs.forEach(d=>{const x=d.data();if(x&&x.date&&x.uid)strafen[d.id]=x});renderStrafen();renderAna()};
-    if(canKings){unsubS.push(F.onSnapshot(F.collection(fdb,"strafen"),onS,()=>{}));
-      unsubS.push(F.onSnapshot(F.collection(fdb,"zettel"),s=>{zettel={};s.docs.forEach(d=>{const x=d.data();if(x&&x.bild)zettel[d.id]=x});renderStrafen()},()=>{}))}
-    else unsubS.push(F.onSnapshot(F.collection(fdb,"strafen"),onS,()=>{}));
+    unsubS.push(F.onSnapshot(F.collection(fdb,"strafen"),onS,()=>{}));
+    unsubS.push(F.onSnapshot(F.collection(fdb,"zettel"),s=>{zettel={};s.docs.forEach(d=>{const x=d.data();if(x&&x.bild)zettel[d.id]=x});renderStrafen()},()=>{}));
     if(!unsubS.me)try{const u=curUser.uid;unsubS.push(F.onSnapshot(F.doc(fdb,"nutzer",u),d=>{const x=d.exists()?d.data():null;if(x&&x.name)meName=x.name;renderName()},()=>{}))}catch(e){}};
   saveName=async n=>{if(!curUser)return;if(SIM.on){simBlock();return}await F.setDoc(F.doc(fdb,"nutzer",curUser.uid),{name:n,email:mail(curUser)},{merge:true})};
   dataHook=on=>{
@@ -1606,6 +1692,7 @@ render();setEdit(null);renderNet();
       $("seedbtn").hidden=!(canPlan&&!Object.keys(games).length);render();maybeArchive();migrateRatings()},
     ()=>{$("status").textContent="Spiele konnten nicht geladen werden."}));
   dataUns.push(db.collection("vorlagen").onSnapshot(s=>{vorlagen={};s.docs.forEach(d=>{const x=d.data();if(x&&x.name)vorlagen[d.id]={...x,id:d.id}});tplLoaded=true;seedTpl(true);if(!$("tscrim").hidden)renderTpl()},()=>{}));
+  dataUns.push(db.collection("katalog").onSnapshot(s=>{s.docs.forEach(d=>{if(d.id==="strafen")katalog=d.data()||{posten:[]}});renderKat()},()=>{}));
   dataUns.push(db.collection("kaiser").onSnapshot(s=>{kaiser={};s.docs.forEach(d=>{const x=d.data();if(x&&x.year&&x.name)kaiser[d.id]=x});render();kaiserFeier()},()=>{}));
   dataUns.push(db.collection("koenige").onSnapshot(s=>{koenige={};s.docs.forEach(d=>{const x=d.data();if(x&&x.date&&x.name)koenige[d.id]=x});render()},()=>{}));
   dataUns.push(db.collection("plan").onSnapshot(s=>{lastPlan=null;s.docs.forEach(d=>{const x=d.data();if(!x)return;
