@@ -190,6 +190,31 @@ body.locked #robar,body.locked .evening,body.locked .top,body.locked .chips,body
 .lockcard span{color:var(--muted)}
 body.nokings #kbox,body.nokings #kzbox,body.nokings .krm,body.nokings #kprompt{display:none!important}
 .kbox{border-top:1px dashed var(--line);padding-top:10px}
+body.abmode .wrap>*:not(.apphead):not(.abend):not(.simbar){display:none!important}
+.abend{display:flex;flex-direction:column;gap:10px}
+.abhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.abhead h2{margin:0;font-family:var(--display);font-size:1.3rem}
+.ablink{border:0;background:none;color:var(--muted);font-size:.85rem;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:4px 0}
+.abenter{align-self:flex-start;color:var(--accent);font-weight:600}
+.ablist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.abcard{border:1.5px solid var(--line);border-radius:16px;background:var(--surface);padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.abcard.now{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.abcard.done{opacity:.45}
+.abtop{display:flex;align-items:center;gap:10px}
+.abno{font-family:var(--display);font-weight:700;color:var(--muted);min-width:22px}
+.abname{flex:1;font-family:var(--display);font-weight:700;font-size:1.15rem;line-height:1.2}
+.abnow{font-size:.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em}
+.abdone{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:none;font-size:1.1rem;cursor:pointer;flex:none}
+.abcard.done .abdone{background:var(--accent);border-color:var(--accent);color:#fff}
+.abrules{margin:0;white-space:pre-wrap;line-height:1.45;font-size:.95rem}
+.rec{margin:0;font-size:.85rem;color:var(--muted)}
+.rec b{color:var(--star)}
+.abrec{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.abrec .ablink{color:var(--star);font-weight:600}
+.abok{color:var(--accent);font-weight:700;font-size:1.2rem}
+.abtools{display:flex;gap:6px;justify-content:flex-end;border-top:1px dashed var(--line);padding-top:6px}
+.abtool{border:1px solid var(--line);background:none;border-radius:9px;padding:4px 10px;font-size:.85rem;cursor:pointer;color:var(--muted)}
+.abadd{align-self:flex-start;color:var(--accent);font-weight:600}
 .klabel{margin:0 0 6px;font-weight:600;font-size:.9rem}
 .kprompt{align-self:flex-start;margin:-6px 0 -8px;padding:4px 2px;border:0;background:none;font-size:.85rem;font-weight:600;color:var(--star);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:3px}
 body.noplan #evsuggest,body.noplan #evtpl,body.noplan #f-del,body.noplan #linkbtn,body.noplan .handle,body.noplan .slot .rm,body.noplan .addslot,body.noplan #evclear{display:none!important}
@@ -245,6 +270,11 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     </div>
     <button type="button" class="btn login" id="loginbtn">Anmelden</button>
   </header>
+  <section class="abend" id="abend" aria-labelledby="h-ab" hidden>
+    <div class="abhead"><h2 id="h-ab">🎳 Kegelabend</h2><button type="button" class="ablink" id="ab-exit">Normale Ansicht</button></div>
+    <ol class="ablist" id="ab-list"></ol>
+  </section>
+  <button type="button" class="ablink abenter" id="ab-enter" hidden>🎳 Zurück zum Kegelabend-Modus</button>
   <p class="netbar" id="netbar" hidden></p>
   <p class="robar" id="robar">Nur Ansicht – zum Bearbeiten anmelden.</p>
   <div class="simbar" id="simbar" hidden><span id="sim-txt"></span><button type="button" class="btn" id="sim-end">Beenden</button></div>
@@ -340,7 +370,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· r27</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· r28</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
@@ -462,8 +492,21 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <div class="tags" id="i-tags"></div>
     <p class="irules" id="i-rules"></p>
     <div><span class="istars" id="i-stars"></span> <span class="meta" id="i-avg"></span></div>
-    <div class="actions"><span style="flex:1"></span><button type="button" class="btn" id="i-close">Schließen</button></div>
+    <p class="rec" id="i-rec"></p>
+    <div class="actions"><button type="button" class="btn" id="i-recbtn">🏅 Neuer Rekord</button><span style="flex:1"></span><button type="button" class="btn" id="i-close">Schließen</button></div>
   </div>
+</div>
+
+<div class="scrim" id="rscrim" hidden>
+  <form class="sheet" id="rform" role="dialog" aria-modal="true" aria-labelledby="r-title" novalidate>
+    <h3 id="r-title">🏅 Neuer Rekord</h3>
+    <p class="hint" id="r-game"></p>
+    <label>Rekordwert<input type="text" id="r-wert" maxlength="30" placeholder="z. B. 142 Holz oder 9 Punkte" autocomplete="off"></label>
+    <label>Kegelbruder<input type="text" id="r-name" maxlength="40" autocomplete="off"></label>
+    <label>Datum<input type="date" id="r-date"></label>
+    <div class="actions"><button type="button" class="btn" id="r-del" hidden>Rekord löschen</button><span style="flex:1"></span>
+      <button type="button" class="btn" id="r-cancel">Abbrechen</button><button type="submit" class="btn primary">Speichern</button></div>
+  </form>
 </div>
 
 <div class="toast" id="toast" role="status" hidden></div>
@@ -515,6 +558,79 @@ function badgesOf(g){const out=[];const ri=rateInfo(g);
 let listOpen=false;try{listOpen=localStorage.getItem("kcrlist")==="1"}catch(e){}
 function setListOpen(v,keep){listOpen=v;document.body.classList.toggle("lclosed",!v);$("listhead").setAttribute("aria-expanded",String(v));
   if(keep!==false){try{localStorage.setItem("kcrlist",v?"1":"0")}catch(e){}}}
+/* Rekorde */
+function recordOf(g){if(!g)return null;
+  if(g.rekord&&g.rekord.wert)return g.rekord;
+  if(g.id==="g-abendkoenig"){const b=Object.values(koenige).filter(k=>k.holz).sort((a,b)=>b.holz-a.holz||a.date.localeCompare(b.date))[0];
+    if(b)return{wert:b.holz+" Holz",name:b.name,date:b.date,auto:true}}
+  return null}
+function recTxt(r){return r?["🏅 Rekord: ",r.wert+(r.name?" · "+r.name:"")+(r.date?" · "+deDate(r.date):"")]:null}
+function fillRec(el,g){el.replaceChildren();const r=recordOf(g);
+  if(!r){el.textContent="🏅 Noch kein Rekord";return}const t=recTxt(r);el.append(t[0]);const b=document.createElement("b");b.textContent=t[1];el.append(b)}
+let recGame=null;
+function openRec(id){const g=games[id];if(!g||!canEdit)return;recGame=id;const r=g.rekord||{};
+  $("r-game").textContent=g.name+(recordOf(g)?" · bisher: "+recTxt(recordOf(g))[1]:"");
+  $("r-wert").value="";$("r-name").value=(curUser&&nutzer[curUser.uid]&&nutzer[curUser.uid].name)||"";$("r-date").value=todayIso();
+  $("r-del").hidden=!(isChef&&g.rekord&&g.rekord.wert);$("rscrim").hidden=false;setTimeout(()=>$("r-wert").focus(),50)}
+$("r-cancel").onclick=()=>$("rscrim").hidden=true;
+$("rscrim").onclick=e=>{if(e.target===$("rscrim"))$("rscrim").hidden=true};
+$("rform").addEventListener("submit",async e=>{e.preventDefault();const id=recGame,g=games[id];if(!g)return;
+  const wert=$("r-wert").value.trim().slice(0,30),name=$("r-name").value.trim().slice(0,40),date=$("r-date").value||todayIso();
+  if(!wert){toast("Rekordwert eintragen");return}
+  const rekord={wert,name,date,at:new Date().toISOString()};games[id]={...g,rekord};$("rscrim").hidden=true;$("iscrim").hidden=true;render();
+  confetti(false);toast("🏅 Neuer Rekord: "+g.name);
+  if(db){try{await db.collection("games").doc(id).update({rekord})}catch(e){toast("Nicht gespeichert.")}}});
+$("r-del").onclick=async()=>{const id=recGame,g=games[id];if(!g||!isChef)return;const {rekord,...rest}=g;games[id]={...rest,rekord:{}};
+  $("rscrim").hidden=true;$("iscrim").hidden=true;render();if(db){try{await db.collection("games").doc(id).update({rekord:{}})}catch(e){toast("Nicht gespeichert.")}}};
+
+/* Kegelabend-Modus: am Kegelabend von 19:50 bis 23:15 */
+let abOff=false;try{abOff=sessionStorage.getItem("kcrab")==="off"}catch(e){}
+function abendActive(){if(!planDate)return false;const n=simNow(),pd=parseIso(planDate);
+  const start=new Date(pd);start.setHours(19,50,0,0);const end=new Date(pd);end.setHours(23,15,0,0);
+  return n>=start&&n<end}
+let planDone=[]; // erledigte Spiele (IDs, Mehrfachnennung möglich) – vom Spielewart gesetzt, für alle sichtbar
+function doneFlags(){const left={};planDone.forEach(id=>left[id]=(left[id]||0)+1);
+  return plan.map(id=>{if(id&&left[id]>0){left[id]--;return true}return false})}
+async function toggleDone(i){if(!canPlan)return;const id=plan[i];if(!id)return;const f=doneFlags();
+  if(f[i]){const k=planDone.lastIndexOf(id);if(k>=0)planDone.splice(k,1)}else planDone.push(id);
+  renderAbend();savePlan()}
+function abMove(i,dir){if(!canPlan)return;let j=i+dir;while(j>=0&&j<plan.length&&!plan[j])j+=dir;if(j<0||j>=plan.length)return;
+  [plan[i],plan[j]]=[plan[j],plan[i]];render();savePlan()}
+function renderAbend(){
+  const act=canRead&&abendActive(),on=act&&!abOff;
+  document.body.classList.toggle("abmode",on);$("abend").hidden=!on;$("ab-enter").hidden=!(act&&abOff);
+  if(!on)return;
+  $("h-ab").textContent="🎳 "+nrFor(planDate)+". Kegelabend";
+  const flags=doneFlags(),ol=$("ab-list");ol.replaceChildren();let nowSet=false,no=0;
+  plan.forEach((id,i)=>{if(!id)return;no++;
+    const li=document.createElement("li");li.className="abcard";const isDone=flags[i];if(isDone)li.classList.add("done");
+    const top=document.createElement("div");top.className="abtop";
+    const n=document.createElement("span");n.className="abno";n.textContent=id===KZ?"👑":no;
+    const nm=document.createElement("div");nm.className="abname";
+    if(!isDone&&!nowSet){li.classList.add("now");nowSet=true;const t=document.createElement("div");t.className="abnow";t.textContent="Jetzt dran";nm.append(t)}
+    const title=document.createElement("div");nm.append(title);
+    const db_=document.createElement("button");db_.type="button";db_.className="abdone";db_.textContent="✓";db_.setAttribute("aria-pressed",String(isDone));
+    db_.setAttribute("aria-label",(isDone?"Nicht erledigt: ":"Erledigt: ")+(games[id]?games[id].name:"Spiel"));
+    db_.onclick=()=>toggleDone(i);
+    if(canPlan)top.append(n,nm,db_);else{top.append(n,nm);if(isDone){const ok=document.createElement("span");ok.className="abok";ok.textContent="✓";top.append(ok)}}
+    li.append(top);
+    if(id===KZ){title.textContent="21:00 Kaiserkegeln 🥪";const p=document.createElement("p");p.className="abrules";
+      const c=kaiserCandidates(parseIso(planDate).getFullYear());p.textContent="2×5 Wurf in die Vollen"+(canEdit&&c.length?"\nKandidaten: "+c.join(", "):"");li.append(p)}
+    else if(id===GAST){title.textContent="🤝 Spiel des Gastclubs"}
+    else{const g=games[id];if(!g){title.textContent="Unbekanntes Spiel"}else{title.textContent=g.name;
+      if(g.wertung){const p=document.createElement("p");p.className="abrules";p.textContent=g.wertung;li.append(p)}
+      const rr=document.createElement("div");rr.className="abrec";const r=document.createElement("p");r.className="rec";fillRec(r,{...g,id});rr.append(r);
+      if(canEdit){const b=document.createElement("button");b.type="button";b.className="ablink";b.textContent="＋ Rekord";b.onclick=()=>openRec(id);rr.append(b)}
+      li.append(rr)}}
+    if(canPlan){const tools=document.createElement("div");tools.className="abtools";
+      const mk=(t,l,f)=>{const b=document.createElement("button");b.type="button";b.className="abtool";b.textContent=t;b.setAttribute("aria-label",l);b.onclick=f;tools.append(b)};
+      mk("↑","Nach oben",()=>abMove(i,-1));mk("↓","Nach unten",()=>abMove(i,1));mk("⇄ Tauschen","Spiel austauschen",()=>openPick(i));li.append(tools)}
+    ol.append(li)});
+  if(canPlan){const li=document.createElement("li");const b=document.createElement("button");b.type="button";b.className="ablink abadd";b.textContent="＋ Spiel hinzufügen";
+    b.onclick=()=>{let k=plan.findIndex(x=>!x);if(k<0){if(plan.length>=MAX_SLOTS){toast("Maximal "+MAX_SLOTS+" Spiele");return}plan.push(null);k=plan.length-1}openPick(k)};li.append(b);ol.append(li)}
+}
+$("ab-exit").onclick=()=>{abOff=true;try{sessionStorage.setItem("kcrab","off")}catch(e){}renderAbend();window.scrollTo(0,0)};
+$("ab-enter").onclick=()=>{abOff=false;try{sessionStorage.removeItem("kcrab")}catch(e){}renderAbend();window.scrollTo(0,0)};
 function kaiserFeier(){ // neuer Kaiser: jedes Handy feiert einmal mit
   if(SIM.on)return;const k=Object.values(kaiser).sort((a,b)=>b.year-a.year)[0];if(!k||!k.updatedAt)return;
   if(Date.now()-new Date(k.updatedAt).getTime()>21*864e5)return;
@@ -572,7 +688,7 @@ function spielDesAbends(){
 function render(){
   const q=$("q").value.trim().toLowerCase(), all=sorted();
   const box=$("list"); box.replaceChildren();
-  $("lh-txt").textContent="Alle Spiele ("+all.length+")";document.body.classList.toggle("lclosed",!listOpen);$("listhead").setAttribute("aria-expanded",String(listOpen));renderYear();
+  $("lh-txt").textContent="Alle Spiele ("+all.length+")";document.body.classList.toggle("lclosed",!listOpen);$("listhead").setAttribute("aria-expanded",String(listOpen));renderYear();renderAbend();
   const shown=all.filter(g=>{
     if(ART[filter]&&!artenOf(g).includes(filter))return false;
     if(filter==="volle"||filter==="abraeumen"){if(g.bahn!==filter)return false}
@@ -700,7 +816,7 @@ let planDate="";
 async function savePlan(){
   if(!db){toast("Noch nicht verbunden – bitte kurz warten oder neu laden.");return}
   if(!planDate)planDate=nextEvening().iso;
-  try{await db.collection("plan").doc("next").set({slots:plan.map(x=>x||""),date:planDate,title:planTitle||"",updatedAt:new Date().toISOString()})}
+  try{await db.collection("plan").doc("next").set({slots:plan.map(x=>x||""),date:planDate,title:planTitle||"",done:planDone.slice(),updatedAt:new Date().toISOString()})}
   catch(e){toast("Plan wurde nicht gespeichert. Bitte noch einmal versuchen.")}
 }
 /* Verschieben: Griff ziehen (Maus & Touch) oder Pfeiltasten */
@@ -761,14 +877,15 @@ function renderReflect(){
   });
   $("rf-count").textContent=canEdit?(rated+"/"+cnt+" bewertet"):"";
 }
+function nextAfter(iso){let n=nextEvening().iso;if(n<=iso){const d=parseIso(iso);d.setDate(d.getDate()+28);n=isoOf(d)}return n}
 async function maybeArchive(){
   if(!db||!canRead||!planLoaded||!gamesLoaded||archiving||!planDate)return;
-  if(planDate>=todayIso())return;
+  {const e=parseIso(planDate);e.setHours(23,15,0,0);if(simNow()<e)return} // Abschluss am Kegelabend um 23:15
   archiving=true;
   if(SIM.on||!canPlan){
     // Nur auf diesem Handy: Rückblick zeigen und nächsten Abend anzeigen, bis der Spielewart den Abend abschließt
     if(!lastPlan||lastPlan.date<planDate)lastPlan={date:planDate,nr:nrFor(planDate),slots:plan.map(x=>x||"")};
-    plan=DEFAULT_SLOTS.slice();planDate=nextEvening().iso;planTitle="";if(isKaiserDate(planDate))plan[4]=KZ;
+    plan=DEFAULT_SLOTS.slice();planDate=nextAfter(planDate);planTitle="";planDone=[];if(isKaiserDate(planDate))plan[4]=KZ;
     archiving=false;render();return;
   }
   try{
@@ -780,7 +897,7 @@ async function maybeArchive(){
       for(const id of ids){const g=games[id];const up={plays:(g.plays||0)+1,updatedAt:new Date().toISOString()};if(!g.lastPlayed||g.lastPlayed<planDate)up.lastPlayed=planDate;
         try{await db.collection("games").doc(id).update(up)}catch(e){}}
     }
-    plan=DEFAULT_SLOTS.slice();planDate=nextEvening().iso;planTitle="";if(isKaiserDate(planDate))plan[4]=KZ;
+    plan=DEFAULT_SLOTS.slice();planDate=nextAfter(planDate);planTitle="";planDone=[];if(isKaiserDate(planDate))plan[4]=KZ;
     await db.collection("plan").doc("next").set({slots:plan.map(x=>x||""),date:planDate,updatedAt:new Date().toISOString()});
   }catch(e){toast("Der letzte Abend konnte nicht abgeschlossen werden.")}
   archiving=false;render();
@@ -818,6 +935,7 @@ function openInfo2(id){const g=games[id];if(!g){toast("Spiel nicht gefunden");re
   const t=$("i-tags");t.replaceChildren();artenOf(g).forEach(k=>t.append(tag(ART[k][0],ART[k][1])));if(BAHN[g.bahn])t.append(tag(BAHN[g.bahn][0],BAHN[g.bahn][1]));
   $("i-rules").textContent=g.wertung||"Noch keine Regeln eingetragen.";
   const ri=rateInfo(g);$("i-stars").textContent=ri.avg?stars(Math.round(ri.avg)):"";$("i-avg").textContent=ri.avg?avgTxt(ri):"Noch nicht bewertet";
+  fillRec($("i-rec"),{...g,id});$("i-recbtn").hidden=!canEdit;$("i-recbtn").onclick=()=>openRec(id);
   $("iscrim").hidden=false}
 $("i-close").onclick=()=>{$("iscrim").hidden=true};
 $("iscrim").onclick=e=>{if(e.target===$("iscrim"))$("iscrim").hidden=true};
@@ -1032,7 +1150,7 @@ function renderKings(){
   if(canKings&&due){kp.textContent="👑 Abendkönig "+deDate(due)+" eintragen →";kp.dataset.date=due}
 }
 function kingDue(){const t=todayIso();
-  if(planDate===t&&!koenige[t])return t;
+  if(planDate===t&&!koenige[t])return simNow().getHours()>=19?t:""; // am Kegelabend erst ab 19 Uhr
   if(lastPlan&&lastPlan.date&&!koenige[lastPlan.date]){const u=parseIso(lastPlan.date);u.setDate(u.getDate()+7);if(parseIso(t)<=u)return lastPlan.date}
   return ""}
 $("kprompt").onclick=()=>{const d=$("kprompt").dataset.date;const sel=$("k-date");if(d&&[...sel.options].some(o=>o.value===d))sel.value=d;
@@ -1041,7 +1159,9 @@ $("kform").addEventListener("submit",async e=>{e.preventDefault();if(!canKings)r
   const date=$("k-date").value,name=$("k-name").value.trim().slice(0,40);
   if(!date||!name){toast("Abend und Name eintragen");return}
   const holz=Math.max(0,Math.min(99,parseInt($("k-holz").value,10)||0));
+  const best=Math.max(0,...Object.values(koenige).filter(k=>k.date!==date).map(k=>k.holz||0));
   db.collection("koenige").doc(date).set({date,nr:nrFor(date),name,holz,updatedAt:new Date().toISOString()}).catch(()=>toast("Speichern fehlgeschlagen"));confetti(isKaiserDate(date));
+  if(holz&&best&&holz>best)setTimeout(()=>toast("🏅 Neuer Holz-Rekord: "+holz+" Holz!"),1800);
   $("k-name").value="";$("k-holz").value="";toast("👑 "+name+(isKaiserDate(date)?" – zählt für "+seasonOf(date):" eingetragen"))});
 
 /* Wunschspiel des Monats */
@@ -1225,7 +1345,7 @@ render();setEdit(null);renderNet();
     toast("Gewählt – bleibt geheim")};
   addWish=gid=>{if(!canPlan)return;let i=plan.indexOf(null);if(i<0){if(plan.length>=MAX_SLOTS){toast("Plan ist voll");return}plan.push(null);i=plan.length-1}
     plan[i]=gid;render();savePlan();toast("Auf Platz "+(i+1)+" eingeplant")};
-  setInterval(()=>{subWish();renderWish()},60000);window.kcrSubWish=subWish;
+  setInterval(()=>{subWish();renderWish();renderKings();renderAbend();maybeArchive()},60000);window.kcrSubWish=subWish;
   const rRef=F.doc(fdb,"config","rollen");
   saveRollen=async d=>{if(SIM.on){simBlock();return}try{await F.setDoc(rRef,{spielewart:d.spielewart,mitglieder:d.mitglieder||[],spielewarte:d.spielewarte||[],schriftwarte:d.schriftwarte||[],gaeste:d.gaeste||[],updatedAt:new Date().toISOString()})}catch(e){toast("Konnte die Mitgliederliste nicht speichern.")}};
   let unsubR=null,unsubN=null;
@@ -1271,7 +1391,7 @@ render();setEdit(null);renderNet();
   dataUns.push(db.collection("plan").onSnapshot(s=>{lastPlan=null;s.docs.forEach(d=>{const x=d.data();if(!x)return;
       if(d.id==="last"&&x.date)lastPlan=x;
       if(d.id==="history"&&x.abende)planHist=x.abende;
-      if(d.id==="next"&&Array.isArray(x.slots)){plan=Array.from({length:Math.min(MAX_SLOTS,Math.max(10,x.slots.length))},(_,i)=>x.slots[i]||null);planDate=x.date||"";planTitle=x.title||""}});
+      if(d.id==="next"&&Array.isArray(x.slots)){plan=Array.from({length:Math.min(MAX_SLOTS,Math.max(10,x.slots.length))},(_,i)=>x.slots[i]||null);planDate=x.date||"";planTitle=x.title||"";planDone=Array.isArray(x.done)?x.done.filter(v=>typeof v==="string"):[]}});
     planLoaded=true;render();maybeArchive();subWish();ensureKaiser()},()=>{}));
     subWish(true);
   };
