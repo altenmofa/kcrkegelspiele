@@ -191,7 +191,52 @@ body.locked #robar,body.locked .evening,body.locked .top,body.locked .chips,body
 .lockcard span{color:var(--muted)}
 body.nokings #kbox,body.nokings #kzbox,body.nokings .krm,body.nokings #kprompt{display:none!important}
 .kbox{border-top:1px dashed var(--line);padding-top:10px}
-body.abmode .wrap>*:not(.apphead):not(.abend):not(.simbar){display:none!important}
+body[data-tab]:not([data-tab="start"]) [data-tab="start"],body[data-tab]:not([data-tab="chronik"]) [data-tab="chronik"],
+body[data-tab]:not([data-tab="strafen"]) [data-tab="strafen"],body[data-tab]:not([data-tab="admin"]) [data-tab="admin"],body[data-tab]:not([data-tab="spiele"]) [data-tab="spiele"]{display:none!important}
+body.tabs[data-tab="spiele"] #listhead{display:none!important}
+body.tabs[data-tab="spiele"].lclosed #filters{display:flex!important}
+body.tabs[data-tab="spiele"].lclosed #list{display:flex!important}
+body.tabs .wrap{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
+.hbtns{display:flex;gap:8px;align-items:center}
+.gear{padding:6px 10px;font-size:1.05rem}
+body[data-tab="admin"] .gear{border-color:var(--accent);background:var(--accent-soft)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:flex-end;gap:4px;
+  padding:6px max(12px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(0,0,0,.06)}
+.tabbar button{flex:1;min-width:0;border:0;background:none;color:var(--muted);font-size:.72rem;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;cursor:pointer;font-family:inherit}
+.tabbar button span{font-size:1.35rem;line-height:1}
+.tabbar button[aria-current="page"]{color:var(--accent)}
+.tabbar .tmain{flex:1.25;transform:translateY(-14px)}
+.tabbar .tmain span{display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:var(--surface);border:2px solid var(--line);font-size:1.7rem;box-shadow:0 3px 10px rgba(0,0,0,.12)}
+.tabbar .tmain[aria-current="page"] span{border-color:var(--accent);background:var(--accent-soft)}
+
+.stsum{margin:4px 0 8px;font-size:1.05rem}
+.stsum b{color:var(--accent)}
+.stlist,.stwlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.stlist li{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.stlist .stp{grid-column:1/-1;font-size:.82rem;color:var(--muted)}
+.stlist .open{color:var(--accent);font-weight:700}
+.stlist .paid{color:var(--muted);text-decoration:line-through}
+.stlbl{display:flex;flex-direction:column;gap:4px;font-size:.85rem;margin:6px 0 10px}
+.stwlist li{display:grid;grid-template-columns:1fr 84px 38px;gap:6px;align-items:center}
+.stwlist li .stwn{font-weight:600;overflow-wrap:anywhere}
+.stwlist li input[type=text]{grid-column:1/-1;font-size:.85rem}
+.stwlist li input{padding:8px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font:inherit;min-width:0}
+.stwlist li .bz{width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:none;cursor:pointer;font-size:1rem}
+.stwlist li .bz[aria-pressed="true"]{background:var(--c-volle,#2e7d32);border-color:transparent;color:#fff}
+.stwlist li{padding:8px 0;border-bottom:1px dashed var(--line)}
+.zettel{margin-top:12px}
+.zettel img{max-width:100%;border-radius:12px;border:1px solid var(--line);display:block;margin-bottom:8px;cursor:zoom-in}
+.zbtn{display:inline-block;cursor:pointer}
+.adbtns{display:flex;flex-wrap:wrap;gap:8px}
+.adrow{display:flex;gap:8px}.adrow input{flex:1;min-width:0;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+.anat{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+.anat th,.anat td{padding:6px 4px;border-bottom:1px solid var(--line);text-align:right}
+.anat th:first-child,.anat td:first-child{text-align:left}
+.anak{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.anak div{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg)}
+.anak b{display:block;font-size:1.1rem}
+.anak span{font-size:.75rem;color:var(--muted)}
+body.abmode[data-tab="start"] .wrap>*:not(.apphead):not(.abend):not(.simbar){display:none!important}
 .abend{display:flex;flex-direction:column;gap:10px}
 .abhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .abhead h2{margin:0;font-family:var(--display);font-size:1.3rem}
@@ -269,21 +314,21 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
       <h1>Unsere Kegelspiele</h1>
       <p class="sub">Kegelclub Rebell</p>
     </div>
-    <button type="button" class="btn login" id="loginbtn">Anmelden</button>
+    <span class="hbtns"><button type="button" class="btn gear" id="tab-admin" aria-label="Einstellungen" hidden>⚙️</button><button type="button" class="btn login" id="loginbtn">Anmelden</button></span>
   </header>
-  <section class="abend" id="abend" aria-labelledby="h-ab" hidden>
+  <section class="abend" id="abend" data-tab="start" aria-labelledby="h-ab" hidden>
     <div class="abhead"><h2 id="h-ab">🎳 Kegelabend</h2><button type="button" class="ablink" id="ab-exit">Normale Ansicht</button></div>
     <ol class="ablist" id="ab-list"></ol>
   </section>
-  <button type="button" class="ablink abenter" id="ab-enter" hidden>🎳 Zurück zum Kegelabend-Modus</button>
+  <button type="button" class="ablink abenter" id="ab-enter" data-tab="start" hidden>🎳 Zurück zum Kegelabend-Modus</button>
   <p class="netbar" id="netbar" hidden></p>
   <p class="robar" id="robar">Nur Ansicht – zum Bearbeiten anmelden.</p>
   <div class="simbar" id="simbar" hidden><span id="sim-txt"></span><button type="button" class="btn" id="sim-end">Beenden</button></div>
   <div class="lockcard" id="lockcard" hidden><b>🔒 Nur für Mitglieder</b><span id="lock-txt">Bitte anmelden.</span><button type="button" class="btn primary" id="lockbtn">Anmelden</button></div>
-  <button type="button" class="btn primary" id="seedbtn" hidden>Startdaten übernehmen (Spiele + Plan aus Claude)</button>
+  <button type="button" class="btn primary" id="seedbtn" data-tab="start" hidden>Startdaten übernehmen (Spiele + Plan aus Claude)</button>
 
-  <button type="button" class="kprompt" id="kprompt" hidden></button>
-  <section class="evening reflect" id="reflect" aria-labelledby="h-rf" hidden>
+  <button type="button" class="kprompt" id="kprompt" data-tab="start" hidden></button>
+  <section class="evening reflect" id="reflect" data-tab="start" aria-labelledby="h-rf" hidden>
     <div class="evhead">
       <h2 id="h-rf">Rückblick: letztes Kegeln</h2>
       <span class="evcount" id="rf-count"></span>
@@ -293,7 +338,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <ol class="slots" id="rf-list"></ol>
   </section>
 
-  <section class="evening" aria-labelledby="h-ev">
+  <section class="evening" data-tab="start" aria-labelledby="h-ev">
     <div class="evhead">
       <h2 id="h-ev">Nächster Kegelabend</h2>
       <span class="evcount" id="evcount">0 von 10</span>
@@ -311,7 +356,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     </div>
   </section>
 
-  <section class="evening wish" aria-labelledby="h-w">
+  <section class="evening wish" data-tab="start" aria-labelledby="h-w">
     <div class="evhead">
       <h2 id="h-w">🎯 Wunschspiel des Monats</h2>
       <span class="evcount" id="w-when"></span>
@@ -319,7 +364,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <div class="wbody" id="w-body"></div>
   </section>
 
-  <section class="evening kings" aria-labelledby="h-k">
+  <section class="evening kings" data-tab="chronik" aria-labelledby="h-k">
     <div class="evhead">
       <h2 id="h-k">👑 Abendkönige <span id="k-year"></span></h2>
       <span class="evcount" id="k-count"></span>
@@ -346,18 +391,18 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     </div>
   </section>
 
-  <section class="evening yr" id="yr" aria-labelledby="h-yr" hidden>
+  <section class="evening yr" id="yr" data-tab="chronik" aria-labelledby="h-yr" hidden>
     <h2 id="h-yr">🎉 Jahresrückblick <span id="yr-year"></span></h2>
     <ul class="yrlist" id="yr-list"></ul>
   </section>
 
-  <div class="top">
+  <div class="top" data-tab="spiele">
     <input class="search" id="q" type="search" placeholder="Spiel suchen …" aria-label="Spiel suchen" autocomplete="off">
     <button type="button" class="btn primary" id="add">＋ Neues Spiel</button>
   </div>
 
-  <button type="button" class="listhead" id="listhead" aria-expanded="false" aria-controls="list"><span id="lh-txt">Alle Spiele</span><span class="lh-arrow" aria-hidden="true">▸</span></button>
-  <div class="chips" id="filters" role="group" aria-label="Filter">
+  <button type="button" class="listhead" id="listhead" data-tab="spiele" aria-expanded="false" aria-controls="list"><span id="lh-txt">Alle Spiele</span><span class="lh-arrow" aria-hidden="true">▸</span></button>
+  <div class="chips" id="filters" data-tab="spiele" role="group" aria-label="Filter">
     <button type="button" data-f="alle" aria-pressed="true">Alle</button>
     <button type="button" data-f="einzel" aria-pressed="false">Einzel</button>
     <button type="button" data-f="seite" aria-pressed="false">Seitenspiel</button>
@@ -367,10 +412,43 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <button type="button" data-f="ungeprueft" aria-pressed="false">🔍 Ungeprüft</button>
   </div>
 
-  <section class="list" id="list" aria-label="Spiele"></section>
-  <p class="status" id="status">Lade eure Spiele …</p>
+  <section class="list" id="list" data-tab="spiele" aria-label="Spiele"></section>
+  <p class="status" id="status" data-tab="spiele">Lade eure Spiele …</p>
 
-  <div class="foot">
+  <section class="evening strafen" id="strafen" data-tab="strafen" aria-labelledby="h-st">
+    <h2 id="h-st">💶 Meine Strafen</h2>
+    <p class="stsum" id="st-sum"></p>
+    <ul class="stlist" id="st-list"></ul>
+  </section>
+
+  <section class="evening strafen" id="stw" data-tab="strafen" aria-labelledby="h-stw" hidden>
+    <h2 id="h-stw">✍️ Strafen eintragen</h2>
+    <label class="stlbl">Kegelabend<select id="stw-date"></select></label>
+    <ul class="stwlist" id="stw-list"></ul>
+    <div class="zettel">
+      <p class="klabel">📷 Strafenzettel</p>
+      <div id="z-view"></div>
+      <label class="btn zbtn">Foto aufnehmen / auswählen<input type="file" id="z-file" accept="image/*" capture="environment" hidden></label>
+    </div>
+  </section>
+
+  <section class="evening admin" id="admin" data-tab="admin" aria-labelledby="h-ad">
+    <h2 id="h-ad">⚙️ Einstellungen</h2>
+    <div class="kbox" id="ad-name-box" hidden>
+      <p class="klabel">Mein Name</p>
+      <form class="adrow" id="ad-name-form"><input type="text" id="ad-name" maxlength="40" autocomplete="name" placeholder="So sehen dich die anderen"><button type="submit" class="btn">Speichern</button></form>
+    </div>
+    <div class="kbox">
+      <p class="klabel">Werkzeuge</p>
+      <div class="adbtns" id="ad-tools"></div>
+    </div>
+    <div class="kbox" id="ad-ana" hidden>
+      <p class="klabel">📊 Strafen-Analyse (nur Warte)</p>
+      <div id="ana"></div>
+    </div>
+  </section>
+
+  <div class="foot" data-tab="admin">
     <span><span id="total"></span> <small style="opacity:.5">· r29</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
@@ -510,6 +588,14 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   </form>
 </div>
 
+<nav class="tabbar" id="tabbar" aria-label="Bereiche" hidden>
+  <button type="button" data-t="spiele"><span>📋</span>Spiele</button>
+  <button type="button" data-t="chronik" id="tb-chronik"><span>👑</span>Chronik</button>
+  <button type="button" data-t="start" class="tmain"><span>🎳</span>Kegeln</button>
+  <button type="button" data-t="strafen" id="tb-strafen"><span>💶</span>Strafen</button>
+  <button type="button" data-t="admin"><span>⚙️</span>Mehr</button>
+</nav>
+
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -632,6 +718,95 @@ function renderAbend(){
 }
 $("ab-exit").onclick=()=>{abOff=true;try{sessionStorage.setItem("kcrab","off")}catch(e){}renderAbend();window.scrollTo(0,0)};
 $("ab-enter").onclick=()=>{abOff=false;try{sessionStorage.removeItem("kcrab")}catch(e){}renderAbend();window.scrollTo(0,0)};
+
+/* ===== Reiter ===== */
+let curTab="start";try{curTab=sessionStorage.getItem("kcrtab")||"start"}catch(e){}
+function setTab(t){curTab=t;document.body.dataset.tab=t;try{sessionStorage.setItem("kcrtab",t)}catch(e){}
+  document.querySelectorAll("#tabbar button").forEach(b=>b.setAttribute("aria-current",b.dataset.t===t?"page":"false"));
+  $("tab-admin").setAttribute("aria-pressed",String(t==="admin"));window.scrollTo(0,0);renderStrafen();renderAna()}
+function renderTabs(){
+  const on=canRead;document.body.classList.toggle("tabs",on);
+  $("tabbar").hidden=!on;$("tab-admin").hidden=true;$("tb-chronik").hidden=!canEdit;$("tb-strafen").hidden=!canEdit;
+  if(!curUser&&curTab==="admin")curTab="start";
+  if(!canEdit&&(curTab==="chronik"||curTab==="strafen"))curTab="start";
+  if(!on&&curTab!=="admin")curTab="start";
+  document.body.dataset.tab=curTab;
+  document.querySelectorAll("#tabbar button").forEach(b=>b.setAttribute("aria-current",b.dataset.t===curTab?"page":"false"));
+  $("ad-name-box").hidden=!curUser;
+}
+document.querySelectorAll("#tabbar button").forEach(b=>b.onclick=()=>setTab(b.dataset.t));
+$("tab-admin").onclick=()=>setTab(curTab==="admin"?"start":"admin");
+{const tools=$("ad-tools");["simbtn","membtn","backup","xlsx"].forEach(id=>tools.append($(id)));
+  const lo=document.createElement("button");lo.type="button";lo.className="btn";lo.id="ad-logout";lo.textContent="Abmelden";lo.onclick=()=>$("loginbtn").click();tools.append(lo)}
+
+/* ===== Strafen ===== */
+let strafen={},zettel={},subStrafen=()=>{},saveName=async()=>{},meName="";
+const eur=v=>(Math.round((v||0)*100)/100).toLocaleString("de-DE",{style:"currency",currency:"EUR"});
+function wartMails(){const r=rollen||{};return new Set([r.spielewart,...(r.mitglieder||[]),...(r.schriftwarte||[]),...(r.spielewarte||[])].filter(Boolean).map(x=>x.toLowerCase()))}
+function clubMembers(){const ok=wartMails();return Object.entries(nutzer).filter(([,u])=>u&&u.email&&ok.has(u.email.toLowerCase()))
+  .map(([uid,u])=>({uid,name:(u.name||u.email.split("@")[0]).trim()})).sort((a,b)=>a.name.localeCompare(b.name,"de"))}
+function stDates(){const t=parseIso(todayIso()),y=t.getFullYear();
+  return [...eveningsOfYear(y),...eveningsOfYear(y-1)].filter(d=>d<=t).map(isoOf).filter((v,i,a)=>a.indexOf(v)===i).sort().reverse()}
+function renderStrafen(){
+  if(!$("strafen"))return;
+  const me=curUser&&curUser.uid;const mine=Object.values(strafen).filter(x=>x.uid===me&&(x.betrag||x.posten)).sort((a,b)=>b.date.localeCompare(a.date));
+  const open=mine.filter(x=>!x.bezahlt).reduce((a,x)=>a+(x.betrag||0),0);
+  const sum=$("st-sum");sum.replaceChildren();
+  if(!mine.length){sum.textContent="Keine Strafen eingetragen 🎉"}else{sum.append("Offen: ");const b=document.createElement("b");b.textContent=eur(open);sum.append(b)}
+  const ul=$("st-list");ul.replaceChildren();
+  mine.forEach(x=>{const li=document.createElement("li");const a=document.createElement("span");a.textContent=fmtD(parseIso(x.date))+" · "+nrFor(x.date)+".";
+    const v=document.createElement("span");v.className=x.bezahlt?"paid":"open";v.textContent=eur(x.betrag)+(x.bezahlt?" ✓":"");li.append(a,v);
+    if(x.posten||x.bezahlt){const p=document.createElement("span");p.className="stp";p.textContent=(x.posten||"")+(x.bezahlt?(x.posten?" · ":"")+"bezahlt":"");li.append(p)}ul.append(li)});
+  // Schriftwarte
+  $("stw").hidden=!canKings;if(!canKings)return;
+  const sel=$("stw-date"),keep=sel.value;
+  if(!sel.options.length||sel.dataset.n!==String(stDates().length)){sel.replaceChildren();stDates().forEach(d=>{const o=document.createElement("option");o.value=d;o.textContent=fmtD(parseIso(d))+" · "+nrFor(d)+". Abend";sel.append(o)});sel.dataset.n=String(sel.options.length);
+    sel.value=keep&&[...sel.options].some(o=>o.value===keep)?keep:(lastPlan&&[...sel.options].some(o=>o.value===lastPlan.date)?lastPlan.date:(sel.options[0]||{}).value)}
+  renderStw();
+}
+function renderStw(){
+  const d=$("stw-date").value,ul=$("stw-list");ul.replaceChildren();if(!d)return;
+  const ms=clubMembers();if(!ms.length){const li=document.createElement("li");li.textContent="Noch keine Kegelbrüder mit Konto.";ul.append(li)}
+  ms.forEach(m=>{const id=d+"__"+m.uid,x=strafen[id]||{};const li=document.createElement("li");
+    const n=document.createElement("span");n.className="stwn";n.textContent=m.name;
+    const b=document.createElement("input");b.type="number";b.min="0";b.step="0.1";b.inputMode="decimal";b.placeholder="€";b.value=x.betrag?String(x.betrag):"";b.setAttribute("aria-label","Strafe "+m.name);
+    const bz=document.createElement("button");bz.type="button";bz.className="bz";bz.textContent="✓";bz.title="bezahlt";bz.setAttribute("aria-pressed",String(!!x.bezahlt));bz.setAttribute("aria-label",m.name+" hat bezahlt");
+    const t=document.createElement("input");t.type="text";t.maxLength=80;t.placeholder="Wofür? (optional)";t.value=x.posten||"";t.setAttribute("aria-label","Wofür "+m.name);
+    const save=()=>saveStrafe(d,m,{betrag:Math.max(0,Math.round((parseFloat(String(b.value).replace(",","."))||0)*100)/100),posten:t.value.trim().slice(0,80),bezahlt:bz.getAttribute("aria-pressed")==="true"});
+    b.onchange=save;t.onchange=save;bz.onclick=()=>{bz.setAttribute("aria-pressed",String(bz.getAttribute("aria-pressed")!=="true"));save()};
+    li.append(n,b,bz,t);ul.append(li)});
+  const z=zettel[d],zv=$("z-view");zv.replaceChildren();
+  if(z&&z.bild){const im=document.createElement("img");im.src=z.bild;im.alt="Strafenzettel vom "+fmtD(parseIso(d));im.onclick=()=>showImg(z.bild);zv.append(im)}
+}
+$("stw-date").onchange=renderStw;
+async function saveStrafe(d,m,f){const id=d+"__"+m.uid;
+  if(!f.betrag&&!f.posten){delete strafen[id];renderStrafen();renderAna();if(db)db.collection("strafen").doc(id).delete().catch(()=>toast("Nicht gespeichert."));return}
+  const doc={date:d,nr:nrFor(d),uid:m.uid,name:m.name,...f,updatedAt:new Date().toISOString(),by:curUser?curUser.uid:""};
+  strafen[id]=doc;renderStrafen();renderAna();if(db)db.collection("strafen").doc(id).set(doc).catch(()=>toast("Nicht gespeichert."))}
+function showImg(src){const o=document.createElement("div");o.className="scrim";o.style.zIndex=60;o.style.alignItems="center";
+  const im=document.createElement("img");im.src=src;im.alt="Strafenzettel";im.style.cssText="max-width:96vw;max-height:90vh;border-radius:10px";o.append(im);o.onclick=()=>o.remove();document.body.append(o)}
+$("z-file").onchange=async e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f||!canKings)return;const d=$("stw-date").value;if(!d)return;
+  try{const url=await shrink(f);zettel[d]={date:d,bild:url,at:new Date().toISOString()};renderStw();
+    if(db)await db.collection("zettel").doc(d).set({date:d,bild:url,at:new Date().toISOString(),by:curUser?curUser.uid:""});toast("Zettel gespeichert")}
+  catch(err){toast("Foto konnte nicht gespeichert werden.")}};
+function shrink(file){return new Promise((ok,bad)=>{const r=new FileReader();r.onerror=bad;r.onload=()=>{const im=new Image();im.onerror=bad;im.onload=()=>{
+  let w=im.width,h=im.height,max=1400;if(w>max||h>max){const k=max/Math.max(w,h);w=Math.round(w*k);h=Math.round(h*k)}
+  const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);
+  let q=.7,u=c.toDataURL("image/jpeg",q);while(u.length>800000&&q>.3){q-=.1;u=c.toDataURL("image/jpeg",q)}ok(u)};im.src=r.result};r.readAsDataURL(file)})}
+function renderAna(){const box=$("ad-ana");if(!box)return;box.hidden=!canKings;if(!canKings)return;
+  const all=Object.values(strafen).filter(x=>x.betrag);const el=$("ana");el.replaceChildren();
+  if(!all.length){el.textContent="Noch keine Strafen eingetragen.";return}
+  const tot=all.reduce((a,x)=>a+x.betrag,0),open=all.filter(x=>!x.bezahlt).reduce((a,x)=>a+x.betrag,0),evs=new Set(all.map(x=>x.date));
+  const per={};all.forEach(x=>{const k=x.uid;per[k]=per[k]||{name:x.name,sum:0,open:0,n:0};per[k].sum+=x.betrag;per[k].n++;if(!x.bezahlt)per[k].open+=x.betrag;per[k].name=x.name});
+  const k=document.createElement("div");k.className="anak";
+  [["Gesamt (Alltime)",eur(tot)],["Davon offen",eur(open)],["Abende mit Strafen",String(evs.size)],["Ø pro Abend",eur(tot/evs.size)]].forEach(([a,b])=>{const d=document.createElement("div");const v=document.createElement("b");v.textContent=b;const l=document.createElement("span");l.textContent=a;d.append(v,l);k.append(d)});
+  el.append(k);
+  const tb=document.createElement("table");tb.className="anat";tb.innerHTML="<thead><tr><th>Kegelbruder</th><th>Gesamt</th><th>Offen</th><th>Abende</th></tr></thead>";
+  const body=document.createElement("tbody");Object.values(per).sort((a,b)=>b.sum-a.sum).forEach(r=>{const tr=document.createElement("tr");[r.name,eur(r.sum),eur(r.open),String(r.n)].forEach(v=>{const td=document.createElement("td");td.textContent=v;tr.append(td)});body.append(tr)});
+  tb.append(body);el.append(tb)}
+$("ad-name-form").addEventListener("submit",async e=>{e.preventDefault();const n=$("ad-name").value.trim().slice(0,40);if(!n)return;meName=n;
+  try{await saveName(n);toast("Name gespeichert")}catch(err){toast("Nicht gespeichert.")}});
+function renderName(){const i=$("ad-name");if(document.activeElement!==i)i.value=meName||(curUser&&nutzer[curUser.uid]&&nutzer[curUser.uid].name)||""}
 function kaiserFeier(){ // neuer Kaiser: jedes Handy feiert einmal mit
   if(SIM.on)return;const k=Object.values(kaiser).sort((a,b)=>b.year-a.year)[0];if(!k||!k.updatedAt)return;
   if(Date.now()-new Date(k.updatedAt).getTime()>21*864e5)return;
@@ -1223,7 +1398,7 @@ function applyRole(){
   $("lock-txt").textContent=role==="none"?"Bitte anmelden.":DEV&&rollenLoaded?"Testversion – nur für den Spielewart.":(rollenLoaded?"Konto erstellt – der Spielewart schaltet dich frei.":"Rechte werden geprüft …");
   $("lockbtn").hidden=role!=="none";
   if(dataHook)dataHook(canRead);
-  $("membtn").hidden=!isChef;$("simbtn").hidden=!realChef;$("backup").hidden=!isChef;renderSimBar();
+  $("membtn").hidden=!isChef;$("simbtn").hidden=!realChef;$("backup").hidden=!isChef;renderSimBar();renderTabs();subStrafen();renderStrafen();renderAna();renderName();
   $("seedbtn").hidden=!(canPlan&&gamesLoaded&&!Object.keys(games).length);
   render();maybeArchive();renderMembers();migrateRatings();ensureKaiser();seedTpl(tplLoaded);
 }
@@ -1367,7 +1542,7 @@ render();setEdit(null);renderNet();
         try{await F.setDoc(rRef,{spielewart:mail(u),mitglieder:[],spielewarte:[],schriftwarte:[],gaeste:[],updatedAt:new Date().toISOString()});return}catch(e){}
       }
       rollen=snap.exists()?snap.data():null;rollenLoaded=true;applyRole();subWish(true);
-      if(isChef&&!unsubN)unsubN=F.onSnapshot(F.collection(fdb,"nutzer"),s=>{nutzer={};s.docs.forEach(d=>{nutzer[d.id]=d.data()});renderMembers()},()=>{});
+      if((isChef||canKings)&&!unsubN)unsubN=F.onSnapshot(F.collection(fdb,"nutzer"),s=>{nutzer={};s.docs.forEach(d=>{nutzer[d.id]=d.data()});renderMembers();renderStrafen();renderName()},()=>{});
     },()=>{rollenLoaded=true;rollen=null;applyRole();setTimeout(subR,20000)})};
     subR();
   });
@@ -1382,6 +1557,15 @@ render();setEdit(null);renderNet();
   $("a-reset").onclick=async()=>{const m=$("a-mail").value.trim();if(!m){$("a-msg").textContent="Bitte zuerst die E-Mail eintragen.";return}
     try{await F.sendPasswordResetEmail(auth,m);$("a-msg").textContent="Falls ein Konto existiert, kommt gleich eine E-Mail zum Zurücksetzen."}catch(err){$("a-msg").textContent="Das hat nicht geklappt."}};
   let dataUns=[];
+  let unsubS=[],strafKey="";
+  subStrafen=()=>{const key=curUser&&canEdit?curUser.uid+"|"+canKings:"";if(key===strafKey)return;strafKey=key;
+    unsubS.forEach(f=>f());unsubS=[];strafen={};zettel={};if(!key){renderStrafen();return}
+    const onS=s=>{strafen={};s.docs.forEach(d=>{const x=d.data();if(x&&x.date&&x.uid)strafen[d.id]=x});renderStrafen();renderAna()};
+    if(canKings){unsubS.push(F.onSnapshot(F.collection(fdb,"strafen"),onS,()=>{}));
+      unsubS.push(F.onSnapshot(F.collection(fdb,"zettel"),s=>{zettel={};s.docs.forEach(d=>{const x=d.data();if(x&&x.bild)zettel[d.id]=x});renderStrafen()},()=>{}))}
+    else unsubS.push(F.onSnapshot(F.query(F.collection(fdb,"strafen"),F.where("uid","==",curUser.uid)),onS,()=>{}));
+    if(!unsubS.me)try{const u=curUser.uid;unsubS.push(F.onSnapshot(F.doc(fdb,"nutzer",u),d=>{const x=d.exists()?d.data():null;if(x&&x.name)meName=x.name;renderName()},()=>{}))}catch(e){}};
+  saveName=async n=>{if(!curUser)return;if(SIM.on){simBlock();return}await F.setDoc(F.doc(fdb,"nutzer",curUser.uid),{name:n,email:mail(curUser)},{merge:true})};
   dataHook=on=>{
     if(on&&dataUns.length)return;
     if(!on){if(!dataUns.length)return;dataUns.forEach(f=>f());dataUns=[];games={};koenige={};kaiser={};vorlagen={};lastPlan=null;gamesLoaded=false;planLoaded=false;render();return}
