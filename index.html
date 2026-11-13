@@ -211,6 +211,9 @@ body.abmode .wrap>*:not(.apphead):not(.abend):not(.simbar){display:none!importan
 .rec b{color:var(--star)}
 .abrec{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .abrec .ablink{color:var(--star);font-weight:600}
+.abhandle{margin-left:-8px;width:26px}
+.abtap{cursor:pointer}
+.abcard.dragging{opacity:.85;box-shadow:0 6px 18px rgba(0,0,0,.18)}
 .abok{color:var(--accent);font-weight:700;font-size:1.2rem}
 .abtools{display:flex;gap:6px;justify-content:flex-end;border-top:1px dashed var(--line);padding-top:6px}
 .abtool{border:1px solid var(--line);background:none;border-radius:9px;padding:4px 10px;font-size:.85rem;cursor:pointer;color:var(--muted)}
@@ -370,7 +373,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· r30</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· r31</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
@@ -614,7 +617,9 @@ function renderAbend(){
     const db_=document.createElement("button");db_.type="button";db_.className="abdone";db_.textContent="✓";db_.setAttribute("aria-pressed",String(isDone));
     db_.setAttribute("aria-label",(isDone?"Nicht erledigt: ":"Erledigt: ")+(games[id]?games[id].name:"Spiel"));
     db_.onclick=()=>toggleDone(i);
-    if(canPlan)top.append(n,nm,db_);else{top.append(n,nm);if(isDone){const ok=document.createElement("span");ok.className="abok";ok.textContent="✓";top.append(ok)}}
+    if(canPlan){li.dataset.i=i;const h=document.createElement("button");h.type="button";h.className="handle abhandle";h.textContent="⠿";h.setAttribute("aria-label","Ziehen zum Verschieben: "+(games[id]?games[id].name:"Spiel"));
+      nm.classList.add("abtap");nm.setAttribute("role","button");nm.tabIndex=0;nm.title="Antippen zum Austauschen";nm.onclick=()=>openPick(i);nm.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();openPick(i)}};
+      top.append(h,n,nm,db_)}else{top.append(n,nm);if(isDone){const ok=document.createElement("span");ok.className="abok";ok.textContent="✓";top.append(ok)}}
     li.append(top);
     if(id===KZ){title.textContent="21:00 Kaiserkegeln 🥪";const p=document.createElement("p");p.className="abrules";
       const c=kaiserCandidates(parseIso(planDate).getFullYear());p.textContent="2×5 Wurf in die Vollen"+(canEdit&&c.length?"\nKandidaten: "+c.join(", "):"");li.append(p)}
@@ -624,13 +629,20 @@ function renderAbend(){
       const rr=document.createElement("div");rr.className="abrec";const r=document.createElement("p");r.className="rec";fillRec(r,{...g,id});rr.append(r);
       if(canEdit){const b=document.createElement("button");b.type="button";b.className="ablink";b.textContent="＋ Rekord";b.onclick=()=>openRec(id);rr.append(b)}
       li.append(rr)}}
-    if(canPlan){const tools=document.createElement("div");tools.className="abtools";
-      const mk=(t,l,f)=>{const b=document.createElement("button");b.type="button";b.className="abtool";b.textContent=t;b.setAttribute("aria-label",l);b.onclick=f;tools.append(b)};
-      mk("↑","Nach oben",()=>abMove(i,-1));mk("↓","Nach unten",()=>abMove(i,1));mk("⇄ Tauschen","Spiel austauschen",()=>openPick(i));li.append(tools)}
     ol.append(li)});
   if(canPlan){const li=document.createElement("li");const b=document.createElement("button");b.type="button";b.className="ablink abadd";b.textContent="＋ Spiel hinzufügen";
     b.onclick=()=>{let k=plan.findIndex(x=>!x);if(k<0){if(plan.length>=MAX_SLOTS){toast("Maximal "+MAX_SLOTS+" Spiele");return}plan.push(null);k=plan.length-1}openPick(k)};li.append(b);ol.append(li)}
 }
+(function(){const ol=$("ab-list");let dg=null;
+  ol.addEventListener("pointerdown",e=>{const h=e.target.closest(".abhandle");if(!h||!canPlan)return;e.preventDefault();const li=h.closest("li");try{h.setPointerCapture(e.pointerId)}catch(_){}
+    dg={li,id:e.pointerId,moved:false};li.classList.add("dragging")});
+  ol.addEventListener("pointermove",e=>{if(!dg||e.pointerId!==dg.id)return;e.preventDefault();
+    const cards=[...ol.querySelectorAll("li.abcard")].filter(x=>x!==dg.li);let t=0;cards.forEach(o=>{const r=o.getBoundingClientRect();if(r.top+r.height/2<e.clientY)t++});
+    const ref=cards[t]||ol.querySelector("li:not(.abcard)");if(ref!==dg.li.nextSibling){ol.insertBefore(dg.li,ref||null);dg.moved=true}});
+  const end=e=>{if(!dg||e.pointerId!==dg.id)return;const d=dg;dg=null;d.li.classList.remove("dragging");if(e.type!=="pointerup"||!d.moved){renderAbend();return}
+    const order=[...ol.querySelectorAll("li.abcard")].map(x=>plan[+x.dataset.i]);const pos=plan.map((v,k)=>v?k:-1).filter(k=>k>=0);
+    const np=plan.slice();pos.forEach((k,j)=>np[k]=order[j]);plan=np;render();savePlan()};
+  ol.addEventListener("pointerup",end);ol.addEventListener("pointercancel",end)})();
 $("ab-exit").onclick=()=>{abOff=true;try{sessionStorage.setItem("kcrab","off")}catch(e){}renderAbend();window.scrollTo(0,0)};
 $("ab-enter").onclick=()=>{abOff=false;try{sessionStorage.removeItem("kcrab")}catch(e){}renderAbend();window.scrollTo(0,0)};
 function kaiserFeier(){ // neuer Kaiser: jedes Handy feiert einmal mit
