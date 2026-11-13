@@ -196,18 +196,21 @@ body[data-tab]:not([data-tab="strafen"]) [data-tab="strafen"],body[data-tab]:not
 body.tabs[data-tab="spiele"] #listhead{display:none!important}
 body.tabs[data-tab="spiele"].lclosed #filters{display:flex!important}
 body.tabs[data-tab="spiele"].lclosed #list{display:flex!important}
-body.tabs .wrap{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
+body.tabs .wrap{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
 .hbtns{display:flex;gap:8px;align-items:center}
 .gear{padding:6px 10px;font-size:1.05rem}
 body[data-tab="admin"] .gear{border-color:var(--accent);background:var(--accent-soft)}
-.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:flex-end;gap:4px;
-  padding:6px max(12px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(0,0,0,.06)}
-.tabbar button{flex:1;min-width:0;border:0;background:none;color:var(--muted);font-size:.72rem;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;cursor:pointer;font-family:inherit}
-.tabbar button span{font-size:1.35rem;line-height:1}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:center;gap:2px;
+  padding:3px max(8px,env(safe-area-inset-left,0px)) calc(2px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line)}
+.tabbar button{flex:1;min-width:0;border:0;background:none;color:var(--muted);font-size:.66rem;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:1px;padding:3px 0;cursor:pointer;font-family:inherit}
+.tabbar button span{font-size:1.2rem;line-height:1.15}
 .tabbar button[aria-current="page"]{color:var(--accent)}
-.tabbar .tmain{flex:1.25;transform:translateY(-14px)}
-.tabbar .tmain span{display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:var(--surface);border:2px solid var(--line);font-size:1.7rem;box-shadow:0 3px 10px rgba(0,0,0,.12)}
-.tabbar .tmain[aria-current="page"] span{border-color:var(--accent);background:var(--accent-soft)}
+.tabbar button{position:relative}
+.tabbar button.dot::after{content:"";position:absolute;top:2px;left:calc(50% + 9px);width:9px;height:9px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
+.stnote{color:var(--accent)}
+.tabbar .tmain{flex:1.15}
+.tabbar .tmain span{display:grid;place-items:center;width:46px;height:30px;border-radius:15px;background:var(--accent-soft);font-size:1.25rem}
+.tabbar .tmain[aria-current="page"] span{background:var(--accent);color:#fff}
 
 .stsum{margin:4px 0 8px;font-size:1.05rem}
 .stsum b{color:var(--accent)}
@@ -327,6 +330,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <div class="lockcard" id="lockcard" hidden><b>🔒 Nur für Mitglieder</b><span id="lock-txt">Bitte anmelden.</span><button type="button" class="btn primary" id="lockbtn">Anmelden</button></div>
   <button type="button" class="btn primary" id="seedbtn" data-tab="start" hidden>Startdaten übernehmen (Spiele + Plan aus Claude)</button>
 
+  <button type="button" class="kprompt stnote" id="stnote" data-tab="start" hidden></button>
   <button type="button" class="kprompt" id="kprompt" data-tab="start" hidden></button>
   <section class="evening reflect" id="reflect" data-tab="start" aria-labelledby="h-rf" hidden>
     <div class="evhead">
@@ -419,6 +423,13 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <h2 id="h-st">💶 Meine Strafen</h2>
     <p class="stsum" id="st-sum"></p>
     <ul class="stlist" id="st-list"></ul>
+  </section>
+
+  <section class="evening strafen" id="stall" data-tab="strafen" aria-labelledby="h-sa" hidden>
+    <h2 id="h-sa">👥 Alle Kegelbrüder</h2>
+    <label class="stlbl">Kegelabend<select id="sa-date"></select></label>
+    <ul class="stlist" id="sa-list"></ul>
+    <p class="stsum" id="sa-open"></p>
   </section>
 
   <section class="evening strafen" id="stw" data-tab="strafen" aria-labelledby="h-stw" hidden>
@@ -757,6 +768,7 @@ function renderStrafen(){
   mine.forEach(x=>{const li=document.createElement("li");const a=document.createElement("span");a.textContent=fmtD(parseIso(x.date))+" · "+nrFor(x.date)+".";
     const v=document.createElement("span");v.className=x.bezahlt?"paid":"open";v.textContent=eur(x.betrag)+(x.bezahlt?" ✓":"");li.append(a,v);
     if(x.posten||x.bezahlt){const p=document.createElement("span");p.className="stp";p.textContent=(x.posten||"")+(x.bezahlt?(x.posten?" · ":"")+"bezahlt":"");li.append(p)}ul.append(li)});
+  renderStAll();renderStNote();
   // Schriftwarte
   $("stw").hidden=!canKings;if(!canKings)return;
   const sel=$("stw-date"),keep=sel.value;
@@ -779,6 +791,26 @@ function renderStw(){
   if(z&&z.bild){const im=document.createElement("img");im.src=z.bild;im.alt="Strafenzettel vom "+fmtD(parseIso(d));im.onclick=()=>showImg(z.bild);zv.append(im)}
 }
 $("stw-date").onchange=renderStw;
+function stLatest(){let best=null;Object.values(strafen).forEach(x=>{if(x.updatedAt&&(!best||x.updatedAt>best.updatedAt))best=x});return best}
+function stSeen(){try{return localStorage.getItem("kcrstseen")||""}catch(e){return""}}
+function renderStNote(){const b=stLatest(),n=$("stnote"),tb=$("tb-strafen");
+  let show=!!b&&canEdit&&b.by!==(curUser&&curUser.uid)&&b.updatedAt>stSeen()&&Date.now()-new Date(b.updatedAt).getTime()<14*864e5;
+  if(show&&curTab==="strafen"){try{localStorage.setItem("kcrstseen",b.updatedAt)}catch(e){}show=false}
+  n.hidden=!show;tb.classList.toggle("dot",show);if(show)n.textContent="💶 Neue Strafen vom "+deDate(b.date)+" eingetragen →"}
+$("stnote").onclick=()=>setTab("strafen");
+function renderStAll(){const all=Object.values(strafen).filter(x=>x.betrag||x.posten);$("stall").hidden=!all.length;if(!all.length)return;
+  const sel=$("sa-date"),keep=sel.value,dates=[...new Set(all.map(x=>x.date))].sort().reverse();
+  if(sel.dataset.k!==dates.join()){sel.replaceChildren();dates.forEach(d=>{const o=document.createElement("option");o.value=d;o.textContent=fmtD(parseIso(d))+" · "+nrFor(d)+". Abend";sel.append(o)});sel.dataset.k=dates.join();
+    sel.value=keep&&dates.includes(keep)?keep:dates[0]}
+  const d=sel.value,ul=$("sa-list");ul.replaceChildren();
+  all.filter(x=>x.date===d).sort((a,b)=>a.name.localeCompare(b.name,"de")).forEach(x=>{const li=document.createElement("li");
+    const a=document.createElement("span");a.textContent=x.name;const v=document.createElement("span");v.className=x.bezahlt?"paid":"open";v.textContent=eur(x.betrag)+(x.bezahlt?" ✓":"");li.append(a,v);
+    if(x.posten||x.bezahlt){const p=document.createElement("span");p.className="stp";p.textContent=(x.posten||"")+(x.bezahlt?(x.posten?" · ":"")+"bezahlt":"");li.append(p)}ul.append(li)});
+  const per={};all.filter(x=>!x.bezahlt&&x.betrag).forEach(x=>{per[x.name]=(per[x.name]||0)+x.betrag});
+  const el=$("sa-open");el.replaceChildren();const ks=Object.keys(per).sort((a,b)=>per[b]-per[a]);
+  if(!ks.length){el.textContent="Alles bezahlt 🎉";return}el.append("Noch offen: ");
+  ks.forEach((k,i)=>{if(i)el.append(", ");el.append(k+" ");const b=document.createElement("b");b.textContent=eur(per[k]);el.append(b)})}
+$("sa-date").onchange=renderStAll;
 async function saveStrafe(d,m,f){const id=d+"__"+m.uid;
   if(!f.betrag&&!f.posten){delete strafen[id];renderStrafen();renderAna();if(db)db.collection("strafen").doc(id).delete().catch(()=>toast("Nicht gespeichert."));return}
   const doc={date:d,nr:nrFor(d),uid:m.uid,name:m.name,...f,updatedAt:new Date().toISOString(),by:curUser?curUser.uid:""};
@@ -1563,7 +1595,7 @@ render();setEdit(null);renderNet();
     const onS=s=>{strafen={};s.docs.forEach(d=>{const x=d.data();if(x&&x.date&&x.uid)strafen[d.id]=x});renderStrafen();renderAna()};
     if(canKings){unsubS.push(F.onSnapshot(F.collection(fdb,"strafen"),onS,()=>{}));
       unsubS.push(F.onSnapshot(F.collection(fdb,"zettel"),s=>{zettel={};s.docs.forEach(d=>{const x=d.data();if(x&&x.bild)zettel[d.id]=x});renderStrafen()},()=>{}))}
-    else unsubS.push(F.onSnapshot(F.query(F.collection(fdb,"strafen"),F.where("uid","==",curUser.uid)),onS,()=>{}));
+    else unsubS.push(F.onSnapshot(F.collection(fdb,"strafen"),onS,()=>{}));
     if(!unsubS.me)try{const u=curUser.uid;unsubS.push(F.onSnapshot(F.doc(fdb,"nutzer",u),d=>{const x=d.exists()?d.data():null;if(x&&x.name)meName=x.name;renderName()},()=>{}))}catch(e){}};
   saveName=async n=>{if(!curUser)return;if(SIM.on){simBlock();return}await F.setDoc(F.doc(fdb,"nutzer",curUser.uid),{name:n,email:mail(curUser)},{merge:true})};
   dataHook=on=>{
