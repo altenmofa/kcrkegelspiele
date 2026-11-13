@@ -370,7 +370,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· r29</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· r30</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
@@ -549,11 +549,13 @@ function sorted(){return Object.entries(games).map(([id,g])=>({id,...g})).sort((
 
 const FIXED=new Set(["g-3-in-die-vollen","g-abendkoenig"]);
 function nieCount(g){return g&&g.nie&&typeof g.nie==="object"?Object.values(g.nie).filter(Boolean).length:0}
+const NEU_AB="2026-11-13T16:05:00.000Z";
 function badgesOf(g){const out=[];const ri=rateInfo(g);
   if(!FIXED.has(g.id)){
     if(ri.avg>=4.5&&ri.n>=2)out.push(["🔥","Beliebt (Schnitt ab 4,5)"]);
-    if(!g.plays&&!g.lastPlayed)out.push(["🆕","Noch nie gespielt"]);
-    else if(g.lastPlayed){const t=parseIso(todayIso());t.setMonth(t.getMonth()-8);if(g.lastPlayed<isoOf(t))out.push(["💤","Über 8 Monate nicht gespielt"])}}
+    // 🆕 nur für Spiele, die nach dem Neustart der Zähler (13.11.2026) angelegt wurden und noch nie liefen
+    if(!g.plays&&!g.lastPlayed&&g.createdAt&&g.createdAt>NEU_AB)out.push(["🆕","Neu – noch nie gespielt"]);
+    else{const t=parseIso(todayIso());t.setMonth(t.getMonth()-6);if((g.lastPlayed||"2026-11-13")<isoOf(t))out.push(["💤","Über 6 Monate nicht gespielt"])}}
   return out}
 let listOpen=false;try{listOpen=localStorage.getItem("kcrlist")==="1"}catch(e){}
 function setListOpen(v,keep){listOpen=v;document.body.classList.toggle("lclosed",!v);$("listhead").setAttribute("aria-expanded",String(v));
@@ -1222,9 +1224,17 @@ function applyRole(){
   if(dataHook)dataHook(canRead);
   $("membtn").hidden=!isChef;$("simbtn").hidden=!realChef;$("backup").hidden=!isChef;renderSimBar();
   $("seedbtn").hidden=!(canPlan&&gamesLoaded&&!Object.keys(games).length);
-  render();maybeArchive();renderMembers();migrateRatings();ensureKaiser();seedTpl(tplLoaded);
+  render();maybeArchive();renderMembers();migrateRatings();resetPlays();ensureKaiser();seedTpl(tplLoaded);
 }
 let migrated=false;
+let playsReset=null,resetting=false;
+async function resetPlays(){ // einmalig: „gespielt“ und „zuletzt gespielt“ ab dem 13.11.2026 neu zählen
+  if(resetting||playsReset===null||playsReset||!canPlan||SIM.on||!gamesLoaded||!planLoaded||!db)return;resetting=true;
+  const keep={};if(lastPlan&&lastPlan.date==="2026-11-13")(lastPlan.slots||[]).filter(id=>id&&games[id]).forEach(id=>keep[id]=1);
+  for(const [id,g] of Object.entries(games)){const v=keep[id]||0,lp=keep[id]?"2026-11-13":"";
+    if((g.plays||0)!==v||(g.lastPlayed||"")!==lp){games[id]={...g,plays:v,lastPlayed:lp};try{await db.collection("games").doc(id).update({plays:v,lastPlayed:lp})}catch(e){}}}
+  try{await db.collection("plan").doc("history").set({playsReset:"2026-11-13"},{merge:true});playsReset="2026-11-13"}catch(e){}
+  resetting=false;render()}
 async function migrateRatings(){
   if(migrated||!canPlan||!gamesLoaded||!db||!myKey())return;migrated=true;
   for(const [id,g] of Object.entries(games)){
@@ -1268,7 +1278,7 @@ function renderMembers(){const ul=$("m-list");ul.replaceChildren();
 function simDates(){
   const nx=planDate||nextEvening().iso,d=parseIso(nx),y=d.getFullYear(),k=kaiserOfYear(y);
   const add=(iso,n)=>{const x=parseIso(iso);x.setDate(x.getDate()+n);return isoOf(x)};
-  const out=[["","Heute"],[add(nx,-1),"Donnerstag vor dem Kegeln (Wunschspiel aufgedeckt)"],[add(nx,1),"Woche nach dem Kegeln ("+fmtD(d)+")"]];
+  const out=[["","Heute"],[add(nx,-1),"Donnerstag vor dem Kegeln (Wunschspiel aufgedeckt)"],[nx,"Kegelabend, 20 Uhr (Kegelabend-Modus)"],[add(nx,1),"Woche nach dem Kegeln ("+fmtD(d)+")"]];
   if(k){out.push([isoOf(new Date(k.getFullYear(),11,1)),"Kaiser-Monat (1.12.)"]);out.push([isoOf(k),"Kaiserabend ("+fmtD(k)+")"])}
   return out;
 }
@@ -1382,7 +1392,7 @@ render();setEdit(null);renderNet();
     if(on&&dataUns.length)return;
     if(!on){if(!dataUns.length)return;dataUns.forEach(f=>f());dataUns=[];games={};koenige={};kaiser={};vorlagen={};lastPlan=null;gamesLoaded=false;planLoaded=false;render();return}
     clearTimeout(timer);$("status").hidden=false;$("status").textContent="Lade eure Spiele …";
-  dataUns.push(db.collection("games").onSnapshot(s=>{games={};s.docs.forEach(d=>{const x=d.data();if(x&&x.name)games[d.id]=x});$("status").hidden=true;gamesLoaded=true;
+  dataUns.push(db.collection("games").onSnapshot(s=>{games={};s.docs.forEach(d=>{const x=d.data();if(x&&x.name)games[d.id]=x});$("status").hidden=true;gamesLoaded=true;setTimeout(resetPlays,0);
       $("seedbtn").hidden=!(canPlan&&!Object.keys(games).length);render();maybeArchive();migrateRatings()},
     ()=>{$("status").textContent="Spiele konnten nicht geladen werden."}));
   dataUns.push(db.collection("vorlagen").onSnapshot(s=>{vorlagen={};s.docs.forEach(d=>{const x=d.data();if(x&&x.name)vorlagen[d.id]={...x,id:d.id}});tplLoaded=true;seedTpl(true);if(!$("tscrim").hidden)renderTpl()},()=>{}));
@@ -1391,8 +1401,9 @@ render();setEdit(null);renderNet();
   dataUns.push(db.collection("plan").onSnapshot(s=>{lastPlan=null;s.docs.forEach(d=>{const x=d.data();if(!x)return;
       if(d.id==="last"&&x.date)lastPlan=x;
       if(d.id==="history"&&x.abende)planHist=x.abende;
+      if(d.id==="history")playsReset=x.playsReset||"";
       if(d.id==="next"&&Array.isArray(x.slots)){plan=Array.from({length:Math.min(MAX_SLOTS,Math.max(10,x.slots.length))},(_,i)=>x.slots[i]||null);planDate=x.date||"";planTitle=x.title||"";planDone=Array.isArray(x.done)?x.done.filter(v=>typeof v==="string"):[]}});
-    planLoaded=true;render();maybeArchive();subWish();ensureKaiser()},()=>{}));
+    if(playsReset===null)playsReset="";planLoaded=true;render();maybeArchive();subWish();ensureKaiser();resetPlays()},()=>{}));
     subWish(true);
   };
   dataHook(canRead);
