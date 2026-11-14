@@ -390,7 +390,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· r37</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· r38</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
@@ -661,7 +661,7 @@ function renderAbend(){
     const isNow=li.classList.contains("now"),open=isNow||abOpen.has(i);const body=document.createElement("div");body.className="abbody";body.hidden=!open;
     const tg=document.createElement("button");tg.type="button";tg.className="abmore";tg.textContent=open?"Regeln ▴":"Regeln ▾";tg.setAttribute("aria-expanded",String(open));
     tg.onclick=()=>{if(abOpen.has(i))abOpen.delete(i);else abOpen.add(i);renderAbend()};
-    if(id===KZ){title.textContent="21:00 Kaiserkegeln 🥪";const p=document.createElement("p");p.className="abrules";
+    if(id===KZ){title.textContent="21:30 Kaiserkegeln 🥪";const p=document.createElement("p");p.className="abrules";
       const c=kaiserCandidates(parseIso(planDate).getFullYear());p.textContent="2×5 Wurf in die Vollen"+(canEdit&&c.length?"\nKandidaten: "+c.join(", "):"");body.append(p)}
     else if(id===GAST){title.textContent="🤝 Spiel des Gastclubs"}
     else{const g=games[id];if(!g){title.textContent="Unbekanntes Spiel"}else{title.textContent=g.name;
@@ -861,7 +861,7 @@ function renderPlan(){
     if(id===KZ){const li=document.createElement("li");li.className="slot kz";
       const h=document.createElement("button");h.type="button";h.className="handle";h.textContent="⠿";h.style.color="#f3dfa6";h.setAttribute("aria-label","Kaiserkegeln verschieben");h.dataset.i=i;li.append(h);
       const no=document.createElement("span");no.className="no";no.textContent="👑";li.append(no);
-      const nm=document.createElement("span");nm.className="sn";nm.textContent="21:00 Kaiserkegeln";
+      const nm=document.createElement("span");nm.className="sn";nm.textContent="21:30 Kaiserkegeln";
       const sm=document.createElement("span");sm.className="sm";sm.textContent="🥪";nm.append(sm);li.append(nm);li.append(document.createElement("span"));
       ol.append(li);return}
     const g=id&&games[id];const li=document.createElement("li");li.className="slot"+(g?"":" empty");
@@ -1114,7 +1114,7 @@ $("evcopy").onclick=async()=>{
   let txt=plan.map((id,i)=>{
     if(id===GAST)return "   🤝 Spiel des Gastclubs";
     if(id===KZ){const c=kaiserCandidates(parseIso(kaiserEvening()||todayIso()).getFullYear());
-      return "\n👑 *21:00 KAISERKEGELN*"+(c.length?"\n   Kandidaten: "+c.join(", "):"")+"\n   2×5 Wurf in die Vollen · 🥪\n"}
+      return "\n👑 *21:30 KAISERKEGELN*"+(c.length?"\n   Kandidaten: "+c.join(", "):"")+"\n   2×5 Wurf in die Vollen · 🥪\n"}
     const g=id&&games[id];if(!g)return null;const ex=[artTxt(g,2),BAHN[g.bahn]?.[2]].filter(Boolean);
     let line=`${++nr}. ${g.name}`+(ex.length?" ("+ex.join(", ")+")":"")+(id===wishWinner?" ⭐ Wunschspiel":"");
     if((g.plays||0)<=2&&g.wertung)line+="\n   ↳ "+((g.plays||0)===0?"Neu: ":"")+g.wertung;
@@ -1178,7 +1178,7 @@ function renderKaiser(){renderKHist();
   const on=kaiserThemeOn();document.body.classList.toggle("kaiser",on);$("kbanner").hidden=!on;
   const k=kaiserEvening();
   if(on){const d=parseIso(k);const c=kaiserCandidates(d.getFullYear());
-    $("kb-sub").textContent=fmtD(d)+" · 21:00 Uhr · 🥪"+(canEdit&&c.length?" · Kandidaten: "+c.join(", "):"")}
+    $("kb-sub").textContent=fmtD(d)+" · 21:30 Uhr · 🥪"+(canEdit&&c.length?" · Kandidaten: "+c.join(", "):"")}
   const list=Object.values(kaiser).sort((a,b)=>b.year-a.year);
   const kl=$("kz-list");kl.replaceChildren();
   if(list.length){kl.append("👑 Kaiser: ");
