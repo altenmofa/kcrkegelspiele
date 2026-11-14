@@ -91,6 +91,14 @@ body.lclosed #filters,body.lclosed #list{display:none!important}
 .foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:.85rem}
 /* Formular */
 .scrim{position:fixed;inset:0;background:rgba(20,10,10,.45);display:flex;align-items:flex-end;justify-content:center;z-index:40}
+/* Fenster passen sich der sichtbaren Fläche an (Tastatur verdeckt nichts) */
+.scrim{top:var(--vvt,0px);bottom:auto;height:var(--vvh,100%)}
+.scrim>.sheet{max-height:calc(100% - 10px)}
+@media (max-width:599px){
+  #pscrim{align-items:flex-start}
+  #pscrim>.sheet{border-radius:0 0 20px 20px;height:calc(100% - 10px);padding-top:calc(16px + env(safe-area-inset-top,0px))}
+  #pscrim .plist{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;align-content:flex-start;justify-content:flex-start}
+  #pscrim .search,#pscrim h3,#pscrim .actions,#pscrim .pitem{flex:none}}
 .sheet{background:var(--surface);width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:20px max(18px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:16px;max-height:92%;overflow:auto}
 @media (min-width:600px){.scrim{align-items:center}.sheet{border-radius:20px}}
 .sheet h3{font-family:var(--display);font-weight:600;font-size:1.2rem;margin:0}
@@ -111,6 +119,11 @@ input[type=date],input[type=number]{width:100%;font:inherit;padding:10px 12px;bo
 .slot.dragging{box-shadow:0 6px 18px rgba(0,0,0,.18);border-color:var(--accent);background:var(--surface);position:relative;z-index:2}
 .reflect{border-color:var(--star)}
 .rslot{display:grid;grid-template-columns:22px 1fr auto auto;gap:10px;align-items:center;padding:7px 8px 7px 10px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.rtap{cursor:pointer}
+#rf-edit{margin-top:8px;font-size:.8rem}
+.pitem.sel{background:var(--accent-soft)}
+.pitem .chk{font-weight:700;color:var(--accent);min-width:18px}
+.rtap:first-line{text-decoration:underline dotted;text-underline-offset:3px}
 .rslot .sn{display:flex;flex-direction:column;min-width:0;line-height:1.25}
 .rslot .sm{display:block;margin-top:2px;font-size:.75rem;color:var(--muted)}
 .slot.kz .sm{display:inline;margin-left:6px}
@@ -284,6 +297,13 @@ body[data-tab="admin"] .gear{border-color:var(--accent);background:var(--accent-
 .anak b{display:block;font-size:1.1rem}
 .anak span{font-size:.75rem;color:var(--muted)}
 body.abmode[data-tab="start"] .wrap>*:not(.apphead):not(.abend):not(.simbar){display:none!important}
+.rfagain{align-self:flex-start;margin:-6px 0 -8px;font-size:.8rem}
+.khist{margin-top:4px;display:flex;flex-direction:column;gap:8px}
+#kh-body{display:flex;flex-direction:column;gap:8px}
+.khlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.khlist li{display:flex;align-items:center;gap:10px;padding:7px 2px;border-bottom:1px dashed var(--line)}
+.khlist li b{min-width:44px;font-variant-numeric:tabular-nums;color:var(--star)}
+.khlist li span{flex:1}
 .abend{display:flex;flex-direction:column;gap:10px}
 .abhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .abhead h2{margin:0;font-family:var(--display);font-size:1.3rem}
@@ -300,10 +320,20 @@ body.abmode[data-tab="start"] .wrap>*:not(.apphead):not(.abend):not(.simbar){dis
 .abdone{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:none;font-size:1.1rem;cursor:pointer;flex:none}
 .abcard.done .abdone{background:var(--accent);border-color:var(--accent);color:#fff}
 .abrules{margin:0;white-space:pre-wrap;line-height:1.45;font-size:.95rem}
-.rec{margin:0;font-size:.85rem;color:var(--muted)}
-.rec b{color:var(--star)}
+.rec{margin:0;font-size:.75rem;color:var(--muted)}
+.frec{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:20px}
+.frec .ablink{font-size:.75rem}
+.rec b{font-weight:600;color:var(--muted)}
 .abrec{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.abrec .ablink{color:var(--star);font-weight:600}
+.abrec .ablink{font-size:.75rem;color:var(--muted)}
+.abbody{display:flex;flex-direction:column;gap:6px}
+.abmore{border:0;background:none;color:var(--muted);font-size:.78rem;cursor:pointer;padding:4px 2px;white-space:nowrap;font-family:inherit}
+.abhandle{margin-left:-8px;width:26px}
+.abtap{cursor:pointer}
+.abcard.dragging{opacity:.85;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.swipe{touch-action:pan-y;transition:transform .12s ease}
+.swipe.swdel{box-shadow:inset -6px 0 0 #c62828;background:#fdecea}
+.swipe.swgone{transform:translateX(-110%)!important;opacity:0;transition:transform .16s,opacity .16s}
 .abok{color:var(--accent);font-weight:700;font-size:1.2rem}
 .abtools{display:flex;gap:6px;justify-content:flex-end;border-top:1px dashed var(--line);padding-top:6px}
 .abtool{border:1px solid var(--line);background:none;border-radius:9px;padding:4px 10px;font-size:.85rem;cursor:pointer;color:var(--muted)}
@@ -389,20 +419,24 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
 
   <button type="button" class="kprompt stnote" id="stnote" data-tab="start" hidden></button>
   <button type="button" class="kprompt" id="kprompt" data-tab="start" hidden></button>
+  <button type="button" class="ablink rfagain" id="rf-again" data-tab="start" hidden>⭐ Deine Bewertungen vom letzten Abend ansehen</button>
   <section class="evening reflect" id="reflect" data-tab="start" aria-labelledby="h-rf" hidden>
     <div class="evhead">
       <h2 id="h-rf">Rückblick: letztes Kegeln</h2>
       <span class="evcount" id="rf-count"></span>
     </div>
     <p class="evdate" id="rf-date"></p>
+    <button type="button" class="ablink" id="rf-close" hidden>✓ Fertig – Rückblick ausblenden</button>
+    <button type="button" class="ablink" id="rf-away" hidden>Ich war nicht beim letzten Kegeln</button>
     <p class="note">Wie war’s? Jeder bewertet selbst.</p>
     <ol class="slots" id="rf-list"></ol>
+    <button type="button" class="ablink" id="rf-edit" hidden>✎ Spiele des letzten Abends neu aufstellen</button>
   </section>
 
   <section class="evening" data-tab="start" aria-labelledby="h-ev">
     <div class="evhead">
       <h2 id="h-ev">Nächster Kegelabend</h2>
-      <span class="evcount" id="evcount">0 von 10</span>
+      <span class="evcount" id="evcount">0 von 8</span>
     </div>
     <p class="evdate" id="evdate"></p>
     <p class="sda" id="sda" hidden></p>
@@ -545,7 +579,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   </section>
 
   <div class="foot" data-tab="admin">
-    <span><span id="total"></span> <small style="opacity:.5">· r29</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· 2.0</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
@@ -553,6 +587,18 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
       <button type="button" class="btn" id="xlsx">⤓ Als Excel-Datei</button>
     </span>
   </div>
+  <section class="khist" id="khist" data-tab="admin" hidden>
+    <button type="button" class="ablink" id="kh-tog" aria-expanded="false" aria-controls="kh-body">👑 Kaiser-Historie</button>
+    <div id="kh-body" hidden>
+      <p class="sda">Nur für dich. Für die Chronik – in der App sieht man nur den aktuellen Kaiser.</p>
+      <form class="kadd" id="kh-form" novalidate>
+        <select id="kh-year" aria-label="Jahr"></select>
+        <input type="text" id="kh-name" maxlength="40" placeholder="Name des Kaisers" aria-label="Kaiser" autocomplete="off" style="grid-column:span 2">
+        <button type="submit" class="btn">Speichern</button>
+      </form>
+      <ul class="khlist" id="kh-list"></ul>
+    </div>
+  </section>
 </div>
 
 <div class="scrim" id="scrim" hidden>
@@ -586,7 +632,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
         <button type="button" id="f-ok" aria-pressed="false">✓ Regel stimmt so</button>
       </div>
     </div>
-    <div>
+    <div id="f-ratewrap">
       <span class="lbl" id="l-rate">Deine Bewertung</span>
       <div class="rate" id="f-rate" role="group" aria-labelledby="l-rate"></div>
       <div class="rhint" id="f-rhint"></div>
@@ -595,6 +641,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
       <label for="f-last">zuletzt</label><input type="date" id="f-last">
       <label for="f-plays">gespielt</label><input type="number" id="f-plays" min="0" max="999" inputmode="numeric" placeholder="0"><span>×</span>
     </div>
+    <div class="frec" id="f-recwrap"><span class="rec" id="f-rec"></span><button type="button" class="ablink" id="f-recbtn">Rekord eintragen</button></div>
     <div id="f-notes-wrap">
       <label class="lbl" for="f-notes">Notizen</label>
       <textarea id="f-notes" maxlength="2000" rows="2" placeholder="Material, Varianten, wann zuletzt gespielt …"></textarea>
@@ -608,6 +655,15 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   </form>
 </div>
 
+<div class="scrim" id="lscrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="l-title">
+    <h3 id="l-title">Gespielte Spiele</h3>
+    <p class="hint" id="l-sub"></p>
+    <input class="search" id="l-q" type="search" placeholder="Spiel suchen …" aria-label="Spiel suchen" autocomplete="off">
+    <div class="plist" id="l-list"></div>
+    <div class="actions"><span class="sda" id="l-count"></span><span style="flex:1"></span><button type="button" class="btn" id="l-cancel">Abbrechen</button><button type="button" class="btn primary" id="l-save">Speichern</button></div>
+  </div>
+</div>
 <div class="scrim" id="pscrim" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="p-title">
     <h3 id="p-title">Platz belegen</h3>
@@ -634,7 +690,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <h2 id="h-sim">🧪 Vorschau</h2>
     <p class="hint">Nur für dich. In der Vorschau wird nichts gespeichert.</p>
     <label>Ansehen als<select id="sim-role">
-      <option value="">Ich (Chef-Spielewart)</option><option value="mitglied">Kegelbruder</option>
+      <option value="">Ich (Chef-Spielewart)</option><option value="spielewart">Spielewart</option><option value="mitglied">Kegelbruder</option>
       <option value="schriftwart">Schriftwart</option><option value="kassenwart">Kassenwart</option><option value="gast">Gast</option></select></label>
     <label>Datum<select id="sim-date"></select></label>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
@@ -668,7 +724,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <p class="irules" id="i-rules"></p>
     <div><span class="istars" id="i-stars"></span> <span class="meta" id="i-avg"></span></div>
     <p class="rec" id="i-rec"></p>
-    <div class="actions"><button type="button" class="btn" id="i-recbtn">🏅 Neuer Rekord</button><span style="flex:1"></span><button type="button" class="btn" id="i-close">Schließen</button></div>
+    <div class="actions"><button type="button" class="ablink" id="i-recbtn">Rekord eintragen</button><span style="flex:1"></span><button type="button" class="btn" id="i-close">Schließen</button></div>
   </div>
 </div>
 
@@ -677,7 +733,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <h3 id="r-title">🏅 Neuer Rekord</h3>
     <p class="hint" id="r-game"></p>
     <label>Rekordwert<input type="text" id="r-wert" maxlength="30" placeholder="z. B. 142 Holz oder 9 Punkte" autocomplete="off"></label>
-    <label>Kegelbruder<input type="text" id="r-name" maxlength="40" autocomplete="off"></label>
+    <label>Kegelbruder / Kegelbrüder<input type="text" id="r-name" maxlength="80" placeholder="z. B. Peter oder Peter, Klaus &amp; Moritz" autocomplete="off"></label>
     <label>Datum<input type="date" id="r-date"></label>
     <div class="actions"><button type="button" class="btn" id="r-del" hidden>Rekord löschen</button><span style="flex:1"></span>
       <button type="button" class="btn" id="r-cancel">Abbrechen</button><button type="submit" class="btn primary">Speichern</button></div>
@@ -717,26 +773,32 @@ function toast(t){const e=$("toast");e.textContent=t;e.hidden=false;clearTimeout
 function tag(t,c){const s=document.createElement("span");s.className="tag";s.textContent=t;s.style.color=c;return s}
 function deDate(s){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||"");return m?m[3]+"."+m[2]+"."+m[1].slice(2):""}
 function myKey(){return curUser?curUser.uid:""}
+// Bewertungen: ratings = allgemeine Wertung je Kegelbruder, votes = zusätzliche Stimme je Kegelabend ("Datum|uid")
+function allVals(g){const r=g.ratings&&typeof g.ratings==="object"?g.ratings:{},v=g.votes&&typeof g.votes==="object"?g.votes:{};
+  return [...Object.values(r),...Object.values(v)].map(Number).filter(x=>x>=1&&x<=5)}
+function myStars(g,date){const v=g.votes||{};return myKey()&&date?Number(v[date+"|"+myKey()]||0):0}
 function rateInfo(g){
   const r=g.ratings&&typeof g.ratings==="object"?g.ratings:{};
-  const vals=Object.values(r).map(Number).filter(v=>v>=1&&v<=5);
+  const vals=allVals(g);
   const mine=myKey()&&r[myKey()]?Number(r[myKey()]):0;
   if(!vals.length&&g.rating)return {avg:Number(g.rating),n:0,mine,legacy:true};
   return {avg:vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0,n:vals.length,mine,legacy:false};
 }
 function avgTxt(i){return i.avg?"Ø "+i.avg.toFixed(1).replace(".",",")+(i.n?" ("+i.n+")":""):""}
 function ratingsWith(g,v){const r={...(g.ratings||{})};if(v)r[myKey()]=v;else delete r[myKey()];return r}
-function roundAvg(r){const v=Object.values(r).map(Number).filter(x=>x>=1&&x<=5);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):0}
+function roundAvg(r,votes){const v=[...Object.values(r||{}),...Object.values(votes||{})].map(Number).filter(x=>x>=1&&x<=5);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):0}
 function stars(n){return n?"★".repeat(n)+"☆".repeat(5-n):""}
 function sorted(){return Object.entries(games).map(([id,g])=>({id,...g})).sort((a,b)=>(a.name||"").localeCompare(b.name||"","de"))}
 
 const FIXED=new Set(["g-3-in-die-vollen","g-abendkoenig"]);
 function nieCount(g){return g&&g.nie&&typeof g.nie==="object"?Object.values(g.nie).filter(Boolean).length:0}
+const NEU_AB="2026-11-13T16:05:00.000Z";
 function badgesOf(g){const out=[];const ri=rateInfo(g);
   if(!FIXED.has(g.id)){
     if(ri.avg>=4.5&&ri.n>=2)out.push(["🔥","Beliebt (Schnitt ab 4,5)"]);
-    if(!g.plays&&!g.lastPlayed)out.push(["🆕","Noch nie gespielt"]);
-    else if(g.lastPlayed){const t=parseIso(todayIso());t.setMonth(t.getMonth()-8);if(g.lastPlayed<isoOf(t))out.push(["💤","Über 8 Monate nicht gespielt"])}}
+    // 🆕 nur für Spiele, die nach dem Neustart der Zähler (13.11.2026) angelegt wurden und noch nie liefen
+    if(!g.plays&&!g.lastPlayed&&g.createdAt&&g.createdAt>NEU_AB)out.push(["🆕","Neu – noch nie gespielt"]);
+    else{const t=parseIso(todayIso());t.setMonth(t.getMonth()-6);if((g.lastPlayed||"2026-11-13")<isoOf(t))out.push(["💤","Über 6 Monate nicht gespielt"])}}
   return out}
 let listOpen=false;try{listOpen=localStorage.getItem("kcrlist")==="1"}catch(e){}
 function setListOpen(v,keep){listOpen=v;document.body.classList.toggle("lclosed",!v);$("listhead").setAttribute("aria-expanded",String(v));
@@ -747,27 +809,29 @@ function recordOf(g){if(!g)return null;
   if(g.id==="g-abendkoenig"){const b=Object.values(koenige).filter(k=>k.holz).sort((a,b)=>b.holz-a.holz||a.date.localeCompare(b.date))[0];
     if(b)return{wert:b.holz+" Holz",name:b.name,date:b.date,auto:true}}
   return null}
-function recTxt(r){return r?["🏅 Rekord: ",r.wert+(r.name?" · "+r.name:"")+(r.date?" · "+deDate(r.date):"")]:null}
+function recTxt(r){return r?["Rekord: ",r.wert+(r.name?" · "+r.name:"")+(r.date?" · "+deDate(r.date):"")]:null}
 function fillRec(el,g){el.replaceChildren();const r=recordOf(g);
-  if(!r){el.textContent="🏅 Noch kein Rekord";return}const t=recTxt(r);el.append(t[0]);const b=document.createElement("b");b.textContent=t[1];el.append(b)}
+  if(!r){el.textContent="";return}const t=recTxt(r);el.append(t[0]);const b=document.createElement("b");b.textContent=t[1];el.append(b)}
 let recGame=null;
-function openRec(id){const g=games[id];if(!g||!canEdit)return;recGame=id;const r=g.rekord||{};
+function openRec(id){const g=games[id];if(!g||!canPlan)return;recGame=id;const r=g.rekord||{};
   $("r-game").textContent=g.name+(recordOf(g)?" · bisher: "+recTxt(recordOf(g))[1]:"");
   $("r-wert").value="";$("r-name").value=(curUser&&nutzer[curUser.uid]&&nutzer[curUser.uid].name)||"";$("r-date").value=todayIso();
   $("r-del").hidden=!(isChef&&g.rekord&&g.rekord.wert);$("rscrim").hidden=false;setTimeout(()=>$("r-wert").focus(),50)}
 $("r-cancel").onclick=()=>$("rscrim").hidden=true;
+$("f-recbtn").onclick=()=>{if(editing)openRec(editing)};
 $("rscrim").onclick=e=>{if(e.target===$("rscrim"))$("rscrim").hidden=true};
 $("rform").addEventListener("submit",async e=>{e.preventDefault();const id=recGame,g=games[id];if(!g)return;
-  const wert=$("r-wert").value.trim().slice(0,30),name=$("r-name").value.trim().slice(0,40),date=$("r-date").value||todayIso();
+  const wert=$("r-wert").value.trim().slice(0,30),name=$("r-name").value.trim().slice(0,80),date=$("r-date").value||todayIso();
   if(!wert){toast("Rekordwert eintragen");return}
   const rekord={wert,name,date,at:new Date().toISOString()};games[id]={...g,rekord};$("rscrim").hidden=true;$("iscrim").hidden=true;render();
-  confetti(false);toast("🏅 Neuer Rekord: "+g.name);
+  if(editing===id){$("f-rec").textContent="Rekord: "+recTxt(rekord)[1];$("f-recbtn").textContent="Rekord ändern"}
+  toast("Rekord gespeichert: "+g.name);
   if(db){try{await db.collection("games").doc(id).update({rekord})}catch(e){toast("Nicht gespeichert.")}}});
 $("r-del").onclick=async()=>{const id=recGame,g=games[id];if(!g||!isChef)return;const {rekord,...rest}=g;games[id]={...rest,rekord:{}};
   $("rscrim").hidden=true;$("iscrim").hidden=true;render();if(db){try{await db.collection("games").doc(id).update({rekord:{}})}catch(e){toast("Nicht gespeichert.")}}};
 
 /* Kegelabend-Modus: am Kegelabend von 19:50 bis 23:15 */
-let abOff=false;try{abOff=sessionStorage.getItem("kcrab")==="off"}catch(e){}
+let abOpen=new Set();let abOff=false;try{abOff=sessionStorage.getItem("kcrab")==="off"}catch(e){}
 function abendActive(){if(!planDate)return false;const n=simNow(),pd=parseIso(planDate);
   const start=new Date(pd);start.setHours(19,50,0,0);const end=new Date(pd);end.setHours(23,15,0,0);
   return n>=start&&n<end}
@@ -795,23 +859,65 @@ function renderAbend(){
     const db_=document.createElement("button");db_.type="button";db_.className="abdone";db_.textContent="✓";db_.setAttribute("aria-pressed",String(isDone));
     db_.setAttribute("aria-label",(isDone?"Nicht erledigt: ":"Erledigt: ")+(games[id]?games[id].name:"Spiel"));
     db_.onclick=()=>toggleDone(i);
-    if(canPlan)top.append(n,nm,db_);else{top.append(n,nm);if(isDone){const ok=document.createElement("span");ok.className="abok";ok.textContent="✓";top.append(ok)}}
+    if(canPlan){li.dataset.i=i;const h=document.createElement("button");h.type="button";h.className="handle abhandle";h.textContent="⠿";h.setAttribute("aria-label","Ziehen zum Verschieben: "+(games[id]?games[id].name:"Spiel"));
+      nm.classList.add("abtap");nm.setAttribute("role","button");nm.tabIndex=0;nm.title="Antippen zum Austauschen";nm.onclick=()=>openPick(i);nm.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();openPick(i)}};
+      top.append(h,n,nm,db_)}else{top.append(n,nm);if(isDone){const ok=document.createElement("span");ok.className="abok";ok.textContent="✓";top.append(ok)}}
     li.append(top);
-    if(id===KZ){title.textContent="21:00 Kaiserkegeln 🥪";const p=document.createElement("p");p.className="abrules";
-      const c=kaiserCandidates(parseIso(planDate).getFullYear());p.textContent="2×5 Wurf in die Vollen"+(canEdit&&c.length?"\nKandidaten: "+c.join(", "):"");li.append(p)}
+    // Regeln nur beim aktuellen Spiel offen, alle anderen per Tipp aufklappbar
+    const isNow=li.classList.contains("now"),open=isNow||abOpen.has(i);const body=document.createElement("div");body.className="abbody";body.hidden=!open;
+    const tg=document.createElement("button");tg.type="button";tg.className="abmore";tg.textContent=open?"Regeln ▴":"Regeln ▾";tg.setAttribute("aria-expanded",String(open));
+    tg.onclick=()=>{if(abOpen.has(i))abOpen.delete(i);else abOpen.add(i);renderAbend()};
+    if(id===KZ){title.textContent="21:30 Kaiserkegeln 🥪";const p=document.createElement("p");p.className="abrules";
+      const c=kaiserCandidates(parseIso(planDate).getFullYear());p.textContent="2×5 Wurf in die Vollen"+(canEdit&&c.length?"\nKandidaten: "+c.join(", "):"");body.append(p)}
     else if(id===GAST){title.textContent="🤝 Spiel des Gastclubs"}
     else{const g=games[id];if(!g){title.textContent="Unbekanntes Spiel"}else{title.textContent=g.name;
-      if(g.wertung){const p=document.createElement("p");p.className="abrules";p.textContent=g.wertung;li.append(p)}
-      const rr=document.createElement("div");rr.className="abrec";const r=document.createElement("p");r.className="rec";fillRec(r,{...g,id});rr.append(r);
-      if(canEdit){const b=document.createElement("button");b.type="button";b.className="ablink";b.textContent="＋ Rekord";b.onclick=()=>openRec(id);rr.append(b)}
-      li.append(rr)}}
-    if(canPlan){const tools=document.createElement("div");tools.className="abtools";
-      const mk=(t,l,f)=>{const b=document.createElement("button");b.type="button";b.className="abtool";b.textContent=t;b.setAttribute("aria-label",l);b.onclick=f;tools.append(b)};
-      mk("↑","Nach oben",()=>abMove(i,-1));mk("↓","Nach unten",()=>abMove(i,1));mk("⇄ Tauschen","Spiel austauschen",()=>openPick(i));li.append(tools)}
+      if(g.wertung){const p=document.createElement("p");p.className="abrules";p.textContent=g.wertung;body.append(p)}
+      const r=recordOf({...g,id});
+      if(r||canPlan){const rr=document.createElement("div");rr.className="abrec";
+        if(r){const x=document.createElement("p");x.className="rec";x.textContent="Rekord: "+recTxt(r)[1];rr.append(x)}else rr.append(document.createElement("span"));
+        if(canPlan){const b=document.createElement("button");b.type="button";b.className="ablink";b.textContent=r?"neuer Rekord":"Rekord eintragen";b.onclick=()=>openRec(id);rr.append(b)}
+        body.append(rr)}}}
+    if(body.childNodes.length){li.append(body);if(!isNow)top.insertBefore(tg,top.querySelector(".abdone,.abok"))}
+    swipeDel(li,()=>{const nm_=games[id]?games[id].name:"Spiel";if(isDone){const k=planDone.indexOf(id);if(k>=0)planDone.splice(k,1)}if(i>=DEFAULT_SLOTS.length)plan.splice(i,1);else plan[i]=null;render();savePlan();toast(nm_+" entfernt")});
     ol.append(li)});
   if(canPlan){const li=document.createElement("li");const b=document.createElement("button");b.type="button";b.className="ablink abadd";b.textContent="＋ Spiel hinzufügen";
     b.onclick=()=>{let k=plan.findIndex(x=>!x);if(k<0){if(plan.length>=MAX_SLOTS){toast("Maximal "+MAX_SLOTS+" Spiele");return}plan.push(null);k=plan.length-1}openPick(k)};li.append(b);ol.append(li)}
 }
+(function(){const ol=$("ab-list");let dg=null;
+  ol.addEventListener("pointerdown",e=>{const h=e.target.closest(".abhandle");if(!h||!canPlan)return;e.preventDefault();const li=h.closest("li");try{h.setPointerCapture(e.pointerId)}catch(_){}
+    dg={li,id:e.pointerId,moved:false};li.classList.add("dragging")});
+  ol.addEventListener("pointermove",e=>{if(!dg||e.pointerId!==dg.id)return;e.preventDefault();
+    const cards=[...ol.querySelectorAll("li.abcard")].filter(x=>x!==dg.li);let t=0;cards.forEach(o=>{const r=o.getBoundingClientRect();if(r.top+r.height/2<e.clientY)t++});
+    const ref=cards[t]||ol.querySelector("li:not(.abcard)");if(ref!==dg.li.nextSibling){ol.insertBefore(dg.li,ref||null);dg.moved=true}});
+  const end=e=>{if(!dg||e.pointerId!==dg.id)return;const d=dg;dg=null;d.li.classList.remove("dragging");if(e.type!=="pointerup"||!d.moved){renderAbend();return}
+    const order=[...ol.querySelectorAll("li.abcard")].map(x=>plan[+x.dataset.i]);const pos=plan.map((v,k)=>v?k:-1).filter(k=>k>=0);
+    const np=plan.slice();pos.forEach((k,j)=>np[k]=order[j]);plan=np;render();savePlan()};
+  ol.addEventListener("pointerup",end);ol.addEventListener("pointercancel",end)})();
+$("rf-again").onclick=()=>{rfShow=true;const d=lastPlan&&lastPlan.date;if(d&&meinNutzer.nichtDa&&meinNutzer.nichtDa[d]&&saveNichtDa){meinNutzer={...meinNutzer,nichtDa:{...meinNutzer.nichtDa,[d]:false}};saveNichtDa(d,false)}render()};
+let lSel=[];
+function renderLList(){const q=$("l-q").value.trim().toLowerCase(),box=$("l-list");box.replaceChildren();
+  const all=Object.entries(games).map(([id,g])=>({id,...g})).filter(g=>!q||(g.name||"").toLowerCase().includes(q))
+    .sort((a,b)=>(lSel.includes(b.id)-lSel.includes(a.id))||(lSel.indexOf(a.id)-lSel.indexOf(b.id))||(a.name||"").localeCompare(b.name||"","de"));
+  all.forEach(g=>{const on=lSel.includes(g.id);const b=document.createElement("button");b.type="button";b.className="pitem"+(on?" sel":"");b.setAttribute("aria-pressed",String(on));
+    const nm=document.createElement("span");const c=document.createElement("span");c.className="chk";c.textContent=on?"✓ ":"";nm.append(c,g.name);
+    const sm=document.createElement("small");sm.textContent=on?"Platz "+(lSel.indexOf(g.id)+1):"";b.append(nm,sm);
+    b.onclick=()=>{if(on)lSel=lSel.filter(x=>x!==g.id);else lSel.push(g.id);renderLList()};box.append(b)});
+  $("l-count").textContent=lSel.length+" Spiele"}
+$("rf-edit").onclick=()=>{if(!isChef||!lastPlan)return;lSel=(lastPlan.slots||[]).filter(id=>id&&games[id]);
+  $("l-sub").textContent=(lastPlan.nr||nrFor(lastPlan.date))+". Kegelabend · "+fmtD(parseIso(lastPlan.date))+" – antippen, was gespielt wurde. Reihenfolge = Reihenfolge des Antippens.";
+  $("l-q").value="";renderLList();$("lscrim").hidden=false};
+$("l-q").addEventListener("input",renderLList);
+$("l-cancel").onclick=()=>$("lscrim").hidden=true;
+$("l-save").onclick=async()=>{if(!isChef||!lastPlan)return;const date=lastPlan.date,old=(lastPlan.slots||[]).filter(id=>id&&games[id]),neu=lSel.slice();
+  $("lscrim").hidden=true;lastPlan={...lastPlan,slots:neu};
+  const add=neu.filter(id=>!old.includes(id)),rem=old.filter(id=>!neu.includes(id));
+  for(const id of add){const g=games[id];const up={plays:(g.plays||0)+1};if(!g.lastPlayed||g.lastPlayed<date)up.lastPlayed=date;games[id]={...g,...up};if(db){try{await db.collection("games").doc(id).update(up)}catch(e){}}}
+  for(const id of rem){const g=games[id];const pl=Math.max(0,(g.plays||0)-1);const up={plays:pl};if(g.lastPlayed===date&&!pl)up.lastPlayed="";games[id]={...g,...up};if(db){try{await db.collection("games").doc(id).update(up)}catch(e){}}}
+  rfShow=true;render();toast("Letzter Abend: "+neu.length+" Spiele");
+  if(db){try{await db.collection("plan").doc("last").set({...lastPlan,slots:neu});await db.collection("plan").doc("history").set({abende:{[date]:{nr:nrFor(date),slots:neu}}},{merge:true})}catch(e){toast("Nicht gespeichert.")}}};
+$("rf-close").onclick=()=>{rfShow=false;rfWasOpen=false;render()};
+$("rf-away").onclick=()=>{if(!lastPlan||!saveNichtDa)return;const d=lastPlan.date;meinNutzer={...meinNutzer,nichtDa:{...(meinNutzer.nichtDa||{}),[d]:true}};rfShow=false;render();
+  toast("Alles klar – kein Rückblick für dich diesmal");saveNichtDa(d,true)};
 $("ab-exit").onclick=()=>{abOff=true;try{sessionStorage.setItem("kcrab","off")}catch(e){}renderAbend();window.scrollTo(0,0)};
 $("ab-enter").onclick=()=>{abOff=false;try{sessionStorage.removeItem("kcrab")}catch(e){}renderAbend();window.scrollTo(0,0)};
 
@@ -975,10 +1081,10 @@ function shrink(file){return new Promise((ok,bad)=>{const r=new FileReader();r.o
   let q=.7,u=c.toDataURL("image/jpeg",q);while(u.length>600000&&q>.3){q-=.1;u=c.toDataURL("image/jpeg",q)}ok(u)};im.src=r.result};r.readAsDataURL(file)})}
 function renderSpielAna(){const box=$("ad-spiel");if(!box)return;box.hidden=!canPlan;if(!canPlan)return;const el=$("spana");el.replaceChildren();
   const gs=Object.entries(games).map(([id,g])=>({id,...g,ri:rateInfo(g)})).filter(g=>!FIXED.has(g.id));if(!gs.length){el.textContent="Noch keine Spiele.";return}
-  const t8=parseIso(todayIso());t8.setMonth(t8.getMonth()-8);const lim=isoOf(t8);
-  const never=gs.filter(g=>!g.plays&&!g.lastPlayed),sleep=gs.filter(g=>g.lastPlayed&&g.lastPlayed<lim),rated=gs.filter(g=>g.ri.n>=2);
+  const t8=parseIso(todayIso());t8.setMonth(t8.getMonth()-6);const lim=isoOf(t8);
+  const never=gs.filter(g=>!g.plays&&!g.lastPlayed),sleep=gs.filter(g=>(g.lastPlayed||"2026-11-13")<lim),rated=gs.filter(g=>g.ri.n>=2);
   const k=document.createElement("div");k.className="anak";
-  [["Spiele in der Sammlung",String(gs.length)],["Nie gespielt",String(never.length)],["Über 8 Monate nicht gespielt",String(sleep.length)],["Mit Club-Bewertung",String(rated.length)]].forEach(([a,b])=>{const d=document.createElement("div");const v=document.createElement("b");v.textContent=b;const l=document.createElement("span");l.textContent=a;d.append(v,l);k.append(d)});
+  [["Spiele in der Sammlung",String(gs.length)],["Seit 13.11.26 noch nicht gespielt",String(never.length)],["Über 6 Monate nicht gespielt",String(sleep.length)],["Mit Club-Bewertung",String(rated.length)]].forEach(([a,b])=>{const d=document.createElement("div");const v=document.createElement("b");v.textContent=b;const l=document.createElement("span");l.textContent=a;d.append(v,l);k.append(d)});
   el.append(k);
   const block=(title,rows,cols)=>{if(!rows.length)return;const h=document.createElement("p");h.className="klabel";h.style.marginTop="10px";h.textContent=title;
     const tb=document.createElement("table");tb.className="anat";const hr=document.createElement("tr");cols.forEach(c=>{const th=document.createElement("th");th.textContent=c;hr.append(th)});const th_=document.createElement("thead");th_.append(hr);tb.append(th_);
@@ -988,8 +1094,8 @@ function renderSpielAna(){const box=$("ad-spiel");if(!box)return;box.hidden=!can
   block("Bestbewertet",[...rated].sort((a,b)=>b.ri.avg-a.ri.avg).slice(0,5).map(g=>[g.name,"Ø "+av(g.ri),g.ri.n+" Stimmen"]),["Spiel","Schnitt","Stimmen"]);
   block("Am schwächsten bewertet",[...rated].sort((a,b)=>a.ri.avg-b.ri.avg).slice(0,3).map(g=>[g.name,"Ø "+av(g.ri),g.ri.n+" Stimmen"]),["Spiel","Schnitt","Stimmen"]);
   block("„Nie wieder“-Stimmen",gs.filter(g=>nieCount(g)).sort((a,b)=>nieCount(b)-nieCount(a)).slice(0,5).map(g=>[g.name,nieCount(g)+"× 👎",g.ri.avg?"Ø "+av(g.ri):"–"]),["Spiel","Stimmen","Schnitt"]);
-  block("Lange nicht gespielt",[...sleep].sort((a,b)=>a.lastPlayed.localeCompare(b.lastPlayed)).slice(0,6).map(g=>[g.name,deDate(g.lastPlayed),g.ri.avg?"Ø "+av(g.ri):"–"]),["Spiel","Zuletzt","Schnitt"]);
-  if(never.length){const p=document.createElement("p");p.className="sda";p.textContent="Nie gespielt: "+never.map(g=>g.name).sort().join(", ");el.append(p)}}
+  block("Lange nicht gespielt",[...sleep].sort((a,b)=>(a.lastPlayed||"").localeCompare(b.lastPlayed||"")).slice(0,6).map(g=>[g.name,g.lastPlayed?deDate(g.lastPlayed):"vor 13.11.26",g.ri.avg?"Ø "+av(g.ri):"–"]),["Spiel","Zuletzt","Schnitt"]);
+  if(never.length){const p=document.createElement("p");p.className="sda";p.textContent="Seit 13.11.26 noch nicht gespielt: "+never.map(g=>g.name).sort().join(", ");el.append(p)}}
 function renderAna(){renderSpielAna();const box=$("ad-ana");if(!box)return;const ok=canFines;box.hidden=!ok;if(!ok)return;
   const all=Object.values(strafen).filter(x=>x.betrag);const el=$("ana");el.replaceChildren();
   if(!all.length){el.textContent="Noch keine Strafen eingetragen.";return}
@@ -1009,8 +1115,23 @@ function renderAna(){renderSpielAna();const box=$("ad-ana");if(!box)return;const
 $("ad-name-form").addEventListener("submit",async e=>{e.preventDefault();const n=$("ad-name").value.trim().slice(0,40);if(!n)return;meName=n;
   try{await saveName(n);toast("Name gespeichert")}catch(err){toast("Nicht gespeichert.")}});
 function renderName(){const i=$("ad-name");if(document.activeElement!==i)i.value=meName||(curUser&&nutzer[curUser.uid]&&nutzer[curUser.uid].name)||""}
+function renderKHist(){const sec=$("khist");sec.hidden=!isChef;if(!isChef)return;
+  const sel=$("kh-year");if(!sel.options.length){const y=new Date().getFullYear();for(let i=0;i<=40;i++){const o=document.createElement("option");o.value=y-i;o.textContent="Kaiser "+(y-i);sel.append(o)}sel.value=String(y-1)}
+  const ul=$("kh-list");ul.replaceChildren();const all=Object.values(kaiser).sort((a,b)=>b.year-a.year);
+  if(!all.length){const li=document.createElement("li");li.textContent="Noch keine Kaiser eingetragen.";ul.append(li)}
+  all.forEach(x=>{const li=document.createElement("li");const y=document.createElement("b");y.textContent=x.year;const n=document.createElement("span");n.textContent=x.name;
+    const rm=document.createElement("button");rm.type="button";rm.className="krm";rm.textContent="×";rm.setAttribute("aria-label","Kaiser "+x.year+" löschen");
+    rm.onclick=()=>{if(!isChef||!db)return;delete kaiser[String(x.year)];render();db.collection("kaiser").doc(String(x.year)).delete().catch(()=>toast("Nicht gelöscht."))};
+    li.append(y,n,rm);ul.append(li)})}
+$("kh-tog").onclick=()=>{const o=$("kh-body").hidden;$("kh-body").hidden=!o;$("kh-tog").setAttribute("aria-expanded",String(o))};
+$("kh-year").onchange=()=>{const k=kaiser[$("kh-year").value];$("kh-name").value=k?k.name:""};
+$("kh-form").addEventListener("submit",e=>{e.preventDefault();if(!isChef||!db)return;const year=+$("kh-year").value,name=$("kh-name").value.trim().slice(0,40);
+  if(!name){toast("Bitte einen Namen eintragen");return}
+  kaiser[String(year)]={year,name,historie:true,updatedAt:new Date().toISOString()};render();
+  db.collection("kaiser").doc(String(year)).set({year,name,historie:true,updatedAt:new Date().toISOString()}).catch(()=>toast("Speichern fehlgeschlagen"));
+  $("kh-name").value="";toast("Kaiser "+year+": "+name+" gespeichert");const sel=$("kh-year");if(sel.selectedIndex<sel.options.length-1){sel.selectedIndex++}});
 function kaiserFeier(){ // neuer Kaiser: jedes Handy feiert einmal mit
-  if(SIM.on)return;const k=Object.values(kaiser).sort((a,b)=>b.year-a.year)[0];if(!k||!k.updatedAt)return;
+  if(SIM.on)return;const k=Object.values(kaiser).sort((a,b)=>b.year-a.year)[0];if(!k||!k.updatedAt||k.historie)return;
   if(Date.now()-new Date(k.updatedAt).getTime()>21*864e5)return;
   const key=k.year+"|"+k.name+"|"+k.updatedAt;let seen="";try{seen=localStorage.getItem("kcrkaiser")||""}catch(e){}
   if(seen===key)return;try{localStorage.setItem("kcrkaiser",key)}catch(e){}
@@ -1086,6 +1207,7 @@ function render(){
     if(BAHN[g.bahn])t.append(tag(BAHN[g.bahn][0],BAHN[g.bahn][1]));
     if(g.quelle&&!g.geprueft)t.append(tag("🔍 Regel ungeprüft","var(--accent)"));
     if(g.notes)t.append(tag("✎ Notiz","var(--muted)"));
+    {const r=recordOf(g);if(r)t.append(tag("Rekord: "+r.wert,"var(--muted)"))}
     if(canPlan&&nieCount(g))t.append(tag("👎 "+nieCount(g)+"× nie wieder","var(--muted)"));
     if(t.children.length)main.append(t);
     const side=document.createElement("div");side.className="side";
@@ -1110,7 +1232,7 @@ async function save(id,doc){
   catch(e){toast("Speichern hat nicht geklappt. Bitte noch einmal versuchen.");return false}
 }
 /* Nächster Abend: 10 Plätze */
-const DEFAULT_SLOTS=["g-3-in-die-vollen",null,null,null,null,"g-abendkoenig",null,null,null,null];
+const DEFAULT_SLOTS=["g-3-in-die-vollen",null,null,null,null,"g-abendkoenig",null,null]; // 8 Plätze
 const KZ="__kaiser__",GAST="__gast__";let planTitle="";
 function isKaiserDate(iso){const d=parseIso(iso);if(!d)return false;const n=new Date(d);n.setDate(n.getDate()+28);return n.getFullYear()>d.getFullYear()}
 function kaiserEvening(){const id=planDate||nextEvening().iso;return isKaiserDate(id)?id:""}
@@ -1157,12 +1279,12 @@ function renderPlan(){
       const no=document.createElement("span");no.className="no";no.textContent="🤝";li.append(no);
       const nm=document.createElement("span");nm.className="sn";nm.textContent="Spiel des Gastclubs";li.append(nm);
       const rm=document.createElement("button");rm.type="button";rm.className="rm";rm.textContent="×";rm.setAttribute("aria-label","Gast-Spiel entfernen");
-      rm.onclick=()=>{if(i>=10)plan.splice(i,1);else plan[i]=null;render();savePlan()};li.append(rm);
+      rm.onclick=()=>{if(i>=DEFAULT_SLOTS.length)plan.splice(i,1);else plan[i]=null;render();savePlan()};li.append(rm);
       ol.append(li);return}
     if(id===KZ){const li=document.createElement("li");li.className="slot kz";
       const h=document.createElement("button");h.type="button";h.className="handle";h.textContent="⠿";h.style.color="#f3dfa6";h.setAttribute("aria-label","Kaiserkegeln verschieben");h.dataset.i=i;li.append(h);
       const no=document.createElement("span");no.className="no";no.textContent="👑";li.append(no);
-      const nm=document.createElement("span");nm.className="sn";nm.textContent="21:00 Kaiserkegeln";
+      const nm=document.createElement("span");nm.className="sn";nm.textContent="21:30 Kaiserkegeln";
       const sm=document.createElement("span");sm.className="sm";sm.textContent="🥪";nm.append(sm);li.append(nm);li.append(document.createElement("span"));
       ol.append(li);return}
     const g=id&&games[id];const li=document.createElement("li");li.className="slot"+(g?"":" empty");
@@ -1175,7 +1297,8 @@ function renderPlan(){
       const sm=document.createElement("span");sm.className="sm";sm.textContent=[id===wishWinner?"⭐ Wunsch":"",artTxt(g,0),BAHN[g.bahn]?.[0]].filter(Boolean).join(" · ");
       nm.append(sm);b.append(nm);b.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();if(canPlan)openPick(i);else openInfo(id)});li.append(b);
       const rm=document.createElement("button");rm.type="button";rm.className="rm";rm.textContent="×";rm.setAttribute("aria-label",g.name+" von Platz "+(i+1)+" entfernen");
-      rm.onclick=()=>{if(i>=10)plan.splice(i,1);else plan[i]=null;render();savePlan()};li.append(rm);
+      rm.onclick=()=>{if(i>=DEFAULT_SLOTS.length)plan.splice(i,1);else plan[i]=null;render();savePlan()};li.append(rm);
+      swipeDel(li,()=>{if(i>=DEFAULT_SLOTS.length)plan.splice(i,1);else plan[i]=null;render();savePlan();toast(g.name+" entfernt")});
     }else{
       const ad=document.createElement("button");ad.type="button";ad.className="addslot";ad.textContent="＋ Spiel wählen";ad.setAttribute("aria-label","Platz "+(i+1)+": Spiel wählen");
       ad.onclick=()=>openPick(i);li.append(ad);li.append(document.createElement("span"));
@@ -1198,6 +1321,15 @@ async function savePlan(){
   try{await db.collection("plan").doc("next").set({slots:plan.map(x=>x||""),date:planDate,title:planTitle||"",done:planDone.slice(),updatedAt:new Date().toISOString()})}
   catch(e){toast("Plan wurde nicht gespeichert. Bitte noch einmal versuchen.")}
 }
+/* Wischen nach links = entfernen (nur Spielewarte) */
+function swipeDel(li,onDel){if(!canPlan)return;li.classList.add("swipe");let st=null;
+  li.addEventListener("pointerdown",e=>{if(e.target.closest("button,input,select,a,.handle"))return;st={x:e.clientX,y:e.clientY,id:e.pointerId,dx:0,on:false}});
+  li.addEventListener("pointermove",e=>{if(!st||e.pointerId!==st.id)return;const dx=e.clientX-st.x,dy=e.clientY-st.y;
+    if(!st.on){if(Math.abs(dy)>12&&Math.abs(dy)>Math.abs(dx)){st=null;return}if(dx<-12&&Math.abs(dx)>Math.abs(dy)){st.on=true;try{li.setPointerCapture(e.pointerId)}catch(_){}}else return}
+    st.dx=Math.min(0,dx);li.dataset.swiped="1";li.style.transform="translateX("+st.dx+"px)";li.classList.toggle("swdel",st.dx<-90)});
+  const end=e=>{if(!st||e.pointerId!==st.id)return;const d=st;st=null;li.style.transform="";li.classList.remove("swdel");
+    if(d.on&&d.dx<-90&&e.type==="pointerup"){li.classList.add("swgone");setTimeout(onDel,160)}setTimeout(()=>{delete li.dataset.swiped},350)};
+  li.addEventListener("pointerup",end);li.addEventListener("pointercancel",end)}
 /* Verschieben: Griff ziehen (Maus & Touch) oder Pfeiltasten */
 function moveSlot(from,to){if(to<0||to>=plan.length||from===to)return;const [x]=plan.splice(from,1);plan.splice(to,0,x);render();savePlan()}
 (function(){
@@ -1223,27 +1355,46 @@ function moveSlot(from,to){if(to<0||to>=plan.length||from===to)return;const [x]=
 
 /* Rückblick: eine Woche nach dem Kegeln */
 let lastPlan=null, planLoaded=false, gamesLoaded=false, archiving=false;
+let rfShow=false,rfWasOpen=false,meinNutzer={},saveNichtDa=null;
+async function removeFromLast(id){if(!canPlan||!lastPlan)return;const sl=(lastPlan.slots||[]).slice();const k=sl.indexOf(id);if(k<0)return;sl.splice(k,1);
+  const date=lastPlan.date;lastPlan={...lastPlan,slots:sl};const g=games[id];
+  if(g){const pl=Math.max(0,(g.plays||0)-1);const up={plays:pl};if(g.lastPlayed===date&&!pl)up.lastPlayed="";games[id]={...g,...up};
+    if(db){try{await db.collection("games").doc(id).update(up)}catch(e){}}}
+  render();toast((g?g.name:"Spiel")+" aus dem letzten Abend entfernt");
+  if(db){try{await db.collection("plan").doc("last").set({...lastPlan,slots:sl});await db.collection("plan").doc("history").set({abende:{[date]:{nr:nrFor(date),slots:sl.filter(Boolean)}}},{merge:true})}catch(e){toast("Nicht gespeichert.")}}}
 function renderReflect(){
   const sec=$("reflect");
   const d=lastPlan&&parseIso(lastPlan.date);
   if(!d){sec.hidden=true;return}
   const until=new Date(d);until.setDate(until.getDate()+7);
   const today=parseIso(todayIso());
-  if(today>until){sec.hidden=true;return}
+  if(today>until){sec.hidden=true;$("rf-again").hidden=true;return}
+  // Wer alle Spiele bewertet hat, bekommt wieder die normale Ansicht
+  const skipFixed=lastPlan.date>"2026-11-13"; // feste Spiele ab der nächsten Bewertungswoche nicht mehr bewerten
+  const ids=(lastPlan.slots||[]).filter(id=>id&&games[id]&&!(skipFixed&&FIXED.has(id)));
+  const nichtDa=!!(meinNutzer.nichtDa&&meinNutzer.nichtDa[lastPlan.date]);
+  if(nichtDa&&!rfShow){sec.hidden=true;$("rf-again").hidden=false;$("rf-again").textContent="Doch dabei gewesen? Rückblick zeigen";return}
+  $("rf-again").textContent="⭐ Deine Bewertungen vom letzten Abend ansehen";
+  const allMine=canEdit&&!!myKey()&&ids.length>0&&ids.every(id=>myStars(games[id],lastPlan.date));
+  if(allMine&&!rfShow){sec.hidden=true;$("rf-again").hidden=false;
+    if(rfWasOpen){rfWasOpen=false;toast("Danke! Alle Spiele bewertet ⭐")}return}
+  rfWasOpen=!allMine;$("rf-again").hidden=true;$("rf-close").hidden=!allMine;$("rf-edit").hidden=!isChef;$("rf-away").hidden=!(canEdit&&myKey())||nichtDa;
   sec.hidden=false;
   $("rf-date").textContent=(lastPlan.nr||nrFor(lastPlan.date))+". Kegelabend · "+fmtD(d)+" · sichtbar bis "+fmtD(until);
   const ol=$("rf-list");ol.replaceChildren();let rated=0,cnt=0;
   (lastPlan.slots||[]).forEach(id=>{
-    const g=id&&games[id];if(!g)return;cnt++;const ri=rateInfo(g);if(ri.mine)rated++;
+    const g=id&&games[id];if(!g||(skipFixed&&FIXED.has(id)))return;cnt++;const ri=rateInfo(g),mv=myStars(g,lastPlan.date);if(mv)rated++;
     const li=document.createElement("li");li.className="rslot";
     const no=document.createElement("span");no.className="no";no.textContent=cnt;
-    const nm=document.createElement("span");nm.className="sn";nm.textContent=g.name;
+    const nm=document.createElement("span");nm.className="sn rtap";nm.textContent=g.name;nm.setAttribute("role","button");nm.tabIndex=0;nm.title="Regeln ansehen";
+    nm.onclick=()=>{if(li.dataset.swiped){delete li.dataset.swiped;return}openInfo(id)};nm.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();openInfo(id)}};
     const st=document.createElement("div");st.className="rstars";st.setAttribute("role","group");st.setAttribute("aria-label","Bewertung für "+g.name);
-    for(let k=1;k<=5;k++){const b=document.createElement("button");b.type="button";b.textContent="★";b.className=k<=ri.mine?"on":"";
-      b.setAttribute("aria-label","Deine Bewertung: "+k+" von 5");b.setAttribute("aria-pressed",String(k<=ri.mine));
-      b.onclick=async()=>{if(!canEdit||!myKey())return;const v=ri.mine===k?0:k;const r=ratingsWith(g,v);
-        games[id]={...g,ratings:r,rating:roundAvg(r),updatedAt:new Date().toISOString()};render();
-        if(db){try{await db.collection("games").doc(id).update({ratings:r,rating:roundAvg(r),updatedAt:new Date().toISOString()})}catch(e){toast("Bewertung wurde nicht gespeichert.")}}};
+    for(let k=1;k<=5;k++){const b=document.createElement("button");b.type="button";b.textContent="★";b.className=k<=mv?"on":"";
+      b.setAttribute("aria-label","Deine Bewertung für diesen Abend: "+k+" von 5");b.setAttribute("aria-pressed",String(k<=mv));
+      b.onclick=async()=>{if(!canEdit||!myKey())return;const v=mv===k?0:k,key=lastPlan.date+"|"+myKey();
+        const votes={...(g.votes||{})};if(v)votes[key]=v;else delete votes[key];const rt=roundAvg(g.ratings,votes);
+        games[id]={...g,votes,rating:rt};render();
+        if(db){try{const KF=window.KF;await db.collection("games").doc(id).update({["votes."+key]:v?v:KF.deleteField(),rating:rt,updatedAt:new Date().toISOString()})}catch(e){toast("Bewertung wurde nicht gespeichert.")}}};
       st.append(b)}
     if(ri.avg){const a=document.createElement("small");a.className="sm";a.textContent=avgTxt(ri);nm.append(a)}
     const nb=document.createElement("button");nb.type="button";
@@ -1253,26 +1404,29 @@ function renderReflect(){
         games[id]={...g,nie};render();if(db){try{await db.collection("games").doc(id).update({nie})}catch(e){toast("Nicht gespeichert.")}}}}
     else nb.hidden=true;
     li.append(no,nm,st,nb);ol.append(li);
+    swipeDel(li,()=>removeFromLast(id));
   });
   $("rf-count").textContent=canEdit?(rated+"/"+cnt+" bewertet"):"";
 }
 function nextAfter(iso){let n=nextEvening().iso;if(n<=iso){const d=parseIso(iso);d.setDate(d.getDate()+28);n=isoOf(d)}return n}
+// Wurden am Abend Spiele mit ✓ abgehakt, zählen nur diese als gespielt
+function playedSlots(){const f=doneFlags(),any=f.some(Boolean);return plan.map((x,k)=>x&&(!any||f[k])?x:"")}
 async function maybeArchive(){
   if(!db||!canRead||!planLoaded||!gamesLoaded||archiving||!planDate)return;
   {const e=parseIso(planDate);e.setHours(23,15,0,0);if(simNow()<e)return} // Abschluss am Kegelabend um 23:15
   archiving=true;
   if(SIM.on||!canPlan){
     // Nur auf diesem Handy: Rückblick zeigen und nächsten Abend anzeigen, bis der Spielewart den Abend abschließt
-    if(!lastPlan||lastPlan.date<planDate)lastPlan={date:planDate,nr:nrFor(planDate),slots:plan.map(x=>x||"")};
+    if(!lastPlan||lastPlan.date<planDate)lastPlan={date:planDate,nr:nrFor(planDate),slots:playedSlots()};
     plan=DEFAULT_SLOTS.slice();planDate=nextAfter(planDate);planTitle="";planDone=[];if(isKaiserDate(planDate))plan[4]=KZ;
     archiving=false;render();return;
   }
   try{
     const done=lastPlan&&lastPlan.date===planDate;
     if(!done){
-      const ids=plan.filter(id=>id&&games[id]);
-      await db.collection("plan").doc("last").set({date:planDate,nr:nrFor(planDate),slots:plan.map(x=>x||""),archivedAt:new Date().toISOString()});
-      try{await db.collection("plan").doc("history").set({abende:{[planDate]:{nr:nrFor(planDate),slots:plan.filter(Boolean)}}},{merge:true})}catch(e){}
+      const pslots=playedSlots(),ids=pslots.filter(id=>id&&games[id]);
+      await db.collection("plan").doc("last").set({date:planDate,nr:nrFor(planDate),slots:pslots,archivedAt:new Date().toISOString()});
+      try{await db.collection("plan").doc("history").set({abende:{[planDate]:{nr:nrFor(planDate),slots:pslots.filter(Boolean)}}},{merge:true})}catch(e){}
       for(const id of ids){const g=games[id];const up={plays:(g.plays||0)+1,updatedAt:new Date().toISOString()};if(!g.lastPlayed||g.lastPlayed<planDate)up.lastPlayed=planDate;
         try{await db.collection("games").doc(id).update(up)}catch(e){}}
     }
@@ -1285,6 +1439,8 @@ function openPick(i){if(!canPlan)return;pickSlot=i;$("p-title").textContent="Pla
 let pickMode="slot";
 function closePick(){$("pscrim").hidden=true;pickSlot=null;pickMode="slot";
   let ch=false;while(plan.length>10&&!plan[plan.length-1]){plan.pop();ch=true}if(ch)render()}
+(function(){const vv=window.visualViewport;if(!vv)return;const up=()=>{const r=document.documentElement.style;r.setProperty("--vvh",vv.height+"px");r.setProperty("--vvt",vv.offsetTop+"px")};
+  vv.addEventListener("resize",up);vv.addEventListener("scroll",up);up()})();
 function renderPick(){
   const q=$("p-q").value.trim().toLowerCase(),box=$("p-list");box.replaceChildren();
   const list=sorted().filter(g=>!q||(g.name||"").toLowerCase().includes(q));
@@ -1313,8 +1469,8 @@ function openInfo2(id){const g=games[id];if(!g){toast("Spiel nicht gefunden");re
   $("i-title").textContent=g.name;
   const t=$("i-tags");t.replaceChildren();artenOf(g).forEach(k=>t.append(tag(ART[k][0],ART[k][1])));if(BAHN[g.bahn])t.append(tag(BAHN[g.bahn][0],BAHN[g.bahn][1]));
   $("i-rules").textContent=g.wertung||"Noch keine Regeln eingetragen.";
-  const ri=rateInfo(g);$("i-stars").textContent=ri.avg?stars(Math.round(ri.avg)):"";$("i-avg").textContent=ri.avg?avgTxt(ri):"Noch nicht bewertet";
-  fillRec($("i-rec"),{...g,id});$("i-recbtn").hidden=!canEdit;$("i-recbtn").onclick=()=>openRec(id);
+  const ri=rateInfo(g),fx=FIXED.has(id);$("i-stars").textContent=!fx&&ri.avg?stars(Math.round(ri.avg)):"";$("i-avg").textContent=fx?"":ri.avg?avgTxt(ri):"Noch nicht bewertet";
+  fillRec($("i-rec"),{...g,id});$("i-recbtn").hidden=!canPlan;$("i-recbtn").onclick=()=>openRec(id);
   $("iscrim").hidden=false}
 $("i-close").onclick=()=>{$("iscrim").hidden=true};
 $("iscrim").onclick=e=>{if(e.target===$("iscrim"))$("iscrim").hidden=true};
@@ -1334,7 +1490,9 @@ function openSheet(id){
   $("f-name").value=g.name||"";$("f-wert").value=g.wertung||"";$("f-notes").value=g.notes||"";
   cur.geprueft=!!g.geprueft;cur.quelle=g.quelle||"";cur.origWert=g.wertung||"";setVerify();
   $("f-last").value=g.lastPlayed||"";$("f-plays").value=g.plays||"";
-  setArten();setSeg("f-bahn",cur.bahn);setRate(cur.rating);
+  {const r=id?recordOf({...g,id}):null;$("f-rec").textContent=r?"Rekord: "+recTxt(r)[1]:(canPlan&&id?"Noch kein Rekord":"");
+    $("f-recbtn").hidden=!(canPlan&&id);$("f-recbtn").textContent=r?"Rekord ändern":"Rekord eintragen";$("f-recwrap").hidden=!r&&!(canPlan&&id)}
+  setArten();setSeg("f-bahn",cur.bahn);setRate(cur.rating);$("f-ratewrap").hidden=FIXED.has(id);
   $("f-del").hidden=!id;$("scrim").hidden=false;setTimeout(()=>$("f-name").focus(),50);
 }
 function close(){$("scrim").hidden=true;editing=null}
@@ -1361,7 +1519,8 @@ $("form").addEventListener("submit",async e=>{
     quelle:cur.quelle||"",geprueft:cur.quelle?(cur.geprueft||wert!==cur.origWert.trim()):true,ratings:myKey()?ratingsWith(old,cur.rating||0):(old.ratings||{}),notes:$("f-notes").value.trim().slice(0,2000),
     lastPlayed:/^\d{4}-\d{2}-\d{2}$/.test($("f-last").value)?$("f-last").value:"",plays:Math.max(0,Math.min(999,parseInt($("f-plays").value,10)||0)),
     createdAt:old.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
-  doc.rating=Object.keys(doc.ratings).length?roundAvg(doc.ratings):(old.rating||0);
+  if(old.votes)doc.votes=old.votes;doc.rating=(Object.keys(doc.ratings).length||doc.votes)?roundAvg(doc.ratings,doc.votes):(old.rating||0);
+  if(old.rekord)doc.rekord=old.rekord;if(old.nie)doc.nie=old.nie; // beim Bearbeiten nicht verlieren
   games[id]=doc;close();render();await save(id,doc);
 });
 $("f-del").onclick=async()=>{if(!canPlan)return;
@@ -1382,7 +1541,7 @@ $("evcopy").onclick=async()=>{
   let txt=plan.map((id,i)=>{
     if(id===GAST)return "   🤝 Spiel des Gastclubs";
     if(id===KZ){const c=kaiserCandidates(parseIso(kaiserEvening()||todayIso()).getFullYear());
-      return "\n👑 *21:00 KAISERKEGELN*"+(c.length?"\n   Kandidaten: "+c.join(", "):"")+"\n   2×5 Wurf in die Vollen · 🥪\n"}
+      return "\n👑 *21:30 KAISERKEGELN*"+(c.length?"\n   Kandidaten: "+c.join(", "):"")+"\n   2×5 Wurf in die Vollen · 🥪\n"}
     const g=id&&games[id];if(!g)return null;const ex=[artTxt(g,2),BAHN[g.bahn]?.[2]].filter(Boolean);
     let line=`${++nr}. ${g.name}`+(ex.length?" ("+ex.join(", ")+")":"")+(id===wishWinner?" ⭐ Wunschspiel":"");
     if((g.plays||0)<=2&&g.wertung)line+="\n   ↳ "+((g.plays||0)===0?"Neu: ":"")+g.wertung;
@@ -1442,11 +1601,11 @@ let tplLoaded=false;
 
 /* Kaiserkegeln */
 let kaiser={};
-function renderKaiser(){
+function renderKaiser(){renderKHist();
   const on=kaiserThemeOn();document.body.classList.toggle("kaiser",on);$("kbanner").hidden=!on;
   const k=kaiserEvening();
   if(on){const d=parseIso(k);const c=kaiserCandidates(d.getFullYear());
-    $("kb-sub").textContent=fmtD(d)+" · 21:00 Uhr · 🥪"+(canEdit&&c.length?" · Kandidaten: "+c.join(", "):"")}
+    $("kb-sub").textContent=fmtD(d)+" · 21:30 Uhr · 🥪"+(canEdit&&c.length?" · Kandidaten: "+c.join(", "):"")}
   const list=Object.values(kaiser).sort((a,b)=>b.year-a.year);
   const kl=$("kz-list");kl.replaceChildren();
   if(list.length){kl.append("👑 Kaiser: ");
@@ -1604,9 +1763,17 @@ function applyRole(){
   if(dataHook)dataHook(canRead);
   $("membtn").hidden=!isChef;$("simbtn").hidden=!realChef;$("backup").hidden=!isChef;renderSimBar();renderTabs();subStrafen();renderStrafen();renderAna();renderName();renderVerz();
   $("seedbtn").hidden=!(canPlan&&gamesLoaded&&!Object.keys(games).length);
-  render();maybeArchive();renderMembers();migrateRatings();ensureKaiser();seedTpl(tplLoaded);
+  render();maybeArchive();renderMembers();migrateRatings();resetPlays();ensureKaiser();seedTpl(tplLoaded);
 }
 let migrated=false;
+let playsReset=null,resetting=false;
+async function resetPlays(){ // einmalig: „gespielt“ und „zuletzt gespielt“ ab dem 13.11.2026 neu zählen
+  if(resetting||playsReset===null||playsReset||!canPlan||SIM.on||!gamesLoaded||!planLoaded||!db)return;resetting=true;
+  const keep={};if(lastPlan&&lastPlan.date==="2026-11-13")(lastPlan.slots||[]).filter(id=>id&&games[id]).forEach(id=>keep[id]=1);
+  for(const [id,g] of Object.entries(games)){const v=keep[id]||0,lp=keep[id]?"2026-11-13":"";
+    if((g.plays||0)!==v||(g.lastPlayed||"")!==lp){games[id]={...g,plays:v,lastPlayed:lp};try{await db.collection("games").doc(id).update({plays:v,lastPlayed:lp})}catch(e){}}}
+  try{await db.collection("plan").doc("history").set({playsReset:"2026-11-13"},{merge:true});playsReset="2026-11-13"}catch(e){}
+  resetting=false;render()}
 async function migrateRatings(){
   if(migrated||!canPlan||!gamesLoaded||!db||!myKey())return;migrated=true;
   for(const [id,g] of Object.entries(games)){
@@ -1680,13 +1847,13 @@ function renderMembers(){const ul=$("m-list");ul.replaceChildren();
 function simDates(){
   const nx=planDate||nextEvening().iso,d=parseIso(nx),y=d.getFullYear(),k=kaiserOfYear(y);
   const add=(iso,n)=>{const x=parseIso(iso);x.setDate(x.getDate()+n);return isoOf(x)};
-  const out=[["","Heute"],[add(nx,-1),"Donnerstag vor dem Kegeln (Wunschspiel aufgedeckt)"],[add(nx,1),"Woche nach dem Kegeln ("+fmtD(d)+")"]];
+  const out=[["","Heute"],[add(nx,-1),"Donnerstag vor dem Kegeln (Wunschspiel aufgedeckt)"],[nx,"Kegelabend, 20 Uhr (Kegelabend-Modus)"],[add(nx,1),"Woche nach dem Kegeln ("+fmtD(d)+")"]];
   if(k){out.push([isoOf(new Date(k.getFullYear(),11,1)),"Kaiser-Monat (1.12.)"]);out.push([isoOf(k),"Kaiserabend ("+fmtD(k)+")"])}
   return out;
 }
 function renderSimBar(){
   const b=$("simbar");b.hidden=!SIM.on;if(!SIM.on)return;
-  const rn={"":"Chef",mitglied:"Kegelbruder",schriftwart:"Schriftwart",kassenwart:"Kassenwart",gast:"Gast"}[SIM.role];
+  const rn={"":"Chef",spielewart:"Spielewart",mitglied:"Kegelbruder",schriftwart:"Schriftwart",kassenwart:"Kassenwart",gast:"Gast"}[SIM.role];
   $("sim-txt").textContent=(DEV?"🛠 DEV":"🧪 Vorschau")+(SIM.role||SIM.date||!DEV?": "+rn:"")+(SIM.date?" · "+fmtD(parseIso(SIM.date)):"")+" – nichts wird gespeichert";
   $("sim-end").hidden=DEV&&!SIM.role&&!SIM.date;
 }
@@ -1727,7 +1894,7 @@ render();setEdit(null);renderNet();
       import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`),
       import(`https://www.gstatic.com/firebasejs/${V}/firebase-firestore.js`),
       import(`https://www.gstatic.com/firebasejs/${V}/firebase-auth.js`)]);
-    F={...appM,...fsM,...authM};
+    F={...appM,...fsM,...authM};window.KF=F;
   }catch(e){clearTimeout(timer);$("status").textContent="Die App konnte nicht geladen werden. Internetverbindung prüfen.";return}
   const app=F.initializeApp(FIREBASE_CONFIG);
   let fdb;try{fdb=F.initializeFirestore(app,{localCache:F.persistentLocalCache()})}catch(e){fdb=F.getFirestore(app)}
@@ -1769,6 +1936,8 @@ render();setEdit(null);renderNet();
     if(!u)return;
     {const nm=($("a-name").value||"").trim().slice(0,40);const d={email:mail(u),lastSeen:new Date().toISOString()};if(nm)d.name=nm;
       (SIM.on?simBlock():F.setDoc(F.doc(fdb,"nutzer",u.uid),d,{merge:true})).catch(()=>{});$("a-name").value=""}
+    {if(window.unsubMe)window.unsubMe();window.unsubMe=F.onSnapshot(F.doc(fdb,"nutzer",u.uid),sn=>{meinNutzer=sn.exists()?sn.data()||{}:{};render()},()=>{});
+      saveNichtDa=(date,on)=>{if(SIM.on){simBlock();return}F.setDoc(F.doc(fdb,"nutzer",u.uid),{email:mail(u),nichtDa:{[date]:on}},{merge:true}).catch(()=>toast("Nicht gespeichert."))}}
     const subR=()=>{if(unsubR){unsubR();unsubR=null}if(!curUser||curUser.uid!==u.uid)return;
     unsubR=F.onSnapshot(rRef,async snap=>{
       if(!snap.exists()){
@@ -1803,7 +1972,7 @@ render();setEdit(null);renderNet();
     if(on&&dataUns.length)return;
     if(!on){if(!dataUns.length)return;dataUns.forEach(f=>f());dataUns=[];games={};koenige={};kaiser={};vorlagen={};lastPlan=null;gamesLoaded=false;planLoaded=false;render();return}
     clearTimeout(timer);$("status").hidden=false;$("status").textContent="Lade eure Spiele …";
-  dataUns.push(db.collection("games").onSnapshot(s=>{games={};s.docs.forEach(d=>{const x=d.data();if(x&&x.name)games[d.id]=x});$("status").hidden=true;gamesLoaded=true;
+  dataUns.push(db.collection("games").onSnapshot(s=>{games={};s.docs.forEach(d=>{const x=d.data();if(x&&x.name)games[d.id]=x});$("status").hidden=true;gamesLoaded=true;setTimeout(resetPlays,0);
       $("seedbtn").hidden=!(canPlan&&!Object.keys(games).length);render();maybeArchive();migrateRatings()},
     ()=>{$("status").textContent="Spiele konnten nicht geladen werden."}));
   dataUns.push(db.collection("vorlagen").onSnapshot(s=>{vorlagen={};s.docs.forEach(d=>{const x=d.data();if(x&&x.name)vorlagen[d.id]={...x,id:d.id}});tplLoaded=true;seedTpl(true);if(!$("tscrim").hidden)renderTpl()},()=>{}));
@@ -1813,8 +1982,10 @@ render();setEdit(null);renderNet();
   dataUns.push(db.collection("plan").onSnapshot(s=>{lastPlan=null;s.docs.forEach(d=>{const x=d.data();if(!x)return;
       if(d.id==="last"&&x.date)lastPlan=x;
       if(d.id==="history"&&x.abende)planHist=x.abende;
-      if(d.id==="next"&&Array.isArray(x.slots)){plan=Array.from({length:Math.min(MAX_SLOTS,Math.max(10,x.slots.length))},(_,i)=>x.slots[i]||null);planDate=x.date||"";planTitle=x.title||"";planDone=Array.isArray(x.done)?x.done.filter(v=>typeof v==="string"):[]}});
-    planLoaded=true;render();maybeArchive();subWish();ensureKaiser()},()=>{}));
+      if(d.id==="history")playsReset=x.playsReset||"";
+      if(d.id==="next"&&Array.isArray(x.slots)){{let sl=x.slots.slice();while(sl.length>DEFAULT_SLOTS.length&&!sl[sl.length-1])sl.pop(); // leere Plätze hinten auf 8 kürzen
+        plan=Array.from({length:Math.min(MAX_SLOTS,Math.max(DEFAULT_SLOTS.length,sl.length))},(_,i)=>sl[i]||null)}planDate=x.date||"";planTitle=x.title||"";planDone=Array.isArray(x.done)?x.done.filter(v=>typeof v==="string"):[]}});
+    if(playsReset===null)playsReset="";planLoaded=true;render();maybeArchive();subWish();ensureKaiser();resetPlays()},()=>{}));
     subWish(true);
   };
   dataHook(canRead);
