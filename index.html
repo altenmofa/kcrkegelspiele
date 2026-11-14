@@ -90,6 +90,14 @@ body.lclosed #filters,body.lclosed #list{display:none!important}
 .foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:.85rem}
 /* Formular */
 .scrim{position:fixed;inset:0;background:rgba(20,10,10,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+/* Fenster passen sich der sichtbaren Fläche an (Tastatur verdeckt nichts) */
+.scrim{top:var(--vvt,0px);bottom:auto;height:var(--vvh,100%)}
+.scrim>.sheet{max-height:calc(100% - 10px)}
+@media (max-width:599px){
+  #pscrim{align-items:flex-start}
+  #pscrim>.sheet{border-radius:0 0 20px 20px;height:calc(100% - 10px);padding-top:calc(16px + env(safe-area-inset-top,0px))}
+  #pscrim .plist{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;align-content:flex-start;justify-content:flex-start}
+  #pscrim .search,#pscrim h3,#pscrim .actions,#pscrim .pitem{flex:none}}
 .sheet{background:var(--surface);width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:20px max(18px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:16px;max-height:92%;overflow:auto}
 @media (min-width:600px){.scrim{align-items:center}.sheet{border-radius:20px}}
 .sheet h3{font-family:var(--display);font-weight:600;font-size:1.2rem;margin:0}
@@ -110,6 +118,8 @@ input[type=date],input[type=number]{width:100%;font:inherit;padding:10px 12px;bo
 .slot.dragging{box-shadow:0 6px 18px rgba(0,0,0,.18);border-color:var(--accent);background:var(--surface);position:relative;z-index:2}
 .reflect{border-color:var(--star)}
 .rslot{display:grid;grid-template-columns:22px 1fr auto auto;gap:10px;align-items:center;padding:7px 8px 7px 10px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.rtap{cursor:pointer}
+.rtap:first-line{text-decoration:underline dotted;text-underline-offset:3px}
 .rslot .sn{display:flex;flex-direction:column;min-width:0;line-height:1.25}
 .rslot .sm{display:block;margin-top:2px;font-size:.75rem;color:var(--muted)}
 .slot.kz .sm{display:inline;margin-left:6px}
@@ -390,7 +400,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· r38</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· r40</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
@@ -443,7 +453,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
         <button type="button" id="f-ok" aria-pressed="false">✓ Regel stimmt so</button>
       </div>
     </div>
-    <div>
+    <div id="f-ratewrap">
       <span class="lbl" id="l-rate">Deine Bewertung</span>
       <div class="rate" id="f-rate" role="group" aria-labelledby="l-rate"></div>
       <div class="rhint" id="f-rhint"></div>
@@ -903,9 +913,9 @@ function swipeDel(li,onDel){if(!canPlan)return;li.classList.add("swipe");let st=
   li.addEventListener("pointerdown",e=>{if(e.target.closest("button,input,select,a,.handle"))return;st={x:e.clientX,y:e.clientY,id:e.pointerId,dx:0,on:false}});
   li.addEventListener("pointermove",e=>{if(!st||e.pointerId!==st.id)return;const dx=e.clientX-st.x,dy=e.clientY-st.y;
     if(!st.on){if(Math.abs(dy)>12&&Math.abs(dy)>Math.abs(dx)){st=null;return}if(dx<-12&&Math.abs(dx)>Math.abs(dy)){st.on=true;try{li.setPointerCapture(e.pointerId)}catch(_){}}else return}
-    st.dx=Math.min(0,dx);li.style.transform="translateX("+st.dx+"px)";li.classList.toggle("swdel",st.dx<-90)});
+    st.dx=Math.min(0,dx);li.dataset.swiped="1";li.style.transform="translateX("+st.dx+"px)";li.classList.toggle("swdel",st.dx<-90)});
   const end=e=>{if(!st||e.pointerId!==st.id)return;const d=st;st=null;li.style.transform="";li.classList.remove("swdel");
-    if(d.on&&d.dx<-90&&e.type==="pointerup"){li.classList.add("swgone");setTimeout(onDel,160)}};
+    if(d.on&&d.dx<-90&&e.type==="pointerup"){li.classList.add("swgone");setTimeout(onDel,160)}setTimeout(()=>{delete li.dataset.swiped},350)};
   li.addEventListener("pointerup",end);li.addEventListener("pointercancel",end)}
 /* Verschieben: Griff ziehen (Maus & Touch) oder Pfeiltasten */
 function moveSlot(from,to){if(to<0||to>=plan.length||from===to)return;const [x]=plan.splice(from,1);plan.splice(to,0,x);render();savePlan()}
@@ -947,7 +957,8 @@ function renderReflect(){
   const today=parseIso(todayIso());
   if(today>until){sec.hidden=true;$("rf-again").hidden=true;return}
   // Wer alle Spiele bewertet hat, bekommt wieder die normale Ansicht
-  const ids=(lastPlan.slots||[]).filter(id=>id&&games[id]);
+  const skipFixed=lastPlan.date>"2026-11-13"; // feste Spiele ab der nächsten Bewertungswoche nicht mehr bewerten
+  const ids=(lastPlan.slots||[]).filter(id=>id&&games[id]&&!(skipFixed&&FIXED.has(id)));
   const nichtDa=!!(meinNutzer.nichtDa&&meinNutzer.nichtDa[lastPlan.date]);
   if(nichtDa&&!rfShow){sec.hidden=true;$("rf-again").hidden=false;$("rf-again").textContent="Doch dabei gewesen? Rückblick zeigen";return}
   $("rf-again").textContent="⭐ Deine Bewertungen vom letzten Abend ansehen";
@@ -959,10 +970,11 @@ function renderReflect(){
   $("rf-date").textContent=(lastPlan.nr||nrFor(lastPlan.date))+". Kegelabend · "+fmtD(d)+" · sichtbar bis "+fmtD(until);
   const ol=$("rf-list");ol.replaceChildren();let rated=0,cnt=0;
   (lastPlan.slots||[]).forEach(id=>{
-    const g=id&&games[id];if(!g)return;cnt++;const ri=rateInfo(g),mv=myStars(g,lastPlan.date);if(mv)rated++;
+    const g=id&&games[id];if(!g||(skipFixed&&FIXED.has(id)))return;cnt++;const ri=rateInfo(g),mv=myStars(g,lastPlan.date);if(mv)rated++;
     const li=document.createElement("li");li.className="rslot";
     const no=document.createElement("span");no.className="no";no.textContent=cnt;
-    const nm=document.createElement("span");nm.className="sn";nm.textContent=g.name;
+    const nm=document.createElement("span");nm.className="sn rtap";nm.textContent=g.name;nm.setAttribute("role","button");nm.tabIndex=0;nm.title="Regeln ansehen";
+    nm.onclick=()=>{if(li.dataset.swiped){delete li.dataset.swiped;return}openInfo(id)};nm.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();openInfo(id)}};
     const st=document.createElement("div");st.className="rstars";st.setAttribute("role","group");st.setAttribute("aria-label","Bewertung für "+g.name);
     for(let k=1;k<=5;k++){const b=document.createElement("button");b.type="button";b.textContent="★";b.className=k<=mv?"on":"";
       b.setAttribute("aria-label","Deine Bewertung für diesen Abend: "+k+" von 5");b.setAttribute("aria-pressed",String(k<=mv));
@@ -1014,6 +1026,8 @@ function openPick(i){if(!canPlan)return;pickSlot=i;$("p-title").textContent="Pla
 let pickMode="slot";
 function closePick(){$("pscrim").hidden=true;pickSlot=null;pickMode="slot";
   let ch=false;while(plan.length>10&&!plan[plan.length-1]){plan.pop();ch=true}if(ch)render()}
+(function(){const vv=window.visualViewport;if(!vv)return;const up=()=>{const r=document.documentElement.style;r.setProperty("--vvh",vv.height+"px");r.setProperty("--vvt",vv.offsetTop+"px")};
+  vv.addEventListener("resize",up);vv.addEventListener("scroll",up);up()})();
 function renderPick(){
   const q=$("p-q").value.trim().toLowerCase(),box=$("p-list");box.replaceChildren();
   const list=sorted().filter(g=>!q||(g.name||"").toLowerCase().includes(q));
@@ -1042,7 +1056,7 @@ function openInfo2(id){const g=games[id];if(!g){toast("Spiel nicht gefunden");re
   $("i-title").textContent=g.name;
   const t=$("i-tags");t.replaceChildren();artenOf(g).forEach(k=>t.append(tag(ART[k][0],ART[k][1])));if(BAHN[g.bahn])t.append(tag(BAHN[g.bahn][0],BAHN[g.bahn][1]));
   $("i-rules").textContent=g.wertung||"Noch keine Regeln eingetragen.";
-  const ri=rateInfo(g);$("i-stars").textContent=ri.avg?stars(Math.round(ri.avg)):"";$("i-avg").textContent=ri.avg?avgTxt(ri):"Noch nicht bewertet";
+  const ri=rateInfo(g),fx=FIXED.has(id);$("i-stars").textContent=!fx&&ri.avg?stars(Math.round(ri.avg)):"";$("i-avg").textContent=fx?"":ri.avg?avgTxt(ri):"Noch nicht bewertet";
   fillRec($("i-rec"),{...g,id});$("i-recbtn").hidden=!canPlan;$("i-recbtn").onclick=()=>openRec(id);
   $("iscrim").hidden=false}
 $("i-close").onclick=()=>{$("iscrim").hidden=true};
@@ -1065,7 +1079,7 @@ function openSheet(id){
   $("f-last").value=g.lastPlayed||"";$("f-plays").value=g.plays||"";
   {const r=id?recordOf({...g,id}):null;$("f-rec").textContent=r?"Rekord: "+recTxt(r)[1]:(canPlan&&id?"Noch kein Rekord":"");
     $("f-recbtn").hidden=!(canPlan&&id);$("f-recbtn").textContent=r?"Rekord ändern":"Rekord eintragen";$("f-recwrap").hidden=!r&&!(canPlan&&id)}
-  setArten();setSeg("f-bahn",cur.bahn);setRate(cur.rating);
+  setArten();setSeg("f-bahn",cur.bahn);setRate(cur.rating);$("f-ratewrap").hidden=FIXED.has(id);
   $("f-del").hidden=!id;$("scrim").hidden=false;setTimeout(()=>$("f-name").focus(),50);
 }
 function close(){$("scrim").hidden=true;editing=null}
