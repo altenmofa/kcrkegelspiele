@@ -307,6 +307,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     </div>
     <p class="evdate" id="rf-date"></p>
     <button type="button" class="ablink" id="rf-close" hidden>✓ Fertig – Rückblick ausblenden</button>
+    <button type="button" class="ablink" id="rf-away" hidden>Ich war nicht beim letzten Kegeln</button>
     <p class="note">Wie war’s? Jeder bewertet selbst.</p>
     <ol class="slots" id="rf-list"></ol>
   </section>
@@ -389,7 +390,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· r36</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· r37</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
@@ -566,16 +567,20 @@ function toast(t){const e=$("toast");e.textContent=t;e.hidden=false;clearTimeout
 function tag(t,c){const s=document.createElement("span");s.className="tag";s.textContent=t;s.style.color=c;return s}
 function deDate(s){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||"");return m?m[3]+"."+m[2]+"."+m[1].slice(2):""}
 function myKey(){return curUser?curUser.uid:""}
+// Bewertungen: ratings = allgemeine Wertung je Kegelbruder, votes = zusätzliche Stimme je Kegelabend ("Datum|uid")
+function allVals(g){const r=g.ratings&&typeof g.ratings==="object"?g.ratings:{},v=g.votes&&typeof g.votes==="object"?g.votes:{};
+  return [...Object.values(r),...Object.values(v)].map(Number).filter(x=>x>=1&&x<=5)}
+function myStars(g,date){const v=g.votes||{};return myKey()&&date?Number(v[date+"|"+myKey()]||0):0}
 function rateInfo(g){
   const r=g.ratings&&typeof g.ratings==="object"?g.ratings:{};
-  const vals=Object.values(r).map(Number).filter(v=>v>=1&&v<=5);
+  const vals=allVals(g);
   const mine=myKey()&&r[myKey()]?Number(r[myKey()]):0;
   if(!vals.length&&g.rating)return {avg:Number(g.rating),n:0,mine,legacy:true};
   return {avg:vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0,n:vals.length,mine,legacy:false};
 }
 function avgTxt(i){return i.avg?"Ø "+i.avg.toFixed(1).replace(".",",")+(i.n?" ("+i.n+")":""):""}
 function ratingsWith(g,v){const r={...(g.ratings||{})};if(v)r[myKey()]=v;else delete r[myKey()];return r}
-function roundAvg(r){const v=Object.values(r).map(Number).filter(x=>x>=1&&x<=5);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):0}
+function roundAvg(r,votes){const v=[...Object.values(r||{}),...Object.values(votes||{})].map(Number).filter(x=>x>=1&&x<=5);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):0}
 function stars(n){return n?"★".repeat(n)+"☆".repeat(5-n):""}
 function sorted(){return Object.entries(games).map(([id,g])=>({id,...g})).sort((a,b)=>(a.name||"").localeCompare(b.name||"","de"))}
 
@@ -682,8 +687,10 @@ function renderAbend(){
     const order=[...ol.querySelectorAll("li.abcard")].map(x=>plan[+x.dataset.i]);const pos=plan.map((v,k)=>v?k:-1).filter(k=>k>=0);
     const np=plan.slice();pos.forEach((k,j)=>np[k]=order[j]);plan=np;render();savePlan()};
   ol.addEventListener("pointerup",end);ol.addEventListener("pointercancel",end)})();
-$("rf-again").onclick=()=>{rfShow=true;render()};
+$("rf-again").onclick=()=>{rfShow=true;const d=lastPlan&&lastPlan.date;if(d&&meinNutzer.nichtDa&&meinNutzer.nichtDa[d]&&saveNichtDa){meinNutzer={...meinNutzer,nichtDa:{...meinNutzer.nichtDa,[d]:false}};saveNichtDa(d,false)}render()};
 $("rf-close").onclick=()=>{rfShow=false;rfWasOpen=false;render()};
+$("rf-away").onclick=()=>{if(!lastPlan||!saveNichtDa)return;const d=lastPlan.date;meinNutzer={...meinNutzer,nichtDa:{...(meinNutzer.nichtDa||{}),[d]:true}};rfShow=false;render();
+  toast("Alles klar – kein Rückblick für dich diesmal");saveNichtDa(d,true)};
 $("ab-exit").onclick=()=>{abOff=true;try{sessionStorage.setItem("kcrab","off")}catch(e){}renderAbend();window.scrollTo(0,0)};
 $("ab-enter").onclick=()=>{abOff=false;try{sessionStorage.removeItem("kcrab")}catch(e){}renderAbend();window.scrollTo(0,0)};
 function renderKHist(){const sec=$("khist");sec.hidden=!isChef;if(!isChef)return;
@@ -925,7 +932,7 @@ function moveSlot(from,to){if(to<0||to>=plan.length||from===to)return;const [x]=
 
 /* Rückblick: eine Woche nach dem Kegeln */
 let lastPlan=null, planLoaded=false, gamesLoaded=false, archiving=false;
-let rfShow=false,rfWasOpen=false;
+let rfShow=false,rfWasOpen=false,meinNutzer={},saveNichtDa=null;
 async function removeFromLast(id){if(!canPlan||!lastPlan)return;const sl=(lastPlan.slots||[]).slice();const k=sl.indexOf(id);if(k<0)return;sl.splice(k,1);
   const date=lastPlan.date;lastPlan={...lastPlan,slots:sl};const g=games[id];
   if(g){const pl=Math.max(0,(g.plays||0)-1);const up={plays:pl};if(g.lastPlayed===date&&!pl)up.lastPlayed="";games[id]={...g,...up};
@@ -941,24 +948,28 @@ function renderReflect(){
   if(today>until){sec.hidden=true;$("rf-again").hidden=true;return}
   // Wer alle Spiele bewertet hat, bekommt wieder die normale Ansicht
   const ids=(lastPlan.slots||[]).filter(id=>id&&games[id]);
-  const allMine=canEdit&&!!myKey()&&ids.length>0&&ids.every(id=>rateInfo(games[id]).mine);
+  const nichtDa=!!(meinNutzer.nichtDa&&meinNutzer.nichtDa[lastPlan.date]);
+  if(nichtDa&&!rfShow){sec.hidden=true;$("rf-again").hidden=false;$("rf-again").textContent="Doch dabei gewesen? Rückblick zeigen";return}
+  $("rf-again").textContent="⭐ Deine Bewertungen vom letzten Abend ansehen";
+  const allMine=canEdit&&!!myKey()&&ids.length>0&&ids.every(id=>myStars(games[id],lastPlan.date));
   if(allMine&&!rfShow){sec.hidden=true;$("rf-again").hidden=false;
     if(rfWasOpen){rfWasOpen=false;toast("Danke! Alle Spiele bewertet ⭐")}return}
-  rfWasOpen=!allMine;$("rf-again").hidden=true;$("rf-close").hidden=!allMine;
+  rfWasOpen=!allMine;$("rf-again").hidden=true;$("rf-close").hidden=!allMine;$("rf-away").hidden=!(canEdit&&myKey())||nichtDa;
   sec.hidden=false;
   $("rf-date").textContent=(lastPlan.nr||nrFor(lastPlan.date))+". Kegelabend · "+fmtD(d)+" · sichtbar bis "+fmtD(until);
   const ol=$("rf-list");ol.replaceChildren();let rated=0,cnt=0;
   (lastPlan.slots||[]).forEach(id=>{
-    const g=id&&games[id];if(!g)return;cnt++;const ri=rateInfo(g);if(ri.mine)rated++;
+    const g=id&&games[id];if(!g)return;cnt++;const ri=rateInfo(g),mv=myStars(g,lastPlan.date);if(mv)rated++;
     const li=document.createElement("li");li.className="rslot";
     const no=document.createElement("span");no.className="no";no.textContent=cnt;
     const nm=document.createElement("span");nm.className="sn";nm.textContent=g.name;
     const st=document.createElement("div");st.className="rstars";st.setAttribute("role","group");st.setAttribute("aria-label","Bewertung für "+g.name);
-    for(let k=1;k<=5;k++){const b=document.createElement("button");b.type="button";b.textContent="★";b.className=k<=ri.mine?"on":"";
-      b.setAttribute("aria-label","Deine Bewertung: "+k+" von 5");b.setAttribute("aria-pressed",String(k<=ri.mine));
-      b.onclick=async()=>{if(!canEdit||!myKey())return;const v=ri.mine===k?0:k;const r=ratingsWith(g,v);
-        games[id]={...g,ratings:r,rating:roundAvg(r),updatedAt:new Date().toISOString()};render();
-        if(db){try{await db.collection("games").doc(id).update({ratings:r,rating:roundAvg(r),updatedAt:new Date().toISOString()})}catch(e){toast("Bewertung wurde nicht gespeichert.")}}};
+    for(let k=1;k<=5;k++){const b=document.createElement("button");b.type="button";b.textContent="★";b.className=k<=mv?"on":"";
+      b.setAttribute("aria-label","Deine Bewertung für diesen Abend: "+k+" von 5");b.setAttribute("aria-pressed",String(k<=mv));
+      b.onclick=async()=>{if(!canEdit||!myKey())return;const v=mv===k?0:k,key=lastPlan.date+"|"+myKey();
+        const votes={...(g.votes||{})};if(v)votes[key]=v;else delete votes[key];const rt=roundAvg(g.ratings,votes);
+        games[id]={...g,votes,rating:rt};render();
+        if(db){try{const KF=window.KF;await db.collection("games").doc(id).update({["votes."+key]:v?v:KF.deleteField(),rating:rt,updatedAt:new Date().toISOString()})}catch(e){toast("Bewertung wurde nicht gespeichert.")}}};
       st.append(b)}
     if(ri.avg){const a=document.createElement("small");a.className="sm";a.textContent=avgTxt(ri);nm.append(a)}
     const nb=document.createElement("button");nb.type="button";
@@ -1081,7 +1092,7 @@ $("form").addEventListener("submit",async e=>{
     quelle:cur.quelle||"",geprueft:cur.quelle?(cur.geprueft||wert!==cur.origWert.trim()):true,ratings:myKey()?ratingsWith(old,cur.rating||0):(old.ratings||{}),notes:$("f-notes").value.trim().slice(0,2000),
     lastPlayed:/^\d{4}-\d{2}-\d{2}$/.test($("f-last").value)?$("f-last").value:"",plays:Math.max(0,Math.min(999,parseInt($("f-plays").value,10)||0)),
     createdAt:old.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
-  doc.rating=Object.keys(doc.ratings).length?roundAvg(doc.ratings):(old.rating||0);
+  if(old.votes)doc.votes=old.votes;doc.rating=(Object.keys(doc.ratings).length||doc.votes)?roundAvg(doc.ratings,doc.votes):(old.rating||0);
   if(old.rekord)doc.rekord=old.rekord;if(old.nie)doc.nie=old.nie; // beim Bearbeiten nicht verlieren
   games[id]=doc;close();render();await save(id,doc);
 });
@@ -1422,7 +1433,7 @@ render();setEdit(null);renderNet();
       import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`),
       import(`https://www.gstatic.com/firebasejs/${V}/firebase-firestore.js`),
       import(`https://www.gstatic.com/firebasejs/${V}/firebase-auth.js`)]);
-    F={...appM,...fsM,...authM};
+    F={...appM,...fsM,...authM};window.KF=F;
   }catch(e){clearTimeout(timer);$("status").textContent="Die App konnte nicht geladen werden. Internetverbindung prüfen.";return}
   const app=F.initializeApp(FIREBASE_CONFIG);
   let fdb;try{fdb=F.initializeFirestore(app,{localCache:F.persistentLocalCache()})}catch(e){fdb=F.getFirestore(app)}
@@ -1464,6 +1475,8 @@ render();setEdit(null);renderNet();
     if(!u)return;
     {const nm=($("a-name").value||"").trim().slice(0,40);const d={email:mail(u),lastSeen:new Date().toISOString()};if(nm)d.name=nm;
       (SIM.on?simBlock():F.setDoc(F.doc(fdb,"nutzer",u.uid),d,{merge:true})).catch(()=>{});$("a-name").value=""}
+    {if(window.unsubMe)window.unsubMe();window.unsubMe=F.onSnapshot(F.doc(fdb,"nutzer",u.uid),sn=>{meinNutzer=sn.exists()?sn.data()||{}:{};render()},()=>{});
+      saveNichtDa=(date,on)=>{if(SIM.on){simBlock();return}F.setDoc(F.doc(fdb,"nutzer",u.uid),{email:mail(u),nichtDa:{[date]:on}},{merge:true}).catch(()=>toast("Nicht gespeichert."))}}
     const subR=()=>{if(unsubR){unsubR();unsubR=null}if(!curUser||curUser.uid!==u.uid)return;
     unsubR=F.onSnapshot(rRef,async snap=>{
       if(!snap.exists()){
