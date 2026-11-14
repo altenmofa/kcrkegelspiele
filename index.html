@@ -119,6 +119,9 @@ input[type=date],input[type=number]{width:100%;font:inherit;padding:10px 12px;bo
 .reflect{border-color:var(--star)}
 .rslot{display:grid;grid-template-columns:22px 1fr auto auto;gap:10px;align-items:center;padding:7px 8px 7px 10px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
 .rtap{cursor:pointer}
+#rf-edit{margin-top:8px;font-size:.8rem}
+.pitem.sel{background:var(--accent-soft)}
+.pitem .chk{font-weight:700;color:var(--accent);min-width:18px}
 .rtap:first-line{text-decoration:underline dotted;text-underline-offset:3px}
 .rslot .sn{display:flex;flex-direction:column;min-width:0;line-height:1.25}
 .rslot .sm{display:block;margin-top:2px;font-size:.75rem;color:var(--muted)}
@@ -320,6 +323,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
     <button type="button" class="ablink" id="rf-away" hidden>Ich war nicht beim letzten Kegeln</button>
     <p class="note">Wie war’s? Jeder bewertet selbst.</p>
     <ol class="slots" id="rf-list"></ol>
+    <button type="button" class="ablink" id="rf-edit" hidden>✎ Spiele des letzten Abends neu aufstellen</button>
   </section>
 
   <section class="evening" aria-labelledby="h-ev">
@@ -400,7 +404,7 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   <p class="status" id="status">Lade eure Spiele …</p>
 
   <div class="foot">
-    <span><span id="total"></span> <small style="opacity:.5">· r40</small></span>
+    <span><span id="total"></span> <small style="opacity:.5">· r41</small></span>
     <span style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn" id="simbtn" hidden>🧪 Vorschau</button>
       <button type="button" class="btn" id="membtn" hidden>👥 Mitglieder</button>
@@ -476,6 +480,15 @@ textarea{resize:vertical;min-height:3.2em;font-size:.95rem}
   </form>
 </div>
 
+<div class="scrim" id="lscrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="l-title">
+    <h3 id="l-title">Gespielte Spiele</h3>
+    <p class="hint" id="l-sub"></p>
+    <input class="search" id="l-q" type="search" placeholder="Spiel suchen …" aria-label="Spiel suchen" autocomplete="off">
+    <div class="plist" id="l-list"></div>
+    <div class="actions"><span class="sda" id="l-count"></span><span style="flex:1"></span><button type="button" class="btn" id="l-cancel">Abbrechen</button><button type="button" class="btn primary" id="l-save">Speichern</button></div>
+  </div>
+</div>
 <div class="scrim" id="pscrim" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="p-title">
     <h3 id="p-title">Platz belegen</h3>
@@ -698,6 +711,27 @@ function renderAbend(){
     const np=plan.slice();pos.forEach((k,j)=>np[k]=order[j]);plan=np;render();savePlan()};
   ol.addEventListener("pointerup",end);ol.addEventListener("pointercancel",end)})();
 $("rf-again").onclick=()=>{rfShow=true;const d=lastPlan&&lastPlan.date;if(d&&meinNutzer.nichtDa&&meinNutzer.nichtDa[d]&&saveNichtDa){meinNutzer={...meinNutzer,nichtDa:{...meinNutzer.nichtDa,[d]:false}};saveNichtDa(d,false)}render()};
+let lSel=[];
+function renderLList(){const q=$("l-q").value.trim().toLowerCase(),box=$("l-list");box.replaceChildren();
+  const all=Object.entries(games).map(([id,g])=>({id,...g})).filter(g=>!q||(g.name||"").toLowerCase().includes(q))
+    .sort((a,b)=>(lSel.includes(b.id)-lSel.includes(a.id))||(lSel.indexOf(a.id)-lSel.indexOf(b.id))||(a.name||"").localeCompare(b.name||"","de"));
+  all.forEach(g=>{const on=lSel.includes(g.id);const b=document.createElement("button");b.type="button";b.className="pitem"+(on?" sel":"");b.setAttribute("aria-pressed",String(on));
+    const nm=document.createElement("span");const c=document.createElement("span");c.className="chk";c.textContent=on?"✓ ":"";nm.append(c,g.name);
+    const sm=document.createElement("small");sm.textContent=on?"Platz "+(lSel.indexOf(g.id)+1):"";b.append(nm,sm);
+    b.onclick=()=>{if(on)lSel=lSel.filter(x=>x!==g.id);else lSel.push(g.id);renderLList()};box.append(b)});
+  $("l-count").textContent=lSel.length+" Spiele"}
+$("rf-edit").onclick=()=>{if(!isChef||!lastPlan)return;lSel=(lastPlan.slots||[]).filter(id=>id&&games[id]);
+  $("l-sub").textContent=(lastPlan.nr||nrFor(lastPlan.date))+". Kegelabend · "+fmtD(parseIso(lastPlan.date))+" – antippen, was gespielt wurde. Reihenfolge = Reihenfolge des Antippens.";
+  $("l-q").value="";renderLList();$("lscrim").hidden=false};
+$("l-q").addEventListener("input",renderLList);
+$("l-cancel").onclick=()=>$("lscrim").hidden=true;
+$("l-save").onclick=async()=>{if(!isChef||!lastPlan)return;const date=lastPlan.date,old=(lastPlan.slots||[]).filter(id=>id&&games[id]),neu=lSel.slice();
+  $("lscrim").hidden=true;lastPlan={...lastPlan,slots:neu};
+  const add=neu.filter(id=>!old.includes(id)),rem=old.filter(id=>!neu.includes(id));
+  for(const id of add){const g=games[id];const up={plays:(g.plays||0)+1};if(!g.lastPlayed||g.lastPlayed<date)up.lastPlayed=date;games[id]={...g,...up};if(db){try{await db.collection("games").doc(id).update(up)}catch(e){}}}
+  for(const id of rem){const g=games[id];const pl=Math.max(0,(g.plays||0)-1);const up={plays:pl};if(g.lastPlayed===date&&!pl)up.lastPlayed="";games[id]={...g,...up};if(db){try{await db.collection("games").doc(id).update(up)}catch(e){}}}
+  rfShow=true;render();toast("Letzter Abend: "+neu.length+" Spiele");
+  if(db){try{await db.collection("plan").doc("last").set({...lastPlan,slots:neu});await db.collection("plan").doc("history").set({abende:{[date]:{nr:nrFor(date),slots:neu}}},{merge:true})}catch(e){toast("Nicht gespeichert.")}}};
 $("rf-close").onclick=()=>{rfShow=false;rfWasOpen=false;render()};
 $("rf-away").onclick=()=>{if(!lastPlan||!saveNichtDa)return;const d=lastPlan.date;meinNutzer={...meinNutzer,nichtDa:{...(meinNutzer.nichtDa||{}),[d]:true}};rfShow=false;render();
   toast("Alles klar – kein Rückblick für dich diesmal");saveNichtDa(d,true)};
@@ -965,7 +999,7 @@ function renderReflect(){
   const allMine=canEdit&&!!myKey()&&ids.length>0&&ids.every(id=>myStars(games[id],lastPlan.date));
   if(allMine&&!rfShow){sec.hidden=true;$("rf-again").hidden=false;
     if(rfWasOpen){rfWasOpen=false;toast("Danke! Alle Spiele bewertet ⭐")}return}
-  rfWasOpen=!allMine;$("rf-again").hidden=true;$("rf-close").hidden=!allMine;$("rf-away").hidden=!(canEdit&&myKey())||nichtDa;
+  rfWasOpen=!allMine;$("rf-again").hidden=true;$("rf-close").hidden=!allMine;$("rf-edit").hidden=!isChef;$("rf-away").hidden=!(canEdit&&myKey())||nichtDa;
   sec.hidden=false;
   $("rf-date").textContent=(lastPlan.nr||nrFor(lastPlan.date))+". Kegelabend · "+fmtD(d)+" · sichtbar bis "+fmtD(until);
   const ol=$("rf-list");ol.replaceChildren();let rated=0,cnt=0;
